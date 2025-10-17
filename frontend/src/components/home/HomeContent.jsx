@@ -1,6 +1,9 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const HomeContent = () => {
+  const navigate = useNavigate();
+
   return (
     <div
       className="
@@ -13,7 +16,7 @@ const HomeContent = () => {
       <img
         src="/images/button_2_4_years.png"
         alt="Hry pre deti 2-4 roky"
-        onClick={() => (window.location.href = "/games-2-4")}
+        onClick={() => navigate("/games-2-4")}
         className="
           absolute top-[36%] left-[18%]
           w-[380px] h-auto
@@ -26,7 +29,7 @@ const HomeContent = () => {
       <img
         src="/images/button_5_6_years.png"
         alt="Hry pre deti 5-6 roky"
-        onClick={() => (window.location.href = "/games-5-6")}
+        onClick={() => navigate("/games-5-6")}
         className="
           absolute top-[20%] left-[45%]
           w-[380px] h-auto
