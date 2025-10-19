@@ -1,11 +1,10 @@
 import whisper
 from gtts import gTTS
-from typing import List, Optional, Dict, Any
+from typing import Dict, Any
 import logging, os
 import io
 from fastapi import UploadFile
 import librosa
-import hashlib
 from pydub import AudioSegment
 import tempfile
 from scripts.utils import hash_string
@@ -102,4 +101,5 @@ class SpeechService:
         return filepath.replace("\\", "/")
 
 
+# ['tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large', 'large-v3-turbo', 'turbo']
 speech_service: SpeechService = SpeechService("base")
