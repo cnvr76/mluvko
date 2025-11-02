@@ -21,7 +21,7 @@ if not logger.handlers:
 
 
 @router.post("/stt")
-async def convert_text_to_speech(audio_file: UploadFile = File(...), reference_text: str = Form(...)):
+async def convert_speech_to_text(audio_file: UploadFile = File(...), reference_text: str = Form(...)):
     try:
         analysis_result = await speech_service.analyze_speech(audio_file, reference_text)
         return analysis_result

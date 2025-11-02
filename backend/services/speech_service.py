@@ -1,14 +1,14 @@
 import whisper
 from gtts import gTTS
-from typing import List, Optional, Dict, Any
+from typing import Dict, Any
 import logging, os
 import io
 from fastapi import UploadFile
 import librosa
-import hashlib
 from pydub import AudioSegment
 import tempfile
 from scripts.utils import hash_string
+from services.phoneme_analyzer_service import phoneme_service
 
 
 logger = logging.getLogger(__name__)
@@ -42,9 +42,19 @@ class SpeechService:
         transcription_result = self.model.transcribe(audio_waveform, language=self.lang)
         recognized_text = transcription_result.get("text")
 
+        ref_phonemas = phoneme_service.text_to_phonemas(reference_text, self.lang)
+        rec_phonemas = phoneme_service.text_to_phonemas(recognized_text, self.lang)
+
+        score, operations = phoneme_service.calculate_phoneme_distance(ref_phonemas, rec_phonemas)
+        errors = phoneme_service.format_errors(operations)
+
         return {
             "recognized_text": recognized_text,
-            "reference_text": reference_text
+            "reference_text": reference_text,
+            "score": round(score, 2),
+            "errors": errors,
+            "phonemes_reference": " ".join(ref_phonemas),
+            "phonemes_recognized": " ".join(rec_phonemas)
         }
     
     def create_speech(self, text: str) -> str:
@@ -102,4 +112,5 @@ class SpeechService:
         return filepath.replace("\\", "/")
 
 
-speech_service: SpeechService = SpeechService("base")
+# ['tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large', 'large-v3-turbo', 'turbo']
+speech_service: SpeechService = SpeechService("small")
