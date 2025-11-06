@@ -3,6 +3,7 @@ import { api } from "../../services/api";
 import getSessionId from "../../services/uuidSessionGenerator";
 import GameCard from "../shared/GameCard";
 import useAsync from "../../hooks/useAsync";
+import PageLoading from "../loading/PageLoading";
 
 const GameCardLoader = ({ ageGroup }) => {
   const loadGames = useCallback(
@@ -11,7 +12,7 @@ const GameCardLoader = ({ ageGroup }) => {
   );
   const { data, isLoading, error } = useAsync(loadGames);
 
-  if (isLoading) return <div className="text-black text-2xl">Loading...</div>;
+  if (isLoading) return <PageLoading />;
   if (error) {
     console.error(error);
     return null;

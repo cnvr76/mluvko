@@ -7,6 +7,11 @@ export const AgeGroups = {
   MIDDLE: "5-6 rokov",
 };
 
+export const GameTypes = {
+  PEXESO: "pexeso",
+  REPEAT_AFTER: "repeat_after",
+};
+
 const apiClient = axios.create({
   baseURL: API_BASE,
   timeout: 15000,
