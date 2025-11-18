@@ -101,6 +101,7 @@ class GameService:
             record = GameBriefResponse(
                 id=game.id,
                 name=game.name,
+                game_type=game.game_type,
                 preview_image_url=game.preview_image_url,
                 activities=activity_schema_list
             )

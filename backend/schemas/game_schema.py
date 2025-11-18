@@ -9,6 +9,7 @@ class GameBriefResponse(BaseModel):
     id: uuid.UUID
     name: str
     preview_image_url: Optional[str]
+    game_type: str
     activities: List[ActivityResponse]
 
     model_config = {"from_attributes": True}
@@ -17,7 +18,6 @@ class GameBriefResponse(BaseModel):
 class GameResponse(GameBriefResponse):
     description: Optional[str]
     age_group: AgeGroups
-    game_type: str
     config_data: Dict[str, Any]
 
     model_config = {"from_attributes": True}

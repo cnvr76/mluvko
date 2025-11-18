@@ -54,7 +54,7 @@ async def get_game_by_id(game_id: UUID, user_session_id: UUID, db: Session = Dep
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{age_group}", response_model=List[GameBriefResponse])
+@router.get("/group/{age_group}", response_model=List[GameBriefResponse])
 async def get_games_for_age_group(user_session_id: UUID, age_group: AgeGroups, db: Session = Depends(get_db)):
     try:
         return game_service.get_games_for(user_session_id, age_group, db)
