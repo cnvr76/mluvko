@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Pexeso from "./pexeso/Pexeso";
 import RepeatAfter from "./repeat_after/RepeatAfter";
 import { GameTypes } from "../../services/api";
+import SpecificGamePage from "../../pages/SpecificGamePage";
 
 const GameHolder = () => {
   const { gameId, gameType } = useParams();
@@ -19,11 +20,13 @@ const GameHolder = () => {
         );
     }
   };
-
+  //priamouholnik
   return (
-    <section className="w-full h-full flex justify-center items-center">
-      {getCorrectGameComponent()}
-    </section>
+    <SpecificGamePage>
+      <section className="w-full h-full flex justify-center items-center">
+        {getCorrectGameComponent()}
+      </section>
+    </SpecificGamePage>
   );
 };
 

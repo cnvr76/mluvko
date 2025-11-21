@@ -10,7 +10,7 @@ const GameCardLoader = ({ ageGroup }) => {
     () => api.getGamesFor(ageGroup, getSessionId()),
     [ageGroup]
   );
-  const { data, isLoading, error } = useAsync(loadGames);
+  const { data, isLoading, error, _ } = useAsync(loadGames);
 
   if (isLoading) return <PageLoading />;
   if (error) {
@@ -26,7 +26,11 @@ const GameCardLoader = ({ ageGroup }) => {
   }
 
   return (
-    <>{data && data.map((game) => <GameCard key={game.id} data={game} />)}</>
+    <>
+      {data?.map((game, _) => (
+        <GameCard key={game.id} data={game} />
+      ))}
+    </>
   );
 };
 

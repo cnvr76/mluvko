@@ -22,9 +22,24 @@ const GamesSelectionSection = ({ children, backgroundImage }) => {
 
         <Link
           to="/"
-          className="px-6 py-2 rounded-full bg-white/30 font-semibold text-lg backdrop-blur-lg border border-white/40
-           no-underline transition-colors duration-300 hover:bg-white/40 hover:scale-105
-           !text-[#642f37] visited:!text-[#642f37] hover:!text-[#ff7110] visited:hover:!text-[#ff7110]"
+          className="
+          px-6 py-2
+          rounded-full
+          bg-white/30
+          backdrop-blur-xl
+          border border-white/40
+          shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+          font-semibold text-lg
+          no-underline
+          text-[#642f37]
+
+          transition-all duration-200
+          hover:scale-105
+          active:scale-95
+          hover:bg-white/40
+
+          hover:text-[#ff7110]
+        "
         >
           Alebo späť
         </Link>
