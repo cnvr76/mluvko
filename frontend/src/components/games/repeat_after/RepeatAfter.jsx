@@ -7,7 +7,8 @@ import PlayAudioButton from "./PlayAudioButton";
 import RecordAudioButton from "./RecordAudioButton";
 import NextButton from "./NextButton";
 import PageLoading from "../../loading/PageLoading.jsx";
-import { useQueryState, parseAsInteger } from "nuqs";
+import useRepeatAfter from "../../../hooks/games/useRepeatAfter";
+// import { useQueryState, parseAsInteger } from "nuqs";
 
 const RepeatAfter = ({ gameId }) => {
   const getGame = useCallback(
@@ -15,48 +16,56 @@ const RepeatAfter = ({ gameId }) => {
     [gameId]
   );
   const { data, isLoading, error } = useAsync(getGame);
+  const {
+    // current
+    currentCard,
+    currentScore,
+    // methods
+    nextCard,
+    evaluateSpeech,
+    // final
+    finalScore,
+    bestScore,
+    isFinished,
+    // loading
+    isSaving,
+    isSubmitting,
+  } = useRepeatAfter(data);
 
-  const cards = useMemo(() => {
-    const list = data?.config_data.cards ?? [];
-    return [...list].sort((a, b) => a.card_id - b.card_id);
-  }, [data]);
-
-  const [currentGameIndex, setCurrentGameIndex] = useQueryState(
-    "current_game",
-    parseAsInteger.withDefault(0)
+  const onRecordingEnd = useCallback(
+    async (audioBlob) => {
+      await evaluateSpeech(audioBlob, currentCard.reference_text);
+    },
+    [evaluateSpeech, currentCard]
   );
-  // const [currentGameIndex, setCurrentGameIndex] = useState(0);
-  const [scores, setScores] = useState([]);
 
-  const incrementIndex = useCallback(() => {
-    setCurrentGameIndex((prev) => prev + 1);
-  }, []);
-
-  const sendForAnalysis = useCallback(() => {}, []);
-
-  if (isLoading) return <PageLoading />;
+  if (isLoading || isSaving) return <PageLoading />;
   if (error) {
     console.error(error);
     return null;
   }
 
-  console.log("data:", data);
-  console.log("cards:", cards);
+  if (isFinished) {
+    return (
+      <section className="flex flex-col justify-center items-center">
+        <h1>Dakujem za hru!</h1>
+        <span>Current score: {finalScore}</span>
+        <span>Best score: {bestScore}</span>
+      </section>
+    );
+  }
+
+  const threshold = data?.config_data.score_threshold;
 
   return (
     <section>
-      <AnimalCard gameData={cards?.[currentGameIndex]} />
+      <AnimalCard gameData={currentCard} currentScore={currentScore || 0} />
       <div className="flex justify-center items-center gap-30 mt-10">
-        <PlayAudioButton
-          referenceAudioLink={cards?.[currentGameIndex]?.reference_audio}
-        />
-        <RecordAudioButton
-          referenceText={cards?.[currentGameIndex]?.reference_text}
-        />
-        <NextButton
-          onClick={incrementIndex}
-          onEnd={data ? currentGameIndex >= cards?.length : false}
-        />
+        <PlayAudioButton referenceAudioLink={currentCard?.reference_audio} />
+        <RecordAudioButton onFinish={onRecordingEnd} isLoading={isSubmitting} />
+        {currentScore && currentScore >= threshold && (
+          <NextButton onClick={nextCard} />
+        )}
       </div>
     </section>
   );
