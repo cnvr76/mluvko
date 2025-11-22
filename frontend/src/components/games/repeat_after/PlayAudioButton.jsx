@@ -1,15 +1,38 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const PlayAudioButton = ({ referenceAudioLink }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
   const playAudio = () => {
+    stopCurrentAudio();
+
+    const audio = new Audio(referenceAudioLink);
+    audioRef.current = audio;
+
     setIsPlaying(true);
-    new Audio(referenceAudioLink).play().then(() => setIsPlaying(false));
+    audio.onended = () => {
+      setIsPlaying(false);
+    };
+
+    audio.play().catch((error) => {
+      console.error(error);
+      setIsPlaying(false);
+    });
   };
 
-  // useEffect(() => {
-  //   playAudio();
-  // }, [referenceAudioLink]);
+  const stopCurrentAudio = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    setIsPlaying(false);
+  };
+
+  useEffect(() => {
+    playAudio();
+    return () => stopCurrentAudio();
+  }, [referenceAudioLink]);
 
   return (
     <button

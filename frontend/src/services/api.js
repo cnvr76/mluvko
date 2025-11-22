@@ -18,7 +18,7 @@ const apiClient = axios.create({
 });
 
 export const api = {
-  // functions just for requesting basic staff
+  // functions just for requesting basic stuff
   getAllGames: async (userSessionId) => {
     return apiClient
       .get("/games", {
@@ -61,6 +61,41 @@ export const api = {
         throw error;
       });
   },
+  // functions for posting basic stuff
+  updateStats: async (gameId, userSessionId, score) => {
+    return apiClient
+      .post(`/games/${gameId}/update-stats`, {
+        user_session_id: userSessionId,
+        score,
+      })
+      .then((response) => response?.data)
+      .catch((error) => {
+        console.error(
+          `Failed to update stats for gameId ${gameId} by ${score}:`,
+          error
+        );
+        throw error;
+      });
+  },
   // functions for voice analyzing
-  analyzeSpeech: async () => {},
+  analyzeSpeech: async (audioBlob, referenceText) => {
+    const formData = new FormData();
+    formData.append("audio_file", audioBlob, "recording.webm");
+    formData.append("reference_text", referenceText);
+
+    return apiClient
+      .post("/speech/stt", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => response?.data)
+      .catch((error) => {
+        console.error(
+          `Failed to send speech evalution request for ${referenceText}:`,
+          error
+        );
+        throw error;
+      });
+  },
 };

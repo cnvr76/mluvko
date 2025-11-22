@@ -9,6 +9,7 @@ from pydub import AudioSegment
 import tempfile
 from scripts.utils import hash_string
 from services.phoneme_analyzer_service import phoneme_service
+from schemas.speech_scheema import AnalysedSpeechResponse
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ class SpeechService:
             logger.error(f"Failed to load whisper {model_name} model: {e}")
             self.model = None
 
-    async def analyze_speech(self, audio_file: UploadFile, reference_text: str) -> Dict[str, Any]:
+    async def analyze_speech(self, audio_file: UploadFile, reference_text: str) -> AnalysedSpeechResponse:
         if not self.model:
             raise RuntimeError("Whisper model is not initialized")
 
@@ -48,14 +49,14 @@ class SpeechService:
         score, operations = phoneme_service.calculate_phoneme_distance(ref_phonemas, rec_phonemas)
         errors = phoneme_service.format_errors(operations)
 
-        return {
-            "recognized_text": recognized_text,
-            "reference_text": reference_text,
-            "score": round(score, 2),
-            "errors": errors,
-            "phonemes_reference": " ".join(ref_phonemas),
-            "phonemes_recognized": " ".join(rec_phonemas)
-        }
+        return AnalysedSpeechResponse(
+            recognized_text=recognized_text,
+            reference_text=reference_text,
+            score=round(score, 2),
+            errors=errors,
+            phonemes_reference=" ".join(ref_phonemas),
+            phonemes_recognized=" ".join(rec_phonemas)
+        )
     
     def create_speech(self, text: str) -> str:
         filename: str = hash_string(text) + ".mp3"

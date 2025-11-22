@@ -1,14 +1,11 @@
 import React from "react";
 
-const AnimalCard = ({ gameData }) => {
-  const animalName = "krava";
-  const score = 50;
-
+const AnimalCard = ({ gameData, currentScore }) => {
   let barGradient = "";
 
-  if (score < 30) {
+  if (currentScore < 30) {
     barGradient = "bg-red-500";
-  } else if (score < 80) {
+  } else if (currentScore < 80) {
     barGradient = "bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400";
   } else {
     barGradient = "bg-gradient-to-r from-red-500 via-yellow-400 to-green-400";
@@ -49,12 +46,14 @@ const AnimalCard = ({ gameData }) => {
           {gameData?.display_text}
         </div>
 
-        <div className="text-2xl font-semibold text-[#642f37]">90/100%</div>
+        <div className="text-2xl font-semibold text-[#642f37]">
+          {currentScore}/100%
+        </div>
 
         <div className="w-full h-4 bg-gray-300 rounded-full overflow-hidden">
           <div
             className={`h-full ${barGradient} transition-all duration-500`}
-            style={{ width: `${score}%` }}
+            style={{ width: `${currentScore}%` }}
           ></div>
         </div>
       </div>

@@ -5,6 +5,7 @@ from services.speech_service import speech_service
 import uuid
 import shutil
 from scripts.utils import hash_string
+from schemas.speech_scheema import AnalysedSpeechResponse
 
 dotenv.load_dotenv()
 
@@ -20,7 +21,7 @@ if not logger.handlers:
     logger.setLevel(logging.INFO)
 
 
-@router.post("/stt")
+@router.post("/stt", response_model=AnalysedSpeechResponse)
 async def convert_speech_to_text(audio_file: UploadFile = File(...), reference_text: str = Form(...)):
     try:
         analysis_result = await speech_service.analyze_speech(audio_file, reference_text)
@@ -41,7 +42,7 @@ async def create_speech_from_text(request: Request, speech_text: str):
     
 
 @router.post("/tts/combined")
-async def create_speech_from_text(request: Request, speech_text: str = Form(...), sfx_audio_file: UploadFile = File(...)):
+async def create_combined_speech_from_text(request: Request, speech_text: str = Form(...), sfx_audio_file: UploadFile = File(...)):
     file_extension: str = sfx_audio_file.filename.split(".")[-1]
     if file_extension.lower() != "mp3":
         raise HTTPException("Only MP3s are allowed at the moment")

@@ -1,6 +1,22 @@
-const RecordAudioButton = ({ referenceText }) => {
+import useAudioRecorder from "../../../hooks/useAudioRecorder";
+
+const RecordAudioButton = ({ onFinish, isLoading }) => {
+  const { isRecording, startRecording, stopRecording } = useAudioRecorder();
+
+  const handleRecording = async () => {
+    if (!isRecording) {
+      await startRecording();
+    } else {
+      const audioBlob = await stopRecording();
+      if (!audioBlob) return;
+      await onFinish(audioBlob);
+    }
+  };
+
   return (
     <button
+      onClick={handleRecording}
+      disabled={isLoading}
       className="
         w-25 h-25
         rounded-full
@@ -14,11 +30,16 @@ const RecordAudioButton = ({ referenceText }) => {
         active:scale-95
       "
     >
-      <img
-        src="/images/RecordAudioButton.png"
-        alt="play audio"
-        className="w-15 h-15 object-contain"
-      />
+      {isRecording && <div>is recording</div>}
+      {!isLoading ? (
+        <img
+          src="/images/RecordAudioButton.png"
+          alt={isRecording ? "Stop Recording" : "Start Recording"}
+          className="w-15 h-15 object-contain"
+        />
+      ) : (
+        <div className="">Analysing...</div>
+      )}
     </button>
   );
 };

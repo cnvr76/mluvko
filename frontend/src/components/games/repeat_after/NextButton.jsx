@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-const NextButton = ({ onClick, onEnd }) => {
-  console.log("onEnd", onEnd);
+const NextButton = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
@@ -20,7 +19,7 @@ const NextButton = ({ onClick, onEnd }) => {
     >
       <img
         src="/images/NextButton.png"
-        alt="play audio"
+        alt="Next"
         className="w-15 h-15 object-contain"
       />
     </button>
