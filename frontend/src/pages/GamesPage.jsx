@@ -15,7 +15,7 @@ const GamesPage = ({ ageGroup }) => {
 
   return (
     <>
-      <Header fixed />
+      <Header />
 
       <GamesSelectionSection backgroundImage={backgroundImage}>
         <GameCardLoader ageGroup={ageGroup} />

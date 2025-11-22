@@ -8,6 +8,7 @@ import RecordAudioButton from "./RecordAudioButton";
 import NextButton from "./NextButton";
 import PageLoading from "../../loading/PageLoading.jsx";
 import useRepeatAfter from "../../../hooks/games/useRepeatAfter";
+import EndGameScreen from "../EndGameScreen";
 // import { useQueryState, parseAsInteger } from "nuqs";
 
 const RepeatAfter = ({ gameId }) => {
@@ -46,23 +47,29 @@ const RepeatAfter = ({ gameId }) => {
   }
 
   if (isFinished) {
-    return (
-      <section className="flex flex-col justify-center items-center">
-        <h1>Dakujem za hru!</h1>
-        <span>Current score: {finalScore}</span>
-        <span>Best score: {bestScore}</span>
-      </section>
-    );
+    return <EndGameScreen currentScore={finalScore} bestScore={bestScore} />;
   }
 
   const threshold = data?.config_data.score_threshold;
 
   return (
-    <section>
+    <section
+      className="
+    w-full
+    min-h-[calc(100vh-10rem)]  
+    flex flex-col items-center justify-center
+   
+  "
+    >
       <AnimalCard gameData={currentCard} currentScore={currentScore || 0} />
-      <div className="flex justify-center items-center gap-30 mt-10">
+      <div
+        className=" mt-8
+        flex flex-row justify-center items-center
+        gap-4 md:gap-6"
+      >
         <PlayAudioButton referenceAudioLink={currentCard?.reference_audio} />
         <RecordAudioButton onFinish={onRecordingEnd} isLoading={isSubmitting} />
+        <NextButton onClick={nextCard} />
         {currentScore && currentScore >= threshold && (
           <NextButton onClick={nextCard} />
         )}
