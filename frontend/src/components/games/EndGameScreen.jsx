@@ -16,7 +16,7 @@ const EndGameScreen = ({ currentScore, bestScore }) => {
       </div>
 
       <Link
-        to="/games-2-4"
+        to="/"
         className="
           px-15 py-5
           rounded-full

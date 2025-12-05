@@ -4,3 +4,9 @@
   font-family: "Rajdhani", sans-serif;
   font-weight: 500;
 }
+
+.react-card-flip {
+  transform-style: preserve-3d;
+  width: 100%;
+  height: 100%;
+}
