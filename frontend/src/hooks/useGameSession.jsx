@@ -8,6 +8,11 @@ const useGameSession = (gameId) => {
   const [finalScore, setFinalScore] = useState(null);
   const [bestScore, setBestScore] = useState(null);
 
+  const getGame = useCallback(
+    () => api.getGameById(gameId, getSessionId()),
+    [gameId]
+  );
+
   const finishGame = useCallback(
     async (score) => {
       setIsSaving(true);
@@ -31,6 +36,7 @@ const useGameSession = (gameId) => {
     isFinished,
     finalScore,
     bestScore,
+    getGame,
     finishGame,
   };
 };
