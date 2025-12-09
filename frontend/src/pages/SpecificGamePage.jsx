@@ -9,17 +9,7 @@ const SpecificGamePage = ({ children }) => {
 
       <main
         className="
-          w-screen
-          min-h-screen
-          flex
-          justify-center
-          items-start
-          pt-24
-          pb-10
-          px-3
-          bg-no-repeat
-          bg-cover
-          bg-center
+        w-screen h-screen overflow-hidden bg-no-repeat bg-cover bg-center px-3 pt-16 sm:pt-20
         "
         style={{
           backgroundImage: "url('/images/repeatAfter__background.png')",

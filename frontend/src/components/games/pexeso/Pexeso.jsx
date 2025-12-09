@@ -42,26 +42,48 @@ const Pexeso = ({ gameId }) => {
     return <EndGameScreen bestScore={bestScore} currentScore={finalScore} />;
 
   return (
-    <section className="flex flex-col items-center">
-      <div className="flex justify-around w-full">
-        <h2 className="text-3xl font-bold text-[#642f37] mb-6 min-h-[40px]">
-          {isPreviewing ? "Zapamätaj si kartičky!" : "Nájdi páry!"}
-        </h2>
-        {!isPreviewing && (
-          <h2 className="text-3xl font-bold text-[#642f37] mb-6 min-h-[40px]">
-            Otvorené {moves} krát
+    <section className="w-full flex justify-center px-3 sm:px-6">
+      <div className="relative w-fit mx-auto">
+        {isPreviewing ? (
+          <h2
+            className="absolute left-1/2 -translate-x-1/2 -top-10 sm:-top-12
+          text-xl sm:text-3xl font-bold text-[#642f37] text-center
+          leading-tight whitespace-nowrap"
+          >
+            Zapamätaj si kartičky!
           </h2>
+        ) : (
+          <>
+            <h2 className="hidden sm:block absolute -left-10 top-1/2 -translate-x-full -translate-y-1/2 pr-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+              Nájdi páry!
+            </h2>
+
+            <h2 className="hidden sm:block absolute -right-10 top-1/2 translate-x-full -translate-y-1/2 pl-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+              Otvorené {moves} krát
+            </h2>
+
+            {/* телефон  */}
+            <div className="sm:hidden mb-1 flex items-end justify-between gap-3">
+              <h2 className="text-xl font-bold text-[#642f37] leading-tight">
+                Nájdi páry!
+              </h2>
+              <h2 className="text-xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+                Otvorené {moves} krát
+              </h2>
+            </div>
+          </>
         )}
-      </div>
-      <div className="grid grid-cols-4 gap-2">
-        {cards.map((card) => (
-          <FlipCard
-            key={`${card.id}${card.matchId}`}
-            data={card}
-            isFlipped={isPreviewing || checkIsFlipped(card)}
-            onClick={() => markFlipped(card)}
-          />
-        ))}
+
+        <div className="grid w-fit mx-auto grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 place-items-center">
+          {cards.map((card) => (
+            <FlipCard
+              key={`${card.id}${card.matchId}`}
+              data={card}
+              isFlipped={isPreviewing || checkIsFlipped(card)}
+              onClick={() => markFlipped(card)}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );

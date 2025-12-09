@@ -5,6 +5,10 @@
   font-weight: 500;
 }
 
+#root {
+  overflow-x: hidden;
+}
+
 .react-card-flip {
   transform-style: preserve-3d;
   width: 100%;
