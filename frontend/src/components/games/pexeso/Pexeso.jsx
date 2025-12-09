@@ -43,9 +43,16 @@ const Pexeso = ({ gameId }) => {
 
   return (
     <section className="flex flex-col items-center">
-      <h2 className="text-3xl font-bold text-[#642f37] mb-6 min-h-[40px]">
-        {isPreviewing ? "Zapamätaj si kartičky!" : "Nájdi páry!"}
-      </h2>
+      <div className="flex justify-around w-full">
+        <h2 className="text-3xl font-bold text-[#642f37] mb-6 min-h-[40px]">
+          {isPreviewing ? "Zapamätaj si kartičky!" : "Nájdi páry!"}
+        </h2>
+        {!isPreviewing && (
+          <h2 className="text-3xl font-bold text-[#642f37] mb-6 min-h-[40px]">
+            Otvorené {moves} krát
+          </h2>
+        )}
+      </div>
       <div className="grid grid-cols-4 gap-2">
         {cards.map((card) => (
           <FlipCard

@@ -13,11 +13,11 @@ const NextButton = ({ onClick }) => {
       shadow-[0_4px_20px_rgba(0,0,0,0.15)]
       flex items-center justify-center
       transition-all duration-200
-      hover:scale-105 active:scale-95
+      hover:scale-105 active:scale-95 cursor-pointer
       "
     >
       <img
-        src="/images/NextButton.png"
+        src="/images/icons/NextButton.png"
         alt="Next"
         className="w-8 h-8 md:w-10 md:h-10 object-contain"
       />
