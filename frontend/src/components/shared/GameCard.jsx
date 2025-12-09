@@ -19,7 +19,7 @@ const GameCard = ({ data }) => {
       >
         <div className="w-[90%] aspect-square overflow-hidden rounded-2xl mt-4">
           <img
-            src={data.preview_image_url}
+            src={data.preview_image_url || "/images/games_page/shared/card.png"}
             alt={data.name}
             className="w-full h-full object-cover"
           />

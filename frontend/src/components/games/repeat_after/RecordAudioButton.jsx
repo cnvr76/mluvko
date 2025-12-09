@@ -26,13 +26,13 @@ const RecordAudioButton = ({ onFinish, isLoading }) => {
       shadow-[0_4px_20px_rgba(0,0,0,0.15)]
       flex items-center justify-center
       transition-all duration-200
-      hover:scale-105 active:scale-95
+      hover:scale-105 active:scale-95 cursor-pointer
       "
     >
       {isRecording && <div>is recording</div>}
       {!isLoading ? (
         <img
-          src="/images/RecordAudioButton.png"
+          src="/images/icons/RecordAudioButton.png"
           alt={isRecording ? "Stop Recording" : "Start Recording"}
           className="w-10 h-10 md:w-10 md:h-10 object-contain"
         />

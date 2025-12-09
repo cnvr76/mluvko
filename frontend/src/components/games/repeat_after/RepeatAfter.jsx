@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback } from "react";
 import useAsync from "../../../hooks/useAsync";
 import { api } from "../../../services/api";
 import getSessionId from "../../../services/uuidSessionGenerator";
@@ -55,11 +55,10 @@ const RepeatAfter = ({ gameId }) => {
   return (
     <section
       className="
-    w-full
-    min-h-[calc(100vh-10rem)]  
-    flex flex-col items-center justify-center
-   
-  "
+        w-full
+        min-h-[calc(100vh-10rem)]  
+        flex flex-col items-center justify-center
+      "
     >
       <AnimalCard gameData={currentCard} currentScore={currentScore || 0} />
       <div

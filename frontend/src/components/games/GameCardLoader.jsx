@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { api } from "../../services/api";
 import getSessionId from "../../services/uuidSessionGenerator";
 import GameCard from "../shared/GameCard";
@@ -10,7 +10,16 @@ const GameCardLoader = ({ ageGroup }) => {
     () => api.getGamesFor(ageGroup, getSessionId()),
     [ageGroup]
   );
-  const { data, isLoading, error, _ } = useAsync(loadGames);
+  const { data, isLoading, error } = useAsync(loadGames);
+
+  const games = useMemo(() => {
+    const list = data ?? [];
+    return [...list].sort((a, b) => {
+      if (a.preview_image_url && !b.preview_image_url) return -1;
+      if (!a.preview_image_url && b.preview_image_url) return 1;
+      return 0;
+    });
+  }, [data]);
 
   if (isLoading) return <PageLoading />;
   if (error) {
@@ -27,7 +36,7 @@ const GameCardLoader = ({ ageGroup }) => {
 
   return (
     <>
-      {data?.map((game, _) => (
+      {games?.map((game, _) => (
         <GameCard key={game.id} data={game} />
       ))}
     </>
