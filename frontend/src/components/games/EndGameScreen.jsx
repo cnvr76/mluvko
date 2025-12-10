@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 
 const EndGameScreen = ({ currentScore, bestScore }) => {
   return (
-    <section className="flex flex-col justify-center items-center text-center mt-20  text-[#642f37]">
-      <h1 className="text-4xl font-bold mb-6">Ďakujeme za hru!</h1>
+    <section className="flex flex-col justify-center items-center text-center  text-[#642f37]">
+      <h1 className="text-4xl font-bold mb-10">Ďakujeme za hru!</h1>
 
       <div className="text-2xl flex flex-col gap-2 mb-10">
         <span>
