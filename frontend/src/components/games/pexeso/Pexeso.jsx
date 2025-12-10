@@ -54,21 +54,21 @@ const Pexeso = ({ gameId }) => {
           </h2>
         ) : (
           <>
-            <h2 className="hidden sm:block absolute -left-10 top-1/2 -translate-x-full -translate-y-1/2 pr-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+            <h2 className="hidden md:block absolute -left-10 top-1/2 -translate-x-full -translate-y-1/2 pr-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
               Nájdi páry!
             </h2>
 
-            <h2 className="hidden sm:block absolute -right-10 top-1/2 translate-x-full -translate-y-1/2 pl-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
-              Otvorené {moves} krát
+            <h2 className="hidden md:block absolute -right-10 top-1/2 translate-x-full -translate-y-1/2 pl-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+              Pohybov: {moves}
             </h2>
 
             {/* телефон  */}
-            <div className="sm:hidden mb-1 flex items-end justify-between gap-3">
+            <div className="md:hidden mb-1 flex items-end justify-between gap-3">
               <h2 className="text-xl font-bold text-[#642f37] leading-tight">
                 Nájdi páry!
               </h2>
               <h2 className="text-xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
-                Otvorené {moves} krát
+                Pohybov: {moves}
               </h2>
             </div>
           </>
