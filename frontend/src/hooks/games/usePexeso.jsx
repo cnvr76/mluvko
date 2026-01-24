@@ -29,7 +29,7 @@ const usePexeso = (gameData) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPreviewing(false);
-    }, 2500);
+    }, 2500); // 2500 (2.5s) can be changed
     return () => clearTimeout(timer);
   });
 

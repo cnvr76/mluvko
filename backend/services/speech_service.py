@@ -114,4 +114,4 @@ class SpeechService:
 
 
 # ['tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large', 'large-v3-turbo', 'turbo']
-speech_service: SpeechService = SpeechService("small")
+speech_service: SpeechService = SpeechService("base")

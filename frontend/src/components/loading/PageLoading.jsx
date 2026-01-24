@@ -77,7 +77,7 @@ const PageLoading = () => {
         </div>
 
         <p className="mt-6 text-white text-2xl font-semibold tracking-[0.3em]">
-          Loading...
+          Načítava sa...
         </p>
       </div>
     </>

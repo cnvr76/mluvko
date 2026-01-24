@@ -9,13 +9,11 @@ import NextButton from "./NextButton";
 import PageLoading from "../../loading/PageLoading.jsx";
 import useRepeatAfter from "../../../hooks/games/useRepeatAfter";
 import EndGameScreen from "../EndGameScreen";
+import useGameSession from "../../../hooks/useGameSession";
 // import { useQueryState, parseAsInteger } from "nuqs";
 
 const RepeatAfter = ({ gameId }) => {
-  const getGame = useCallback(
-    () => api.getGameById(gameId, getSessionId()),
-    [gameId]
-  );
+  const { getGame } = useGameSession(gameId);
   const { data, isLoading, error } = useAsync(getGame);
   const {
     // current
@@ -68,9 +66,13 @@ const RepeatAfter = ({ gameId }) => {
       >
         <PlayAudioButton referenceAudioLink={currentCard?.reference_audio} />
         <RecordAudioButton onFinish={onRecordingEnd} isLoading={isSubmitting} />
-        <NextButton onClick={nextCard} />
+        <NextButton
+          onClick={nextCard}
+          isDisabled={isSubmitting}
+          icon={"/images/icons/SkipButton.png"}
+        />
         {currentScore && currentScore >= threshold && (
-          <NextButton onClick={nextCard} />
+          <NextButton onClick={nextCard} isDisabled={isSubmitting} />
         )}
       </div>
     </section>
