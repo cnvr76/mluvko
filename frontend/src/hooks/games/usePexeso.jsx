@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import useGameSession from "../useGameSession";
 import { v4 as uuidv4 } from "uuid";
 
+const VITE_API_BASE = import.meta.env.VITE_API_BASE;
+
 const usePexeso = (gameData) => {
   const { isSaving, isFinished, finalScore, bestScore, finishGame } =
     useGameSession(gameData?.id);
@@ -53,11 +55,12 @@ const usePexeso = (gameData) => {
         return newSet;
       });
 
-      const audio = new Audio(card1.animal_audio);
+      const audioLink = `${VITE_API_BASE}${card1.animal_audio}`;
+      const audio = new Audio(audioLink);
       audio
         .play()
         .catch((error) =>
-          console.error(`Error playing sound ${card1.animal_audio}:`, error)
+          console.error(`Error playing sound ${audioLink}:`, error)
         );
 
       console.log(matchedIds);

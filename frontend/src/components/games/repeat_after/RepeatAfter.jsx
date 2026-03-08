@@ -12,6 +12,8 @@ import EndGameScreen from "../EndGameScreen";
 import useGameSession from "../../../hooks/useGameSession";
 // import { useQueryState, parseAsInteger } from "nuqs";
 
+const VITE_API_BASE = import.meta.env.VITE_API_BASE;
+
 const RepeatAfter = ({ gameId }) => {
   const { getGame } = useGameSession(gameId);
   const { data, isLoading, error } = useAsync(getGame);
@@ -64,7 +66,9 @@ const RepeatAfter = ({ gameId }) => {
         flex flex-row justify-center items-center
         gap-4 md:gap-6"
       >
-        <PlayAudioButton referenceAudioLink={currentCard?.reference_audio} />
+        <PlayAudioButton
+          referenceAudioLink={`${VITE_API_BASE}${currentCard?.reference_audio}`}
+        />
         <RecordAudioButton onFinish={onRecordingEnd} isLoading={isSubmitting} />
         <NextButton
           onClick={nextCard}
