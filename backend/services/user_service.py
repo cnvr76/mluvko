@@ -2,6 +2,10 @@ from uuid import UUID
 from models.user_model import User
 from sqlalchemy.orm import Session
 from typing import Optional
+from config.logger import Logger
+
+
+logger = Logger(__name__).configure()
 
 
 class UserService:

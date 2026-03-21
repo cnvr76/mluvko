@@ -1,7 +1,6 @@
 import whisper
 from gtts import gTTS
-from typing import Dict, Any
-import logging, os
+import os
 import io
 from fastapi import UploadFile
 import librosa
@@ -10,14 +9,10 @@ import tempfile
 from scripts.utils import hash_string
 from services.phoneme_analyzer_service import phoneme_service
 from schemas.speech_scheema import AnalysedSpeechResponse
+from config.logger import Logger
 
 
-logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.FileHandler("./logs/speech_service.log", encoding="utf-8")
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+logger = Logger(__name__).configure()
 
 
 class SpeechService:

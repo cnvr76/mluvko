@@ -1,16 +1,18 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, contains_eager, noload, Query
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import and_
 from uuid import UUID
-from typing import List, Dict, Optional
+from typing import List
 from models.game_model import AgeGroups, Game
 from models.activity_model import Activity
 from models.user_model import User
 from schemas.game_schema import GameCreate, GameBriefResponse, GameResponse
 from services.user_service import user_service
+from config.exeptions import ActivityDublicateError
+from config.logger import Logger
 
 
-class ActivityDublicateError(Exception):
-    pass
+logger = Logger(__name__).configure()
 
 
 class GameService:
@@ -28,33 +30,19 @@ class GameService:
 
     def get_game(self, game_id: UUID, user_session_id: UUID, db: Session) -> GameResponse:
         current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        game: Game = db.query(Game).filter(Game.id == game_id).first()
-        
-        activity: List[Activity] = []
-        if current_user:
-            activity = db.query(Activity).filter(Activity.user_id == current_user.id,
-                                                                 Activity.game_id == game_id).all()
-        
-        return GameResponse(
-            id=game_id,
-            name=game.name,
-            preview_image_url=game.preview_image_url,
-            activities=activity,
-            description=game.description,
-            age_group=game.age_group,
-            game_type=game.game_type,
-            config_data=game.config_data
-        )
+        query: Query = self._build_games_query(current_user, db).filter(Game.id == game_id)
+        game: Game = query.first()
+        return game
 
     def get_all_games(self, user_session_id: UUID, db: Session) -> List[GameBriefResponse]:
         current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        games: List[Game] = db.query(Game).all()
-        return self._merge_user_with_games(current_user, games, db)
+        query: Query = self._build_games_query(current_user, db)
+        return query.all()
 
     def get_games_for(self, user_session_id: UUID, age_group: AgeGroups, db: Session) -> List[GameBriefResponse]:
         current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        games: List[Game] = db.query(Game).filter(Game.age_group == age_group.value).all()
-        return self._merge_user_with_games(current_user, games, db)
+        query: Query = self._build_games_query(current_user, db).filter(Game.age_group == age_group.value)
+        return query.all()
 
     def update_game_stats(self, game_id: UUID, user_session_id: UUID, new_score: float, db: Session) -> Activity:
         current_user: User = user_service.get_or_create_user(user_session_id, db)
@@ -85,29 +73,21 @@ class GameService:
 
         return activity
 
-    def _merge_user_with_games(self, user: User, games: List[Game], db: Session) -> List[GameBriefResponse]:
-        activities_map: Dict[UUID, Activity] = {}
+    def _build_games_query(self, user: User, db: Session) -> Query:
+        query: Query = db.query(Game)
+        
         if user:
-            activities: List[Activity] = db.query(Activity).filter(Activity.user_id == user.id).all()
-            for activity in activities:
-                activities_map[activity.game_id] = activity
-
-        response: List[GameBriefResponse] = []
-        for game in games:
-            activity_schema_list = []
-            if activity_model := activities_map.get(game.id):
-                activity_schema_list.append(activity_model)
-
-            record = GameBriefResponse(
-                id=game.id,
-                name=game.name,
-                game_type=game.game_type,
-                preview_image_url=game.preview_image_url,
-                activities=activity_schema_list
-            )
-            response.append(record)
-
-        return response
+            query = query.outerjoin(
+                Activity,
+                and_(
+                    Activity.game_id == Game.id,
+                    Activity.user_id == user.id
+                )
+            ).options(contains_eager(Game.activities))
+        else:
+            query = query.options(noload(Game.activities))
+            
+        return query
 
 
 game_service: GameService = GameService()

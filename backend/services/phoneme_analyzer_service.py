@@ -3,15 +3,10 @@ from phonemizer import phonemize
 import numpy as np
 import string
 import re
-import logging
+from config.logger import Logger
 
 
-logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.FileHandler("./logs/phoneme_analyzer.log", encoding="utf-8")
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+logger = Logger(__name__).configure()
 
 
 SUBSTITUTION_COSTS = {
