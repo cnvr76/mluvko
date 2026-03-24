@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session, contains_eager, noload, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
 from uuid import UUID
-from typing import List
 from models.game_model import AgeGroups, Game
 from models.activity_model import Activity
 from models.user_model import User
@@ -34,12 +33,12 @@ class GameService:
         game: Game = query.first()
         return game
 
-    def get_all_games(self, user_session_id: UUID, db: Session) -> List[GameBriefResponse]:
+    def get_all_games(self, user_session_id: UUID, db: Session) -> list[GameBriefResponse]:
         current_user: User = user_service.get_user_by_session_id(user_session_id, db)
         query: Query = self._build_games_query(current_user, db)
         return query.all()
 
-    def get_games_for(self, user_session_id: UUID, age_group: AgeGroups, db: Session) -> List[GameBriefResponse]:
+    def get_games_for(self, user_session_id: UUID, age_group: AgeGroups, db: Session) -> list[GameBriefResponse]:
         current_user: User = user_service.get_user_by_session_id(user_session_id, db)
         query: Query = self._build_games_query(current_user, db).filter(Game.age_group == age_group.value)
         return query.all()

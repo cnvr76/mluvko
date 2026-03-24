@@ -1,12 +1,12 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict
+from typing import Optional
 
 
 class AnalysedSpeechResponse(BaseModel):
     recognized_text: str
     reference_text: str
     score: float
-    errors: Optional[List[Dict]]
+    errors: Optional[list[dict]]
     phonemes_reference: str
     phonemes_recognized: str
 

@@ -3,7 +3,7 @@ from schemas.game_schema import GameResponse, GameCreate, GameBriefResponse
 from schemas.activity_schema import ActivityResponse, ActivityCreate
 from models.activity_model import Activity
 from models.game_model import AgeGroups, Game
-from typing import List, Optional
+from typing import list, Optional
 from services.game_service import game_service
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -13,7 +13,7 @@ from config.database_config import get_db
 router = APIRouter()
 
 
-@router.get("/", response_model=List[GameBriefResponse])
+@router.get("/", response_model=list[GameBriefResponse])
 async def get_all_games(user_session_id: UUID, db: Session = Depends(get_db)):
     try:
         return game_service.get_all_games(user_session_id, db)
@@ -54,7 +54,7 @@ async def get_game_by_id(game_id: UUID, user_session_id: UUID, db: Session = Dep
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/group/{age_group}", response_model=List[GameBriefResponse])
+@router.get("/group/{age_group}", response_model=list[GameBriefResponse])
 async def get_games_for_age_group(user_session_id: UUID, age_group: AgeGroups, db: Session = Depends(get_db)):
     try:
         return game_service.get_games_for(user_session_id, age_group, db)

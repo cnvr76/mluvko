@@ -1,8 +1,8 @@
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, Any
 import uuid
-from models.game_model import AgeGroups
-from schemas.activity_schema import ActivityResponse
+from models import AgeGroups, GameStatus
+from schemas import ActivityResponse
 
 
 class GameBriefResponse(BaseModel):
@@ -10,15 +10,17 @@ class GameBriefResponse(BaseModel):
     name: str
     preview_image_url: Optional[str]
     game_type: str
-    activities: List[ActivityResponse]
+    activities: list[ActivityResponse]
+    status: GameStatus
 
     model_config = {"from_attributes": True}
 
 
 class GameResponse(GameBriefResponse):
+    author_id: uuid.UUID
     description: Optional[str]
     age_group: AgeGroups
-    config_data: Dict[str, Any]
+    config_data: dict[str, Any]
 
     model_config = {"from_attributes": True}
 
@@ -29,4 +31,4 @@ class GameCreate(BaseModel):
     preview_image_url: Optional[str]
     age_group: AgeGroups
     game_type: str
-    config_data: Dict[str, Any]
+    config_data: dict[str, Any]

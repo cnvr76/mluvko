@@ -6,7 +6,7 @@ from config.database_config import Base
 from enum import Enum
 
 
-class GameStatuses(str, Enum):
+class GameStatus(str, Enum):
     PRIVATE = "private"
     PENDING = "pending"
     PUBLISHED = "published"
@@ -17,7 +17,7 @@ class AgeGroups(str, Enum):
     MIDDLE = "5-6 rokov"
 
 
-game_statuses_enum: SQLEnum = SQLEnum(GameStatuses, name="statuses", values_callable=lambda items: [enum.value for enum in items])
+game_statuses_enum: SQLEnum = SQLEnum(GameStatus, name="statuses", values_callable=lambda items: [enum.value for enum in items])
 
 
 class Game(Base):
@@ -30,7 +30,7 @@ class Game(Base):
     preview_image_url = Column(Text)
     age_group = Column(Text, nullable=False)
     game_type = Column(Text, nullable=False)
-    status = Column(game_statuses_enum, nullable=False, default=GameStatuses.PRIVATE.value)
+    status = Column(game_statuses_enum, nullable=False, default=GameStatus.PRIVATE.value)
     config_data = Column(JSONB, nullable=False)
 
     activities = relationship("Activity", back_populates="game")
