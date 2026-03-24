@@ -7,6 +7,7 @@ from typing import Optional
 from uuid import UUID
 from config.database_config import get_db
 from config.dependencies import get_current_user, require_admin
+from config.exeptions import UserDoesntExist
 
 
 router = APIRouter()
@@ -28,7 +29,7 @@ def get_all_users(db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserResponse)
-def get_my_profile(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def get_my_profile(current_user: User = Depends(get_current_user)):
     return current_user
 
 
@@ -42,7 +43,9 @@ def update_user(update_data: UserUpdate, current_user: User = Depends(get_curren
     return user_service.update_user(current_user, update_data, db)
 
 
-@router.patch("/{user_id}", dependencies=[Depends(require_admin)], response_model=Optional[UserResponse])
+@router.patch("/{user_id}", dependencies=[Depends(require_admin)], response_model=UserResponse)
 def update_someone(update_data: UserUpdate, user_id: UUID, db: Session = Depends(get_db)):
-    user: User = user_service.get_user_by_id(user_id, db)
+    user: Optional[User] = user_service.get_user_by_id(user_id, db)
+    if not user:
+        raise UserDoesntExist()
     return user_service.update_user(user, update_data, db)

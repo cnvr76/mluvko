@@ -14,6 +14,13 @@ class ActivityDublicateError(CustomException):
         super().__init__(detail, status.HTTP_409_CONFLICT)
         
         
+# -- USERS exceptions ---
+class UserDoesntExist(CustomException):
+    def __init__(self):
+        self.detail: str = "User doesn't exist"
+        super().__init__(self.detail, status.HTTP_404_NOT_FOUND)
+        
+        
 # --- AUTH exceptions ---
 class UserAlreadyExists(CustomException):
     def __init__(self):
