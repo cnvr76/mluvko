@@ -3,7 +3,7 @@ from services import user_service
 from schemas import UserUpdate, UserResponse
 from sqlalchemy.orm import Session
 from models import User
-from typing import Optional
+from typing import Optional, Any
 from uuid import UUID
 from config.database_config import get_db
 from config.dependencies import require_login, require_admin
@@ -40,7 +40,8 @@ def get_user(user_id: UUID, db: Session = Depends(get_db)):
 
 @router.patch("/me", response_model=UserResponse)
 def update_user(update_data: UserUpdate, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
-    return user_service.update_user(current_user, update_data, db)
+    safe_update_data: dict[str, Any] = update_data.model_dump(exclude_unset=True, exclude={"role"})
+    return user_service.update_user(current_user, safe_update_data, db)
 
 
 @router.patch("/{user_id}", dependencies=[Depends(require_admin)], response_model=UserResponse)
@@ -48,4 +49,5 @@ def update_someone(update_data: UserUpdate, user_id: UUID, db: Session = Depends
     user: Optional[User] = user_service.get_user_by_id(user_id, db)
     if not user:
         raise UserDoesntExist()
-    return user_service.update_user(user, update_data, db)
+    admin_update_data: dict[str, Any] = update_data.model_dump(exclude_unset=True)
+    return user_service.update_user(user, admin_update_data, db)

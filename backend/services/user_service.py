@@ -14,8 +14,7 @@ class UserService:
         return db.query(User).filter(User.id == user_id).first()
     
     
-    def update_user(self, user: User, info: UserUpdate, db: Session) -> User:
-        update_data: dict[str, Any] = info.model_dump(exclude_unset=True)
+    def update_user(self, user: User, update_data: dict[str, Any], db: Session) -> User:
         for key, value in update_data.items():
             setattr(user, key, value)
             
