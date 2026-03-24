@@ -6,7 +6,7 @@ from models import User
 from typing import Optional
 from uuid import UUID
 from config.database_config import get_db
-from config.dependencies import get_current_user, require_admin
+from config.dependencies import require_login, require_admin
 from config.exeptions import UserDoesntExist
 
 
@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.delete("/me", status_code=200)
-def delete_user(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def delete_user(current_user: User = Depends(require_login), db: Session = Depends(get_db)):
     deleted_count: int = user_service.delete_user(current_user.id, db)
     db.commit()
     return {
@@ -29,7 +29,7 @@ def get_all_users(db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserResponse)
-def get_my_profile(current_user: User = Depends(get_current_user)):
+def get_my_profile(current_user: User = Depends(require_login)):
     return current_user
 
 
@@ -39,7 +39,7 @@ def get_user(user_id: UUID, db: Session = Depends(get_db)):
 
 
 @router.patch("/me", response_model=UserResponse)
-def update_user(update_data: UserUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+def update_user(update_data: UserUpdate, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
     return user_service.update_user(current_user, update_data, db)
 
 

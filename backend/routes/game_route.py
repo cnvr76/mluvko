@@ -1,30 +1,32 @@
 from fastapi import APIRouter, Depends
 from schemas import GameResponse, GameCreate, GameBriefResponse, ActivityResponse, ActivityCreate
-from models import AgeGroups, Game, Activity
+from models import AgeGroups, Game, Activity, User
 from services import game_service
 from sqlalchemy.orm import Session
 from uuid import UUID
+from typing import Optional
 from config.database_config import get_db
+from config.dependencies import require_login, require_therapist_or_admin, get_current_user
 
 
 router = APIRouter()
 
 
 @router.get("/", response_model=list[GameBriefResponse])
-def get_all_games(user_session_id: UUID, db: Session = Depends(get_db)):
-    return game_service.get_all_games(user_session_id, db)
+def get_all_games(current_user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)):
+    return game_service.get_all_games(current_user, db)
 
 
 @router.post("/new", response_model=GameResponse)
-def create_new_game(config_data: GameCreate, db: Session = Depends(get_db)):
-    new_game: Game = game_service.create_game(config_data, db)
+def create_new_game(config_data: GameCreate, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    new_game: Game = game_service.create_game(config_data, current_user.id, db)
     db.commit()
     return new_game
 
 
-@router.delete("/{game_id}/delete", status_code=200)
-def delete_game(game_id: UUID, db: Session = Depends(get_db)):
-    deleted_count: int = game_service.delete_game(game_id, db)
+@router.delete("/{game_id}", status_code=200)
+def delete_game(game_id: UUID, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    deleted_count: int = game_service.delete_game(game_id, current_user, db)
     db.commit()
     return {
         "success": deleted_count > 0,
@@ -33,20 +35,20 @@ def delete_game(game_id: UUID, db: Session = Depends(get_db)):
 
 
 @router.get("/{game_id}", response_model=GameResponse)
-def get_game_by_id(game_id: UUID, user_session_id: UUID, db: Session = Depends(get_db)):
-    return game_service.get_game(game_id, user_session_id, db)
+def get_game_by_id(game_id: UUID, current_user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)):
+    return game_service.get_game(game_id, current_user, db)
 
 
 @router.get("/group/{age_group}", response_model=list[GameBriefResponse])
-def get_games_for_age_group(user_session_id: UUID, age_group: AgeGroups, db: Session = Depends(get_db)):
-    return game_service.get_games_for(user_session_id, age_group, db)
+def get_games_for_age_group(age_group: AgeGroups, current_user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)):
+    return game_service.get_games_for(age_group, current_user, db)
 
 
 @router.post("/{game_id}/update-stats", response_model=ActivityResponse)
-def update_game_stats(game_id: UUID, activity_data: ActivityCreate, db: Session = Depends(get_db)):
+def update_game_stats(game_id: UUID, activity_data: ActivityCreate, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
     updated_stats: Activity = game_service.update_game_stats(
             game_id,
-            activity_data.user_session_id,
+            current_user.id,
             activity_data.score,
             db
         )

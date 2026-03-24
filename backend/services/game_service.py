@@ -1,22 +1,19 @@
 from sqlalchemy.orm import Session, contains_eager, noload, Query
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy import and_
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import and_, func
 from uuid import UUID
-from models.game_model import AgeGroups, Game
-from models.activity_model import Activity
-from models.user_model import User
-from schemas.game_schema import GameCreate, GameBriefResponse, GameResponse
-from services.user_service import user_service
-from config.exeptions import ActivityDublicateError
+from models import AgeGroups, Game, Role, Activity, User
+from schemas import GameCreate
 from config.logger import Logger
+from typing import Optional
 
 
 logger = Logger(__name__).configure()
 
 
 class GameService:
-    def create_game(self, config: GameCreate, db: Session) -> Game:
-        game = Game(**config.model_dump())
+    def create_game(self, config: GameCreate, user_id: UUID, db: Session) -> Game:
+        game = Game(**config.model_dump(), author_id=user_id)
         
         db.add(game)
         db.flush()
@@ -24,55 +21,53 @@ class GameService:
         
         return game
     
-    def delete_game(self, game_id: UUID, db: Session) -> int:
-        return db.query(Game).filter(Game.id == game_id).delete()
+    
+    def delete_game(self, game_id: UUID, user: User, db: Session) -> int:
+        query: Query = db.query(Game).filter(Game.id == game_id)
+        
+        if user.role != Role.ADMIN.value:
+            query.filter(Game.author_id == user.id)
+        
+        return query.delete()
+    
 
-    def get_game(self, game_id: UUID, user_session_id: UUID, db: Session) -> GameResponse:
-        current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        query: Query = self._build_games_query(current_user, db).filter(Game.id == game_id)
+    def get_game(self, game_id: UUID, user: Optional[User], db: Session) -> Optional[Game]:
+        query: Query = self._build_games_query(user, db).filter(Game.id == game_id)
         game: Game = query.first()
         return game
+    
 
-    def get_all_games(self, user_session_id: UUID, db: Session) -> list[GameBriefResponse]:
-        current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        query: Query = self._build_games_query(current_user, db)
+    def get_all_games(self, user: Optional[User], db: Session) -> list[Game]:
+        query: Query = self._build_games_query(user, db)
         return query.all()
+    
 
-    def get_games_for(self, user_session_id: UUID, age_group: AgeGroups, db: Session) -> list[GameBriefResponse]:
-        current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        query: Query = self._build_games_query(current_user, db).filter(Game.age_group == age_group.value)
+    def get_games_for(self, age_group: AgeGroups, user: Optional[User], db: Session) -> list[Game]:
+        query: Query = self._build_games_query(user, db).filter(Game.age_group == age_group.value)
         return query.all()
+    
 
-    def update_game_stats(self, game_id: UUID, user_session_id: UUID, new_score: float, db: Session) -> Activity:
-        current_user: User = user_service.get_or_create_user(user_session_id, db)
-        activity: Activity = db.query(Activity).filter(Activity.user_id == current_user.id, 
-                                                       Activity.game_id == game_id).first()
-        if not activity:
-            try:
-                activity = Activity(
-                    user_id=current_user.id,
-                    game_id=game_id,
-                    last_score=new_score,
-                    best_score=new_score
-                )
-                db.add(activity)
-                db.flush()
-                db.refresh(activity)
-                return activity
-            except IntegrityError:
-                db.rollback()
-                raise ActivityDublicateError(f"Activity for {game_id=} and {current_user.id=} already exists")
+    def update_game_stats(self, game_id: UUID, user_id: UUID, new_score: float, db: Session) -> Activity:
+        stmt = insert(Activity).values(
+            user_id=user_id,
+            game_id=game_id,
+            last_score=new_score,
+            best_score=new_score
+        )
         
-        activity.last_score = new_score
-        if activity.best_score < new_score:
-            activity.best_score = new_score
-
-        db.flush()
-        db.refresh(activity)
-
+        stmt.on_conflict_do_update(
+            index_elements=['user_id', 'game_id'],
+            set_={
+                'last_score': new_score,
+                'best_score': func.greatest(Activity.best_score, new_score)
+            }
+        ).returning(Activity)
+        
+        activity: Activity = db.scalar(stmt)
         return activity
 
-    def _build_games_query(self, user: User, db: Session) -> Query:
+
+    def _build_games_query(self, user: Optional[User], db: Session) -> Query:
         query: Query = db.query(Game)
         
         if user:

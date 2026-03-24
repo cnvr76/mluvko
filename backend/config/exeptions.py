@@ -8,12 +8,6 @@ class CustomException(Exception):
         super().__init__(self.detail)
         
         
-# -- GAMES exceptions ---
-class ActivityDublicateError(CustomException):
-    def __init__(self, detail: str):
-        super().__init__(detail, status.HTTP_409_CONFLICT)
-        
-        
 # -- USERS exceptions ---
 class UserDoesntExist(CustomException):
     def __init__(self):

@@ -12,7 +12,8 @@ from routes.auth_route import router as auth_router
 
 
 app = FastAPI(
-    title="Mluvko"
+    title="Mluvko",
+    version="1.0.2"
 )
 
 
@@ -27,10 +28,10 @@ app.add_middleware(
 )
 
 
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(speech_router, prefix="/speech", tags=["speech"])
 app.include_router(game_router, prefix="/games", tags=["games"])
 app.include_router(user_router, prefix="/users", tags=["users"])
-app.include_router(auth_router, prefix="/auth", tags=["auth"])
 
 
 @app.exception_handler(CustomException)

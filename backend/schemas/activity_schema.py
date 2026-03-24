@@ -15,5 +15,4 @@ class ActivityResponse(BaseModel):
 
 
 class ActivityCreate(BaseModel):
-    user_session_id: uuid.UUID
     score: Optional[float]

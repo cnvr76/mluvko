@@ -16,9 +16,9 @@ class UserResponse(BaseModel):
 
 
 class UserCreate(BaseModel):
-    username: str = Field(None, min_length=1, max_length=50)
+    username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
-    password: str
+    password: str = Field(..., min_length=8)
     
     @field_validator("password")
     @classmethod
