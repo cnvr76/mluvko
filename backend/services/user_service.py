@@ -1,7 +1,8 @@
 from uuid import UUID
-from models.user_model import User
+from models import User
+from schemas import UserUpdate
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, Any
 from config.logger import Logger
 
 
@@ -9,31 +10,27 @@ logger = Logger(__name__).configure()
 
 
 class UserService:
-    def get_user_by_session_id(self, user_session_id: UUID, db: Session) -> Optional[User]:
-        return db.query(User).filter(User.user_session_id == user_session_id).first()
-
-    def _create_user(self, user_session_id: UUID, db: Session) -> User:
-        user = User(
-            username=None,
-            user_session_id=user_session_id
-        )
+    def get_user_by_id(self, user_id: UUID, db: Session) -> Optional[User]:
+        return db.query(User).filter(User.id == user_id).first()
+    
+    
+    def update_user(self, user: User, info: UserUpdate, db: Session) -> User:
+        update_data: dict[str, Any] = info.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(user, key, value)
+            
         db.add(user)
         db.flush()
         db.refresh(user)
-
         return user
-
-    def get_or_create_user(self, user_session_id: UUID, db: Session) -> User:
-        current_user = self.get_user_by_session_id(user_session_id, db)
-        if not current_user:
-            return self._create_user(user_session_id, db)
-        return current_user
     
-    def delete_user(self, user_session_id: UUID, db: Session) -> int:
-        return db.query(User).filter(User.user_session_id == user_session_id).delete()
-
-    def update_username(self, new_username: str, db: Session) -> User:
-        pass
+    
+    def get_all_users(self, db: Session) -> list[User]:
+        db.query(User).all()
+    
+    
+    def delete_user(self, user_id: UUID, db: Session) -> int:
+        return db.query(User).filter(User.id == user_id).delete()
             
 
 user_service: UserService = UserService()

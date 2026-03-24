@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field, field_validator
 from typing import Optional
 from datetime import datetime
 import uuid
@@ -16,7 +16,32 @@ class UserResponse(BaseModel):
 
 
 class UserCreate(BaseModel):
-    username: str
+    username: str = Field(None, min_length=1, max_length=50)
     email: EmailStr
     password: str
     role: Optional[Role]
+    
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("Password must contain at least 8 symbols")
+        if not any(char.isdigit() for char in value):
+            raise ValueError('Password must contain number')
+        return value
+    
+    
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+    
+    
+class UserLoginResponse(BaseModel):
+    user: UserResponse
+    message: str = "Login successful"
+    tokens: dict[str, str]
+    
+    
+class UserUpdate(BaseModel):
+    username: Optional[str] = Field(None, min_length=1, max_length=50)
+    role: Optional[Role] = None

@@ -12,3 +12,25 @@ class CustomException(Exception):
 class ActivityDublicateError(CustomException):
     def __init__(self, detail: str):
         super().__init__(detail, status.HTTP_409_CONFLICT)
+        
+        
+# --- AUTH exceptions ---
+class UserAlreadyExists(CustomException):
+    def __init__(self):
+        self.detail: str = "User already exists"
+        super().__init__(self.detail, status.HTTP_409_CONFLICT)
+
+class InvalidCredentials(CustomException):
+    def __init__(self):
+        self.detail: str = "Incorrect email or password"
+        super().__init__(self.detail, status.HTTP_401_UNAUTHORIZED)
+        
+class RefreshTokenExpired(CustomException):
+    def __init__(self):
+        self.detail: str = "Refresh token expired or not found"
+        super().__init__(self.detail, status.HTTP_401_UNAUTHORIZED)
+        
+class CredentialsValidationError(CustomException):
+    def __init__(self):
+        self.detail: str = "Could not validate credentials"
+        super().__init__(self.detail, status.HTTP_401_UNAUTHORIZED)

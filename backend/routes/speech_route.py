@@ -1,24 +1,17 @@
 from fastapi import HTTPException, APIRouter, Depends, Form, UploadFile, File
-import logging, os, sys
+import os
 import dotenv
 from services.speech_service import speech_service
-import uuid
 import shutil
 from scripts.utils import hash_string
 from schemas.speech_scheema import AnalysedSpeechResponse
+from config.logger import Logger
 
 dotenv.load_dotenv()
 
 
 router = APIRouter()
-
-
-logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.FileHandler("./logs/speech_route.log", encoding="utf-8")
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+logger = Logger(__name__).configure()
 
 
 @router.post("/stt", response_model=AnalysedSpeechResponse)

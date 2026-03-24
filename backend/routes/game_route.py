@@ -1,10 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
-from schemas.game_schema import GameResponse, GameCreate, GameBriefResponse
-from schemas.activity_schema import ActivityResponse, ActivityCreate
-from models.activity_model import Activity
-from models.game_model import AgeGroups, Game
-from typing import list, Optional
-from services.game_service import game_service
+from schemas import GameResponse, GameCreate, GameBriefResponse, ActivityResponse, ActivityCreate
+from models import AgeGroups, Game, Activity
+from services import game_service
 from sqlalchemy.orm import Session
 from uuid import UUID
 from config.database_config import get_db

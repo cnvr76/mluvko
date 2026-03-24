@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from services.user_service import user_service
+from services import user_service
 from sqlalchemy.orm import Session
 from uuid import UUID
 from config.database_config import get_db
