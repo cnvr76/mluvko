@@ -11,19 +11,19 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[GameBriefResponse])
-async def get_all_games(user_session_id: UUID, db: Session = Depends(get_db)):
+def get_all_games(user_session_id: UUID, db: Session = Depends(get_db)):
     return game_service.get_all_games(user_session_id, db)
 
 
 @router.post("/new", response_model=GameResponse)
-async def create_new_game(config_data: GameCreate, db: Session = Depends(get_db)):
+def create_new_game(config_data: GameCreate, db: Session = Depends(get_db)):
     new_game: Game = game_service.create_game(config_data, db)
     db.commit()
     return new_game
 
 
 @router.delete("/{game_id}/delete", status_code=200)
-async def delete_game(game_id: UUID, db: Session = Depends(get_db)):
+def delete_game(game_id: UUID, db: Session = Depends(get_db)):
     deleted_count: int = game_service.delete_game(game_id, db)
     db.commit()
     return {
@@ -33,17 +33,17 @@ async def delete_game(game_id: UUID, db: Session = Depends(get_db)):
 
 
 @router.get("/{game_id}", response_model=GameResponse)
-async def get_game_by_id(game_id: UUID, user_session_id: UUID, db: Session = Depends(get_db)):
+def get_game_by_id(game_id: UUID, user_session_id: UUID, db: Session = Depends(get_db)):
     return game_service.get_game(game_id, user_session_id, db)
 
 
 @router.get("/group/{age_group}", response_model=list[GameBriefResponse])
-async def get_games_for_age_group(user_session_id: UUID, age_group: AgeGroups, db: Session = Depends(get_db)):
+def get_games_for_age_group(user_session_id: UUID, age_group: AgeGroups, db: Session = Depends(get_db)):
     return game_service.get_games_for(user_session_id, age_group, db)
 
 
 @router.post("/{game_id}/update-stats", response_model=ActivityResponse)
-async def update_game_stats(game_id: UUID, activity_data: ActivityCreate, db: Session = Depends(get_db)):
+def update_game_stats(game_id: UUID, activity_data: ActivityCreate, db: Session = Depends(get_db)):
     updated_stats: Activity = game_service.update_game_stats(
             game_id,
             activity_data.user_session_id,

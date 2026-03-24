@@ -35,6 +35,11 @@ class CredentialsValidationError(CustomException):
         self.detail: str = "Could not validate credentials"
         super().__init__(self.detail, status.HTTP_401_UNAUTHORIZED)
         
+class NotEnoughRights(CustomException):
+    def __init__(self):
+        self.detail: str = "You don't have enough rights to access this route"
+        super().__init__(self.detail, status.HTTP_403_FORBIDDEN)
+        
 
 # --- SPEECH exceptions ---
 class IncorrectAudioFormat(CustomException):
