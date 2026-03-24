@@ -1,11 +1,12 @@
-from fastapi import HTTPException, APIRouter, Depends, Form, UploadFile, File
+from fastapi import HTTPException, APIRouter, Form, UploadFile, File
 import os
 import dotenv
-from services.speech_service import speech_service
+from services import speech_service
 import shutil
 from scripts.utils import hash_string
-from schemas.speech_scheema import AnalysedSpeechResponse
+from schemas import AnalysedSpeechResponse
 from config.logger import Logger
+from config.exeptions import IncorrectAudioFormat
 
 dotenv.load_dotenv()
 
@@ -16,29 +17,21 @@ logger = Logger(__name__).configure()
 
 @router.post("/stt", response_model=AnalysedSpeechResponse)
 async def convert_speech_to_text(audio_file: UploadFile = File(...), reference_text: str = Form(...)):
-    try:
-        analysis_result = await speech_service.analyze_speech(audio_file, reference_text)
-        return analysis_result
-    except Exception as e:
-        logger.error(f"Error in convert_text_to_speech: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    analysis_result = await speech_service.analyze_speech(audio_file, reference_text)
+    return analysis_result
     
 
 @router.post("/tts")
 async def create_speech_from_text(speech_text: str):
-    try:
-        audio_filepath: str = speech_service.create_speech(speech_text)
-        return audio_filepath
-    except Exception as e:
-        logger.error(f"Error in create_speech_from_text: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    audio_filepath: str = speech_service.create_speech(speech_text)
+    return audio_filepath
     
 
 @router.post("/tts/combined")
 async def create_combined_speech_from_text(speech_text: str = Form(...), sfx_audio_file: UploadFile = File(...)):
     file_extension: str = sfx_audio_file.filename.split(".")[-1]
     if file_extension.lower() != "mp3":
-        raise HTTPException(status_code=406, detail="Only MP3s are allowed at the moment")
+        raise IncorrectAudioFormat()
     
     sfx_filepath: str = f"static/sfx/{hash_string(sfx_audio_file.filename)}.mp3"
 

@@ -34,3 +34,10 @@ class CredentialsValidationError(CustomException):
     def __init__(self):
         self.detail: str = "Could not validate credentials"
         super().__init__(self.detail, status.HTTP_401_UNAUTHORIZED)
+        
+
+# --- SPEECH exceptions ---
+class IncorrectAudioFormat(CustomException):
+    def __init__(self):
+        self.detail: str = "Only MP3s are allowed at the moment"
+        super().__init__(self.detail, status.HTTP_406_NOT_ACCEPTABLE)

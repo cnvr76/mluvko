@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from services import user_service
 from sqlalchemy.orm import Session
 from uuid import UUID
@@ -10,13 +10,9 @@ router = APIRouter()
 
 @router.delete("/delete", status_code=200)
 async def delete_user(user_session_id: UUID, db: Session = Depends(get_db)):
-    try:
-        deleted_count: int = user_service.delete_user(user_session_id, db)
-        db.commit()
-        return {
-            "success": deleted_count > 0,
-            "deleted_count": deleted_count
-        }
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+    deleted_count: int = user_service.delete_user(user_session_id, db)
+    db.commit()
+    return {
+        "success": deleted_count > 0,
+        "deleted_count": deleted_count
+    }

@@ -47,7 +47,7 @@ class AuthService:
     def login(self, login_data: UserLogin, db: Session) -> tuple[str, UserLoginResponse]:
         user = db.query(User).filter(User.email == login_data.email).first()
 
-        if not user or not check_password_hash(login_data.password, user.password_hash):
+        if not user or not check_password_hash(user.password_hash, login_data.password):
             raise InvalidCredentials()
         
         token_data = {"sub": user.email}
