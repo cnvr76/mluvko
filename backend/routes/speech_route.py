@@ -1,4 +1,4 @@
-from fastapi import HTTPException, APIRouter, Form, UploadFile, File
+from fastapi import HTTPException, APIRouter, Form, UploadFile, File, Depends
 import os
 import dotenv
 from services import speech_service
@@ -7,6 +7,7 @@ from scripts.utils import hash_string
 from schemas import AnalysedSpeechResponse
 from config.logger import Logger
 from config.exeptions import IncorrectAudioFormat
+from config.dependencies import require_therapist_or_admin
 
 dotenv.load_dotenv()
 
@@ -21,13 +22,13 @@ async def convert_speech_to_text(audio_file: UploadFile = File(...), reference_t
     return analysis_result
     
 
-@router.post("/tts")
+@router.post("/tts", dependencies=[Depends(require_therapist_or_admin)], status_code=201)
 def create_speech_from_text(speech_text: str):
     audio_filepath: str = speech_service.create_speech(speech_text)
     return audio_filepath
     
 
-@router.post("/tts/combined")
+@router.post("/tts/combined", dependencies=[Depends(require_therapist_or_admin)], status_code=201)
 def create_combined_speech_from_text(speech_text: str = Form(...), sfx_audio_file: UploadFile = File(...)):
     file_extension: str = sfx_audio_file.filename.split(".")[-1]
     if file_extension.lower() != "mp3":
