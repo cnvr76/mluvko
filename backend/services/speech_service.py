@@ -7,8 +7,8 @@ import librosa
 from pydub import AudioSegment
 import tempfile
 from scripts.utils import hash_string
-from services.phoneme_analyzer_service import phoneme_service
-from schemas.speech_scheema import AnalysedSpeechResponse
+from services import phoneme_service
+from schemas import AnalysedSpeechResponse
 from config.logger import Logger
 
 
