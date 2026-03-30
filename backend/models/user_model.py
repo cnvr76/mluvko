@@ -12,7 +12,7 @@ class Role(str, Enum):
     ADMIN = "admin"
     
 
-roles_eum: SQLEnum = SQLEnum(Role, name="roles", values_callable=lambda items: [enum.value for enum in items])
+roles_enum: SQLEnum = SQLEnum(Role, name="roles", values_callable=lambda items: [enum.value for enum in items])
 
 
 FavoritesT = Table(
@@ -30,9 +30,9 @@ class User(Base):
     username = Column(Text, nullable=False)
     email = Column(Text, nullable=False, unique=True)
     password_hash = Column(Text, nullable=False)
-    role = Column(roles_eum, nullable=False, default=Role.PARENT.value)
+    role = Column(roles_enum, nullable=False, default=Role.PARENT.value)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     
     activities = relationship("Activity", back_populates="user")
-    games = relationship("Game", back_populates="user")
+    games = relationship("Game", back_populates="author")
     favorites = relationship("Game", secondary=FavoritesT)

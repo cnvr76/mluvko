@@ -1,23 +1,8 @@
 import uuid
-from sqlalchemy import Column, Text, Enum as SQLEnum, ForeignKey
+from sqlalchemy import Column, DateTime, ForeignKey, func
 from sqlalchemy.orm import relationship
-from sqlalchemy.dialects.postgresql import UUID, JSONB
+from sqlalchemy.dialects.postgresql import UUID
 from config.database_config import Base
-from enum import Enum
-
-
-class GameStatus(str, Enum):
-    PRIVATE = "private"
-    PENDING = "pending"
-    PUBLISHED = "published"
-
-
-class AgeGroups(str, Enum):
-    JUNIOR = "2-4 roky"
-    MIDDLE = "5-6 rokov"
-
-
-game_statuses_enum: SQLEnum = SQLEnum(GameStatus, name="statuses", values_callable=lambda items: [enum.value for enum in items])
 
 
 class Game(Base):
@@ -25,13 +10,21 @@ class Game(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     author_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
-    name = Column(Text, nullable=False)
-    description = Column(Text)
-    preview_image_url = Column(Text)
-    age_group = Column(Text, nullable=False)
-    game_type = Column(Text, nullable=False)
-    status = Column(game_statuses_enum, nullable=False, default=GameStatus.PRIVATE.value)
-    config_data = Column(JSONB, nullable=False)
+    published_version_id = Column(UUID(as_uuid=True), ForeignKey("snapshots.id", ondelete="SET NULL"), nullable=True)
+    created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
+    author = relationship("User", back_populates="games")
     activities = relationship("Activity", back_populates="game")
-    user = relationship("User", back_populates="games")
+    
+    versions = relationship(
+        "Snapshot", 
+        foreign_keys="[Snapshot.game_id]", 
+        back_populates="game", 
+        cascade="all, delete-orphan"
+    )
+    
+    published_version = relationship(
+        "Snapshot", 
+        foreign_keys=[published_version_id], 
+        post_update=True
+    )

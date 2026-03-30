@@ -54,3 +54,31 @@ def update_game_stats(game_id: UUID, activity_data: ActivityCreate, current_user
         )
     db.commit()
     return updated_stats
+
+
+@router.post("/{game_id}/favorite", status_code=200)
+def mark_as_favorite(game_id: UUID, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    added: bool = game_service.mark_as_favorite(game_id, current_user.id, db)
+    db.commit()
+    return {
+        "success": added,
+    }
+    
+    
+@router.delete("/{game_id}/favorite", status_code=200)
+def remove_from_favorites(game_id: UUID, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    removed: bool = game_service.remove_from_favorites(game_id, current_user.id, db)
+    db.commit()
+    return {
+        "success": removed,
+    }
+    
+    
+@router.get("/favorites", response_model=list[GameBriefResponse])
+def get_all_favorites(current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    return current_user.favorites
+
+
+@router.get("/my", response_model=list[GameBriefResponse])
+def get_my_created_games(current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    return game_service.get_my_created_games(current_user.id, db)
