@@ -7,7 +7,7 @@ from models import Role
 
 class UserResponse(BaseModel):
     id: uuid.UUID
-    username: Optional[str]
+    username: Optional[str] = None
     email: EmailStr
     role: Role
     created_at: datetime

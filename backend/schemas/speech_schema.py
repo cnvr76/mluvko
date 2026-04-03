@@ -6,7 +6,7 @@ class AnalysedSpeechResponse(BaseModel):
     recognized_text: str
     reference_text: str
     score: float
-    errors: Optional[list[dict]]
+    errors: Optional[list[dict]] = None
     phonemes_reference: str
     phonemes_recognized: str
 

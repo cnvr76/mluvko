@@ -1,27 +1,17 @@
-from sqlalchemy.orm import Session, contains_eager, noload, Query
+from sqlalchemy.orm import Session, contains_eager, noload, Query, joinedload
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy import and_, func, CursorResult, delete
 from uuid import UUID
-from models import AgeGroups, Game, Role, Activity, User, FavoritesT, GameStatus
-from schemas import GameCreate
+from models import AgeGroups, Game, Role, Activity, User, FavoritesT, Snapshot
 from config.logger import Logger
 from typing import Optional, Any
+from config.exeptions import GameDoesntExist
 
 
 logger = Logger(__name__).configure()
 
 
 class GameService:
-    def create_game(self, config: GameCreate, user_id: UUID, db: Session) -> Game:
-        game = Game(**config.model_dump(), author_id=user_id)
-        
-        db.add(game)
-        db.flush()
-        db.refresh(game)
-        
-        return game
-    
-    
     def mark_as_favorite(self, game_id: UUID, user_id: UUID, db: Session) -> bool:
         stmt = insert(FavoritesT).values(
             user_id=user_id,
@@ -42,21 +32,6 @@ class GameService:
         return result.rowcount > 0
     
     
-    def get_my_created_games(self, user_id: UUID, db: Session) -> list[Game]:
-        return db.query(Game).filter(Game.author_id == user_id).all()
-    
-    
-    def change_game_status(self, game_id: UUID, status: GameStatus, db: Session) -> Game:
-        game: Game = db.query(Game.id == game_id).first()
-        game.status = status.name
-        
-        db.add(game)
-        db.flush()
-        db.refresh(game)
-        
-        return game
-    
-    
     def delete_game(self, game_id: UUID, user: User, db: Session) -> int:
         query: Query = db.query(Game).filter(Game.id == game_id)
         
@@ -69,16 +44,32 @@ class GameService:
     def get_game(self, game_id: UUID, user: Optional[User], db: Session) -> Optional[Game]:
         query: Query = self._build_games_query(user, db).filter(Game.id == game_id)
         game: Game = query.first()
+
+        if not game:
+            raise GameDoesntExist()
+        
         return game
     
 
-    def get_all_games(self, user: Optional[User], db: Session) -> list[Game]:
+    def get_all_published_games(self, user: Optional[User], db: Session) -> list[Game]:
         query: Query = self._build_games_query(user, db)
+        return query.all()
+    
+    
+    def get_favorite_games(self, user: User, db: Session) -> list[Game]:
+        query: Query = self._build_games_query(user, db)
+        
+        query = query.join(
+            FavoritesT, Game.id == FavoritesT.c.game_id
+        ).filter(
+            FavoritesT.c.user_id == user.id
+        )
+        
         return query.all()
     
 
     def get_games_for(self, age_group: AgeGroups, user: Optional[User], db: Session) -> list[Game]:
-        query: Query = self._build_games_query(user, db).filter(Game.age_group == age_group.value)
+        query: Query = self._build_games_query(user, db).filter(Snapshot.age_group == age_group.value)
         return query.all()
     
 
@@ -90,7 +81,7 @@ class GameService:
             best_score=new_score
         )
         
-        stmt.on_conflict_do_update(
+        stmt = stmt.on_conflict_do_update(
             index_elements=['user_id', 'game_id'],
             set_={
                 'last_score': new_score,
@@ -103,7 +94,12 @@ class GameService:
 
 
     def _build_games_query(self, user: Optional[User], db: Session) -> Query:
-        query: Query = db.query(Game)
+        query: Query = db.query(Game).join(
+            Snapshot, Game.published_version_id == Snapshot.id
+        ).options(
+            contains_eager(Game.published_version),
+            joinedload(Game.author)
+        )
         
         if user:
             query = query.outerjoin(

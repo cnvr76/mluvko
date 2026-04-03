@@ -3,3 +3,4 @@ from services.game_service import game_service
 from services.speech_service import speech_service
 from services.phoneme_analyzer_service import phoneme_service
 from services.user_service import user_service
+from services.snapshot_service import snapshot_service

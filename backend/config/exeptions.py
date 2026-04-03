@@ -8,6 +8,26 @@ class CustomException(Exception):
         super().__init__(self.detail)
         
         
+# --- SNAPSHOTS exceptions ---
+class VersionDoesntExist(CustomException):
+    def __init__(self):
+        self.detail: str = "Version not found or access denied"
+        super().__init__(self.detail, status.HTTP_404_NOT_FOUND)
+        
+        
+class SnapshotEditRestriction(CustomException):
+    def __init__(self):
+        self.detail: str = "Game is under review, you cannot edit it now"
+        super().__init__(self.detail, status.HTTP_403_FORBIDDEN)
+        
+        
+# --- GAMES exceptions ---
+class GameDoesntExist(CustomException):
+    def __init__(self):
+        self.detail: str = "Game not found or doesn't exist"
+        super().__init__(self.detail, status.HTTP_404_NOT_FOUND)
+        
+        
 # -- USERS exceptions ---
 class UserDoesntExist(CustomException):
     def __init__(self):

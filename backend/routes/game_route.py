@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from schemas import GameResponse, GameCreate, GameBriefResponse, ActivityResponse, ActivityCreate
-from models import AgeGroups, Game, Activity, User
-from services import game_service
+from schemas import GameResponse, GameBriefResponse, ActivityResponse, ActivityCreate, AuthorGameResponse
+from models import AgeGroups, Activity, User
+from services import game_service, snapshot_service
 from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import Optional
@@ -14,14 +14,17 @@ router = APIRouter()
 
 @router.get("/", response_model=list[GameBriefResponse])
 def get_all_games(current_user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)):
-    return game_service.get_all_games(current_user, db)
+    return game_service.get_all_published_games(current_user, db)
 
 
-@router.post("/new", response_model=GameResponse)
-def create_new_game(config_data: GameCreate, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
-    new_game: Game = game_service.create_game(config_data, current_user.id, db)
-    db.commit()
-    return new_game
+@router.get("/favorites", response_model=list[GameBriefResponse])
+def get_all_favorites(current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    return game_service.get_favorite_games(current_user, db)
+
+
+@router.get("/my", response_model=list[AuthorGameResponse])
+def get_my_created_games(current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    return snapshot_service.get_all_my_games(current_user.id, db)
 
 
 @router.delete("/{game_id}", status_code=200)
@@ -72,13 +75,3 @@ def remove_from_favorites(game_id: UUID, current_user: User = Depends(require_lo
     return {
         "success": removed,
     }
-    
-    
-@router.get("/favorites", response_model=list[GameBriefResponse])
-def get_all_favorites(current_user: User = Depends(require_login), db: Session = Depends(get_db)):
-    return current_user.favorites
-
-
-@router.get("/my", response_model=list[GameBriefResponse])
-def get_my_created_games(current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
-    return game_service.get_my_created_games(current_user.id, db)

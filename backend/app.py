@@ -9,6 +9,8 @@ from routes.speech_route import router as speech_router
 from routes.game_route import router as game_router
 from routes.user_route import router as user_router
 from routes.auth_route import router as auth_router
+from routes.snapshot_route import router as snapshot_router
+from routes.admin_route import router as admin_router
 
 
 app = FastAPI(
@@ -31,6 +33,8 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(speech_router, prefix="/speech", tags=["speech"])
 app.include_router(game_router, prefix="/games", tags=["games"])
+app.include_router(snapshot_router, prefix="/versions", tags=["versions"])
+app.include_router(admin_router, prefix="/versions", tags=["admin"])
 app.include_router(user_router, prefix="/users", tags=["users"])
 
 

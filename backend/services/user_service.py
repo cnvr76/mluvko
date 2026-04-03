@@ -25,7 +25,7 @@ class UserService:
     
     
     def get_all_users(self, db: Session) -> list[User]:
-        db.query(User).all()
+        return db.query(User).all()
     
     
     def delete_user(self, user_id: UUID, db: Session) -> int:
