@@ -33,15 +33,25 @@ def get_my_profile(current_user: User = Depends(require_login)):
     return current_user
 
 
+@router.patch("/me", response_model=UserResponse)
+def update_user(update_data: UserUpdate, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    safe_update_data: dict[str, Any] = update_data.model_dump(exclude_unset=True, exclude={"role"})
+    return user_service.update_user(current_user, safe_update_data, db)
+
+
 @router.get("/{user_id}", dependencies=[Depends(require_admin)], response_model=Optional[UserResponse])
 def get_user(user_id: UUID, db: Session = Depends(get_db)):
     return user_service.get_user_by_id(user_id, db)
 
 
-@router.patch("/me", response_model=UserResponse)
-def update_user(update_data: UserUpdate, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
-    safe_update_data: dict[str, Any] = update_data.model_dump(exclude_unset=True, exclude={"role"})
-    return user_service.update_user(current_user, safe_update_data, db)
+@router.delete("/{user_id}", dependencies=[Depends(require_admin)], status_code=200)
+def delete_user(user_id: UUID, db: Session = Depends(get_db)):
+    deleted_count: int = user_service.delete_user(user_id, db)
+    db.commit()
+    return {
+        "success": deleted_count > 0,
+        "deleted_count": deleted_count
+    }
 
 
 @router.patch("/{user_id}", dependencies=[Depends(require_admin)], response_model=UserResponse)
