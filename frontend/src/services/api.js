@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+export const API_BASE =
+  import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
 export const AgeGroups = {
   JUNIOR: "2-4 roky",
@@ -12,33 +13,40 @@ export const GameTypes = {
   REPEAT_AFTER: "repeat_after",
 };
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: API_BASE,
   timeout: 30000,
+  withCredentials: true,
 });
 
 export const api = {
+  // registration route
+  login: async (email, password) => {
+    return apiClient.post("/auth/login", {
+      email,
+      password,
+    });
+  },
+  signup: async (username, email, password) => {
+    return apiClient.post("/auth/signup", {
+      username,
+      email,
+      password,
+    });
+  },
   // functions just for requesting basic stuff
-  getAllGames: async (userSessionId) => {
+  getAllGames: async () => {
     return apiClient
-      .get("/games", {
-        params: {
-          user_session_id: userSessionId,
-        },
-      })
+      .get("/games")
       .then((response) => response?.data)
       .catch((error) => {
         console.error("Failed to fetch all games:", error);
         throw error;
       });
   },
-  getGamesFor: async (ageGroup, userSessionId) => {
+  getGamesFor: async (ageGroup) => {
     return apiClient
-      .get(`/games/group/${ageGroup}`, {
-        params: {
-          user_session_id: userSessionId,
-        },
-      })
+      .get(`/games/group/${ageGroup}`)
       .then((response) => response?.data)
       .catch((error) => {
         console.error(
@@ -48,13 +56,9 @@ export const api = {
         throw error;
       });
   },
-  getGameById: async (gameId, userSessionId) => {
+  getGameById: async (gameId) => {
     return apiClient
-      .get(`/games/${gameId}`, {
-        params: {
-          user_session_id: userSessionId,
-        },
-      })
+      .get(`/games/${gameId}`)
       .then((response) => response?.data)
       .catch((error) => {
         console.error(`Failed to fetch game by id ${gameId}:`, error);
@@ -62,10 +66,9 @@ export const api = {
       });
   },
   // functions for posting basic stuff
-  updateStats: async (gameId, userSessionId, score) => {
+  updateStats: async (gameId, score) => {
     return apiClient
       .post(`/games/${gameId}/update-stats`, {
-        user_session_id: userSessionId,
         score,
       })
       .then((response) => response?.data)

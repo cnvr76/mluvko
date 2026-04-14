@@ -3,6 +3,7 @@ import GamesPage from "./pages/GamesPage";
 import { AgeGroups } from "./services/api";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import GameHolder from "./components/games/GameHolder";
+import AuthForm from "./pages/AuthForm";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           element={<GamesPage ageGroup={AgeGroups.MIDDLE} />}
         />
         <Route path="/games/:gameId/:gameType" element={<GameHolder />} />
+        <Route path="/auth" element={<AuthForm />} />
       </Routes>
     </Router>
   );

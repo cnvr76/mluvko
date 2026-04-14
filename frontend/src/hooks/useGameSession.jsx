@@ -21,7 +21,7 @@ const useGameSession = (gameId) => {
       setIsFinished(true);
       try {
         const response = await api.updateStats(gameId, getSessionId(), score);
-        setBestScore(response?.best_score);
+        setBestScore(Math.round(response?.best_score * 100) / 100);
       } catch (error) {
         console.error("Failed to update game score:", error);
       } finally {

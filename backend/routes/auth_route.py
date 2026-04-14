@@ -41,3 +41,8 @@ def refresh(refresh_token: str = Cookie(None), db: Session = Depends(get_db)):
         tokens=tokens
     )
     
+    
+@router.post("/logout", status_code=200)
+def logout(response: Response):
+    response.delete_cookie("refresh_token", httponly=True, samesite="strict")
+    return {"message": "Logged out"}

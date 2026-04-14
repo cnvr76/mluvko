@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useGameSession from "../useGameSession";
 import { v4 as uuidv4 } from "uuid";
 
@@ -45,9 +45,6 @@ const usePexeso = (gameData) => {
     const card1 = cards.find((c) => c.id == firstId);
     const card2 = cards.find((c) => c.id == secondId);
 
-    console.log(card1);
-    console.log(card2);
-
     if (card1.matchId === card2.matchId) {
       setMatchedIds((prev) => {
         const newSet = new Set(prev);
@@ -90,6 +87,7 @@ const usePexeso = (gameData) => {
   const markFlipped = (card) => {
     if (
       isChecking ||
+      isPreviewing ||
       flippedIds.includes(card.id) ||
       matchedIds.has(card.matchId)
     )
