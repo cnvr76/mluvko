@@ -60,7 +60,6 @@ const usePexeso = (gameData) => {
           console.error(`Error playing sound ${audioLink}:`, error)
         );
 
-      console.log(matchedIds);
       setFlippedIds([]);
       setIsChecking(false);
     } else {

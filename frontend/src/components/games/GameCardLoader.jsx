@@ -1,15 +1,11 @@
 import React, { useCallback, useMemo } from "react";
 import { api } from "../../services/api";
-import getSessionId from "../../services/uuidSessionGenerator";
 import GameCard from "../shared/GameCard";
 import useAsync from "../../hooks/useAsync";
 import PageLoading from "../loading/PageLoading";
 
 const GameCardLoader = ({ ageGroup }) => {
-  const loadGames = useCallback(
-    () => api.getGamesFor(ageGroup, getSessionId()),
-    [ageGroup]
-  );
+  const loadGames = useCallback(() => api.getGamesFor(ageGroup), [ageGroup]);
   const { data, isLoading, error } = useAsync(loadGames);
 
   const games = useMemo(() => {

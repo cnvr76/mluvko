@@ -1,7 +1,5 @@
 import React, { useCallback } from "react";
 import useAsync from "../../../hooks/useAsync";
-import { api } from "../../../services/api";
-import getSessionId from "../../../services/uuidSessionGenerator";
 import AnimalCard from "./AnimalCard";
 import PlayAudioButton from "./PlayAudioButton";
 import RecordAudioButton from "./RecordAudioButton";

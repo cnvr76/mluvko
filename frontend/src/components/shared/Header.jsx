@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen((prev) => !prev);
+  const { isAuthenticated } = useAuth();
 
   return (
     <header
@@ -23,14 +25,14 @@ const Header = () => {
       {/* desktop */}
       <nav className="hidden md:flex gap-8 mr-4 font-[600]">
         <h3 className="text-lg md:text-2xl text-[#642f37] m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]">
-          Aktuality
-        </h3>
-        <h3 className="text-lg md:text-2xl text-[#642f37] m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]">
-          Všetky hry
-        </h3>
-        <h3 className="text-lg md:text-2xl text-[#642f37] m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]">
           Kontakt
         </h3>
+        <Link
+          to="/auth?type=signup"
+          className="text-lg md:text-2xl text-[#642f37] m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]"
+        >
+          {isAuthenticated ? "Moje konto" : "Registrovať"}
+        </Link>
       </nav>
 
       {/* burger */}

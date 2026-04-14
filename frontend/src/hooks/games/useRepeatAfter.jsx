@@ -3,8 +3,14 @@ import useGameSession from "../useGameSession";
 import { api } from "../../services/api";
 
 const useRepeatAfter = (gameData) => {
-  const { isSaving, isFinished, finalScore, bestScore, finishGame } =
-    useGameSession(gameData?.id);
+  const {
+    isSaving,
+    isFinished,
+    isAuthenticated,
+    finalScore,
+    bestScore,
+    finishGame,
+  } = useGameSession(gameData?.id);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState([]);
   const [currentScore, setCurrentScore] = useState(null);
@@ -61,6 +67,7 @@ const useRepeatAfter = (gameData) => {
     finalScore,
     bestScore,
     isFinished,
+    isAuthenticated,
     // loading
     isSaving,
     isSubmitting,

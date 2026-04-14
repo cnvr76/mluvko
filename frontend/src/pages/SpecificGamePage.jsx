@@ -1,4 +1,3 @@
-// src/pages/SpecificGamePage.jsx
 import React from "react";
 import Header from "../components/shared/Header";
 
