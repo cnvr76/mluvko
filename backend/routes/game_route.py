@@ -17,7 +17,7 @@ def get_all_games(current_user: Optional[User] = Depends(get_current_user), db: 
     return game_service.get_all_published_games(current_user, db)
 
 
-@router.get("/favorites", response_model=list[GameBriefResponse])
+@router.get("/favorite", response_model=list[GameBriefResponse])
 def get_all_favorites(current_user: User = Depends(require_login), db: Session = Depends(get_db)):
     return game_service.get_favorite_games(current_user, db)
 

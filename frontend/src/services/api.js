@@ -19,6 +19,25 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
+const get = async (url, errorMessage) => {
+  return apiClient
+    .get(url)
+    .then((response) => response?.data)
+    .catch((error) => {
+      console.error(errorMessage, error);
+      throw error;
+    });
+};
+const post = async (url, body, errorMessage, headers = {}) => {
+  return apiClient
+    .post(url, body, { headers })
+    .then((response) => response?.data)
+    .catch((error) => {
+      console.error(errorMessage, error);
+      throw error;
+    });
+};
+
 export const api = {
   // registration route
   login: async (email, password) => {
@@ -35,79 +54,37 @@ export const api = {
     });
   },
   // functions just for requesting basic stuff
-  getMyProfile: async () => {
-    return apiClient
-      .get("/users/me")
-      .then((response) => response?.data)
-      .catch((error) => {
-        console.error("Failed to fetch my profile:", error);
-        throw error;
-      });
-  },
-  getAllGames: async () => {
-    return apiClient
-      .get("/games")
-      .then((response) => response?.data)
-      .catch((error) => {
-        console.error("Failed to fetch all games:", error);
-        throw error;
-      });
-  },
-  getGamesFor: async (ageGroup) => {
-    return apiClient
-      .get(`/games/group/${ageGroup}`)
-      .then((response) => response?.data)
-      .catch((error) => {
-        console.error(
-          `Failed to fetch games for age group ${ageGroup}:`,
-          error
-        );
-        throw error;
-      });
-  },
-  getGameById: async (gameId) => {
-    return apiClient
-      .get(`/games/${gameId}`)
-      .then((response) => response?.data)
-      .catch((error) => {
-        console.error(`Failed to fetch game by id ${gameId}:`, error);
-        throw error;
-      });
-  },
+  getMyProfile: async () => get("/users/me", "Failed to fetch my profile:"),
+  getMyFavoriteGames: async () =>
+    get("/games/favorite", "Failed to fetch my favorite games:"),
+  getAllGames: async () => get("/games", "Failed to fetch all games:"),
+  getGamesFor: async (ageGroup) =>
+    get(
+      `/games/group/${ageGroup}`,
+      `Failed to fetch games for age group ${ageGroup}:`
+    ),
+  getGameById: async (gameId) =>
+    get(`/games/${gameId}`, `Failed to fetch game by id ${gameId}:`),
   // functions for posting basic stuff
-  updateStats: async (gameId, score) => {
-    return apiClient
-      .post(`/games/${gameId}/update-stats`, {
-        score,
-      })
-      .then((response) => response?.data)
-      .catch((error) => {
-        console.error(
-          `Failed to update stats for gameId ${gameId} by ${score}:`,
-          error
-        );
-        throw error;
-      });
-  },
+  updateStats: async (gameId, score) =>
+    post(
+      `/games/${gameId}/update-stats`,
+      { score },
+      `Failed to update stats for gameId ${gameId} by ${score}:`
+    ),
   // functions for voice analyzing
   analyzeSpeech: async (audioBlob, referenceText) => {
     const formData = new FormData();
     formData.append("audio_file", audioBlob, "recording.webm");
     formData.append("reference_text", referenceText);
 
-    return apiClient
-      .post("/speech/stt", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => response?.data)
-      .catch((error) => {
-        console.error(
-          `Failed to send speech evalution request for ${referenceText}:`,
-          error
-        );
-        throw error;
-      });
+    return post(
+      "/speech/stt",
+      formData,
+      `Failed to send speech evalution request for ${referenceText}:`,
+      {
+        "Content-Type": "multipart/form-data",
+      }
+    );
   },
 };
