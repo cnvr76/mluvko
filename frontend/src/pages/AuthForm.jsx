@@ -53,7 +53,10 @@ const AuthForm = () => {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "0 auto", padding: "2rem" }}>
+    <div
+      className="w-screen h-screen flex flex-col justify-center"
+      style={{ maxWidth: "400px", margin: "0 auto", padding: "2rem" }}
+    >
       <h2>{isLoginMode ? "Prihlásiť sa do svojho účtu" : "Registrácia"}</h2>
 
       <form

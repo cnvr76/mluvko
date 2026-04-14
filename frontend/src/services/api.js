@@ -35,6 +35,15 @@ export const api = {
     });
   },
   // functions just for requesting basic stuff
+  getMyProfile: async () => {
+    return apiClient
+      .get("/users/me")
+      .then((response) => response?.data)
+      .catch((error) => {
+        console.error("Failed to fetch my profile:", error);
+        throw error;
+      });
+  },
   getAllGames: async () => {
     return apiClient
       .get("/games")

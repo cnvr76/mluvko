@@ -31,7 +31,9 @@ const Header = () => {
           to="/auth?type=signup"
           className="text-lg md:text-2xl text-[#642f37] m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]"
         >
-          {isAuthenticated ? "Moje konto" : "Registrovať"}
+          {isAuthenticated
+            ? `Konto (${localStorage.getItem("username")})`
+            : "Registrovať"}
         </Link>
       </nav>
 
