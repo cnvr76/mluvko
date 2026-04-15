@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/AuthContext";
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen((prev) => !prev);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   return (
     <header
@@ -23,18 +23,26 @@ const Header = () => {
       </Link>
 
       {/* desktop */}
-      <nav className="hidden md:flex gap-8 mr-4 font-[600]">
-        <h3 className="text-lg md:text-2xl text-[#642f37] m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]">
+      <nav className="hidden md:flex gap-8 mr-4 font-[600] text-[#642f37]">
+        <h3 className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]">
           Kontakt
         </h3>
         <Link
           to="/auth?type=signup"
-          className="text-lg md:text-2xl text-[#642f37] m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]"
+          className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]"
         >
           {isAuthenticated
             ? `Konto (${localStorage.getItem("username")})`
             : "Registrovať"}
         </Link>
+        {isAuthenticated && (
+          <button
+            onClick={logout}
+            className="cursor-pointer hover:text-[#ff7110] transition-colors duration-300"
+          >
+            <i className="fa-solid fa-right-from-bracket text-2xl"></i>
+          </button>
+        )}
       </nav>
 
       {/* burger */}

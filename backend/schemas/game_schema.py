@@ -15,6 +15,7 @@ class GameBriefResponse(BaseModel):
     age_group: AgeGroups
     activities: list[ActivityResponse] = []
     status: VersionStatus
+    is_favorite: bool = False
 
     model_config = {"from_attributes": True}
 
@@ -26,6 +27,7 @@ class GameBriefResponse(BaseModel):
                 "id": data.id,
                 "author_id": data.author_id,
                 "activities": data.activities if hasattr(data, "activities") else [],
+                "is_favorite": getattr(data, "is_favorite", False),
                 # users (if author exists)
                 "author_name": data.author.username if hasattr(data, "author") and data.author else None,
                 # from snapshot

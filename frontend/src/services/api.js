@@ -1,4 +1,5 @@
 import axios from "axios";
+import { GET, POST, DELETE } from "./methods";
 
 export const API_BASE =
   import.meta.env.VITE_API_BASE || "http://localhost:8000";
@@ -19,25 +20,6 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
-const get = async (url, errorMessage) => {
-  return apiClient
-    .get(url)
-    .then((response) => response?.data)
-    .catch((error) => {
-      console.error(errorMessage, error);
-      throw error;
-    });
-};
-const post = async (url, body, errorMessage, headers = {}) => {
-  return apiClient
-    .post(url, body, { headers })
-    .then((response) => response?.data)
-    .catch((error) => {
-      console.error(errorMessage, error);
-      throw error;
-    });
-};
-
 export const api = {
   // registration route
   login: async (email, password) => {
@@ -54,20 +36,35 @@ export const api = {
     });
   },
   // functions just for requesting basic stuff
-  getMyProfile: async () => get("/users/me", "Failed to fetch my profile:"),
+  getMyProfile: async () => GET("/users/me", "Failed to fetch my profile:"),
   getMyFavoriteGames: async () =>
-    get("/games/favorite", "Failed to fetch my favorite games:"),
-  getAllGames: async () => get("/games", "Failed to fetch all games:"),
+    GET("/games/favorite", "Failed to fetch my favorite games:"),
+  getAllGames: async () => GET("/games", "Failed to fetch all games:"),
   getGamesFor: async (ageGroup) =>
-    get(
+    GET(
       `/games/group/${ageGroup}`,
       `Failed to fetch games for age group ${ageGroup}:`
     ),
   getGameById: async (gameId) =>
-    get(`/games/${gameId}`, `Failed to fetch game by id ${gameId}:`),
+    GET(`/games/${gameId}`, `Failed to fetch game by id ${gameId}:`),
   // functions for posting basic stuff
+  toggleFavorite: async (gameId, isFavorite) => {
+    if (isFavorite) {
+      return POST(
+        `/games/${gameId}/favorite`,
+        {},
+        "Failed to mark game as favorite"
+      );
+    } else {
+      return DELETE(
+        `/games/${gameId}/favorite`,
+        {},
+        "Failed to delete game from favorites"
+      );
+    }
+  },
   updateStats: async (gameId, score) =>
-    post(
+    POST(
       `/games/${gameId}/update-stats`,
       { score },
       `Failed to update stats for gameId ${gameId} by ${score}:`
@@ -78,7 +75,7 @@ export const api = {
     formData.append("audio_file", audioBlob, "recording.webm");
     formData.append("reference_text", referenceText);
 
-    return post(
+    return POST(
       "/speech/stt",
       formData,
       `Failed to send speech evalution request for ${referenceText}:`,

@@ -48,12 +48,15 @@ class GameService:
         if not game:
             raise GameDoesntExist()
         
+        self._populate_is_favorite(game, user, db)
         return game
     
 
     def get_all_published_games(self, user: Optional[User], db: Session) -> list[Game]:
         query: Query = self._build_games_query(user, db)
-        return query.all()
+        games: list[Game] = query.all()
+        self._populate_is_favorite(games, user, db)
+        return games
     
     
     def get_favorite_games(self, user: User, db: Session) -> list[Game]:
@@ -65,12 +68,16 @@ class GameService:
             FavoritesT.c.user_id == user.id
         )
         
-        return query.all()
+        games: list[Game] = query.all()
+        self._populate_is_favorite(games, user, db)
+        return games
     
 
     def get_games_for(self, age_group: AgeGroups, user: Optional[User], db: Session) -> list[Game]:
         query: Query = self._build_games_query(user, db).filter(Snapshot.age_group == age_group.value)
-        return query.all()
+        games: list[Game] = query.all()
+        self._populate_is_favorite(games, user, db)
+        return games
     
 
     def update_game_stats(self, game_id: UUID, user_id: UUID, new_score: float, db: Session) -> Activity:
@@ -113,6 +120,31 @@ class GameService:
             query = query.options(noload(Game.activities))
             
         return query
+    
+    
+    def _populate_is_favorite(self, target: list[Game] | Game | None, user: Optional[User], db: Session) -> None:
+        if not target:
+            return
+
+        games = target if isinstance(target, list) else [target]
+        
+        if not user:
+            for game in games:
+                game.is_favorite = False
+            return
+            
+        game_ids = [game.id for game in games]
+        if not game_ids:
+            return
+            
+        favs = db.query(FavoritesT.c.game_id).filter(
+            FavoritesT.c.user_id == user.id,
+            FavoritesT.c.game_id.in_(game_ids)
+        ).all()
+        
+        fav_set = {f[0] for f in favs}
+        for game in games:
+            game.is_favorite = game.id in fav_set
 
 
 game_service: GameService = GameService()

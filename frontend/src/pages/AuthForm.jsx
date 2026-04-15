@@ -4,7 +4,6 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 
 const AuthForm = () => {
   const { login, signup } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -39,10 +38,6 @@ const AuthForm = () => {
       if (result.success) {
         result = await login(formData.email, formData.password);
       }
-    }
-
-    if (result.success) {
-      navigate(from, { replace: true });
     }
 
     setIsLoading(false);
