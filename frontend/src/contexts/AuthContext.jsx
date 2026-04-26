@@ -1,5 +1,5 @@
 import React, { useContext, createContext, useState, useEffect } from "react";
-import { apiClient, api, API_BASE } from "../services/api.js";
+import { apiClient, api, API_BASE, Roles } from "../services/api.js";
 import axios from "axios";
 
 const AuthContext = createContext();
@@ -32,6 +32,8 @@ const processQueue = (error, token = null) => {
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isTherapist, setIsTherapist] = useState(false);
 
   const refreshToken = async () => {
     const response = await axios.post(
@@ -70,6 +72,8 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("username", username);
         localStorage.setItem("role", role);
         setIsAuthenticated(true);
+        setIsAdmin(role === Roles.ADMIN);
+        setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
 
         return { success: true, username };
       } else {
@@ -155,18 +159,23 @@ export const AuthProvider = ({ children }) => {
 
       if (accessToken) {
         try {
-          await apiClient.get("/users/me");
+          const response = await apiClient.get("/users/me");
+          const role = response.data.role || localStorage.getItem("role");
           setIsAuthenticated(true);
+          setIsAdmin(role === Roles.ADMIN);
+          setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
         } catch (error) {
           if (error.response?.status === 401) {
             try {
               await refreshToken();
               setIsAuthenticated(true);
+              const role = localStorage.getItem("role");
+              setIsAdmin(role === Roles.ADMIN);
+              setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
             } catch (refreshError) {
               logout();
             }
           } else {
-            // Если ошибка 500 или нет сети, не разлогиниваем юзера!
             setIsAuthenticated(true);
           }
         }
@@ -178,7 +187,15 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  const value = { isAuthenticated, isLoading, login, signup, logout };
+  const value = {
+    isAuthenticated,
+    isAdmin,
+    isTherapist,
+    isLoading,
+    login,
+    signup,
+    logout,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

@@ -3,18 +3,36 @@ import { Link } from "react-router-dom";
 import { useAuthAction } from "../../hooks/useAuthAction";
 import { api } from "../../services/api";
 
-const GameCard = ({ data }) => {
+const GameCard = ({ data, onFavoriteToggle }) => {
   const [isStarred, setIsStarred] = useState(data.is_favorite || false);
   const withAuth = useAuthAction();
 
-  const handleFavorite = async () => {
+  const handleFavorite = async (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     const toggledState = !isStarred;
     setIsStarred(toggledState);
-    await api.toggleFavorite(data.id, toggledState);
+
+    if (onFavoriteToggle) {
+      onFavoriteToggle(data.id, toggledState);
+    }
+
+    try {
+      await api.toggleFavorite(data.id, toggledState);
+    } catch (error) {
+      setIsStarred(!toggledState);
+      if (onFavoriteToggle) {
+        onFavoriteToggle(data.id, !toggledState);
+      }
+      console.error("Failed to toggle favorite", error);
+    }
   };
 
   return (
-    <div className="relative hover:rotate-[-1deg] origin-center cursor-pointer select-none transition-transform duration-200 ease-out">
+    <div className="relative hover:rotate-[-1deg] origin-center cursor-pointer select-none transition-transform duration-200 ease-out w-fit">
       <div className="absolute z-30 right-5 top-5">
         <button
           className="cursor-pointer hover:scale-125 hover:rotate-12 transition-transform duration-200 ease-out"

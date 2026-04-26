@@ -8,10 +8,14 @@ export const AgeGroups = {
   JUNIOR: "2-4 roky",
   MIDDLE: "5-6 rokov",
 };
-
 export const GameTypes = {
   PEXESO: "pexeso",
   REPEAT_AFTER: "repeat_after",
+};
+export const Roles = {
+  PARENT: "parent",
+  ADMIN: "admin",
+  THERAPIST: "therapist",
 };
 
 export const apiClient = axios.create({
