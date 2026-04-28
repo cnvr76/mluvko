@@ -1,5 +1,5 @@
 import axios from "axios";
-import { GET, POST, DELETE } from "./methods";
+import { GET, POST, DELETE, PATCH } from "./methods";
 
 export const API_BASE =
   import.meta.env.VITE_API_BASE || "http://localhost:8000";
@@ -39,10 +39,13 @@ export const api = {
       password,
     });
   },
+
   // functions just for requesting basic stuff
   getMyProfile: async () => GET("/users/me", "Failed to fetch my profile:"),
   getMyFavoriteGames: async () =>
     GET("/games/favorite", "Failed to fetch my favorite games:"),
+  getMyCreatedGames: async () =>
+    GET("/games/my", "Failed to fetch my created games:"),
   getAllGames: async () => GET("/games", "Failed to fetch all games:"),
   getGamesFor: async (ageGroup) =>
     GET(
@@ -51,6 +54,9 @@ export const api = {
     ),
   getGameById: async (gameId) =>
     GET(`/games/${gameId}`, `Failed to fetch game by id ${gameId}:`),
+  getSnapshotInfo: async (gameId, snapshotId) =>
+    GET(`/versions/${snapshotId}/game/${gameId}`),
+
   // functions for posting basic stuff
   toggleFavorite: async (gameId, isFavorite) => {
     if (isFavorite) {
@@ -67,12 +73,24 @@ export const api = {
       );
     }
   },
+  deleteGame: async (gameId) =>
+    DELETE(`/games/${gameId}`, "Chyba pri mazaní hry:"),
+  saveGame: async (gameId, data) =>
+    PATCH(
+      `/versions/${gameId}/draft`,
+      data,
+      "Error while saving draft occured:"
+    ),
+  initDraft: async () =>
+    POST("/versions/init/draft", {}, "Couldn't initialized draft:"),
+
   updateStats: async (gameId, score) =>
     POST(
       `/games/${gameId}/update-stats`,
       { score },
       `Failed to update stats for gameId ${gameId} by ${score}:`
     ),
+
   // functions for voice analyzing
   analyzeSpeech: async (audioBlob, referenceText) => {
     const formData = new FormData();
@@ -88,4 +106,49 @@ export const api = {
       }
     );
   },
+  generateTTS: async (text) =>
+    POST(
+      `/speech/tts?speech_text=${encodeURIComponent(text)}`,
+      {},
+      "Failed to generate TTS:"
+    ),
+
+  // --- ADMIN ROUTES ---
+  getAdminDashboard: async () =>
+    GET("/admin/dashboard/snapshots", "Chyba načítania dashboardu:"),
+  approveSnapshot: async (gameId, snapshotId) =>
+    POST(`/admin/${gameId}/approve/${snapshotId}`, {}, "Chyba schvaľovania:"),
+
+  // Для отклонения pending версий
+  rejectPendingSnapshot: async (gameId, snapshotId, reason) =>
+    POST(
+      `/admin/${gameId}/reject/${snapshotId}`,
+      { reason },
+      "Chyba zamietnutia verzie:"
+    ),
+
+  // Для отзыва уже опубликованной игры
+  revokeGame: async (gameId, reason) =>
+    POST(`/admin/${gameId}/revoke`, { reason }, "Chyba zrušenia hry:"),
+
+  rollbackGame: async (gameId, targetSnapshotId, reason) =>
+    POST(
+      `/admin/${gameId}/rollback/${targetSnapshotId}`,
+      { reason },
+      "Chyba rollbacku:"
+    ),
+
+  // --- VERSIONS / THERAPIST ROUTES ---
+  submitForReview: async (gameId) =>
+    POST(`/versions/${gameId}/submit`, {}, "Chyba odosielania na kontrolu:"),
+  getSnapshotInfo: async (gameId, snapshotId) =>
+    GET(
+      `/versions/${snapshotId}/game/${gameId}`,
+      "Chyba načítania detailov verzie:"
+    ),
+  getSnapshotForTesting: async (gameId, snapshotId) =>
+    GET(
+      `/versions/testing/${snapshotId}/game/${gameId}`,
+      "Chyba načítania verzie pre testovanie:"
+    ),
 };

@@ -3,7 +3,7 @@ import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const useGameSession = (gameId) => {
+const useGameSession = (gameId, snapshotId) => {
   const { isAuthenticated } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
@@ -13,7 +13,13 @@ const useGameSession = (gameId) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getGame = useCallback(() => api.getGameById(gameId), [gameId]);
+  const getGame = useCallback(
+    () =>
+      snapshotId
+        ? api.getSnapshotInfo(gameId, snapshotId)
+        : api.getGameById(gameId),
+    [gameId, snapshotId]
+  );
 
   const requireAuthRedirect = useCallback(() => {
     if (!isAuthenticated) {

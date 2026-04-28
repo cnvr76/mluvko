@@ -17,7 +17,7 @@ class VersionDoesntExist(CustomException):
         
 class SnapshotEditRestriction(CustomException):
     def __init__(self):
-        self.detail: str = "Game is under review, you cannot edit it now"
+        self.detail: str = "Game is under review, you cannot edit it now & cannot send other versions"
         super().__init__(self.detail, status.HTTP_403_FORBIDDEN)
         
         

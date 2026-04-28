@@ -34,3 +34,10 @@ def rollback_to_version(game_id: UUID, target_snapshot_id: UUID, feedback: Admin
     snapshot_service.rollback_to_version(game_id, target_snapshot_id, feedback.reason, db)
     db.commit()
     return SuccessfulResponse(detail=f"Successfully rolled back to version {target_snapshot_id}")
+
+
+@router.post("/{game_id}/reject/{snapshot_id}", dependencies=[Depends(require_admin)], response_model=SuccessfulResponse, status_code=200)
+def reject_snapshot(game_id: UUID, snapshot_id: UUID, feedback: AdminFeedbackRequest, db: Session = Depends(get_db)):
+    snapshot_service.reject_snapshot(game_id, snapshot_id, feedback.reason, db)
+    db.commit()
+    return SuccessfulResponse(detail="Pending version successfully rejected")

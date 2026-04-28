@@ -22,6 +22,11 @@ export const POST = async (url, body, errorMessage, headers = {}) => {
     errorMessage
   );
 };
+
 export const DELETE = async (url, body, errorMessage) => {
   return __finalizeRequest(apiClient.delete(url, body), errorMessage);
+};
+
+export const PATCH = async (url, body, errorMessage) => {
+  return __finalizeRequest(apiClient.patch(url, body), errorMessage);
 };

@@ -161,26 +161,14 @@ export const AuthProvider = ({ children }) => {
         try {
           const response = await apiClient.get("/users/me");
           const role = response.data.role || localStorage.getItem("role");
+
           setIsAuthenticated(true);
           setIsAdmin(role === Roles.ADMIN);
           setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
         } catch (error) {
-          if (error.response?.status === 401) {
-            try {
-              await refreshToken();
-              setIsAuthenticated(true);
-              const role = localStorage.getItem("role");
-              setIsAdmin(role === Roles.ADMIN);
-              setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
-            } catch (refreshError) {
-              logout();
-            }
-          } else {
-            setIsAuthenticated(true);
-          }
+          logout();
         }
       }
-
       setIsLoading(false);
     };
 

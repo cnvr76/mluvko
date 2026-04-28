@@ -1,6 +1,6 @@
 from uuid import UUID
 from models import User
-from schemas import GameUpdate, DraftInitResponse, SuccessfulResponse, SnapshotBriefResponse, SnapshotFullResponse
+from schemas import GameUpdate, DraftInitResponse, SuccessfulResponse, SnapshotBriefResponse, SnapshotFullResponse, SnapshotTestingResponse
 from config.dependencies import require_therapist_or_admin
 from config.database_config import get_db
 from fastapi import APIRouter, Depends
@@ -39,4 +39,9 @@ def get_my_problematic_games(current_user: User = Depends(require_therapist_or_a
 
 @router.get("/{snapshot_id}/game/{game_id}", response_model=SnapshotFullResponse, status_code=200)
 def get_snapshot(game_id: UUID, snapshot_id: UUID, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    return snapshot_service.get_snapshot_for_testing(game_id, snapshot_id, current_user, db)
+
+
+@router.get("/testing/{snapshot_id}/game/{game_id}", response_model=SnapshotTestingResponse)
+def get_snapshot_for_testing(snapshot_id: UUID, game_id: UUID, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
     return snapshot_service.get_snapshot_for_testing(game_id, snapshot_id, current_user, db)

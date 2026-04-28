@@ -52,7 +52,7 @@ const usePexeso = (gameData) => {
         return newSet;
       });
 
-      const audioLink = `${VITE_API_BASE}${card1.animal_audio}`;
+      const audioLink = `${VITE_API_BASE}/${card1.animal_audio}`;
       const audio = new Audio(audioLink);
       audio
         .play()

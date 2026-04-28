@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, model_validator
 from typing import Optional, Any
 from datetime import datetime
 from uuid import UUID
 from models import VersionStatus
+from schemas.activity_schema import ActivityResponse
 
 
 class DraftInitResponse(BaseModel):
@@ -15,6 +16,7 @@ class SnapshotBriefResponse(BaseModel):
     version: int
     name: str
     status: VersionStatus
+    game_type: str
     admin_feedback: Optional[str] = None
     created_at: datetime
     
@@ -66,5 +68,44 @@ class SnapshotFullResponse(BaseModel):
                 "created_at": data.created_at,
                 
                 "versions": data.game.versions if hasattr(data.game, "versions") else []
+            }
+        return data
+    
+    
+class SnapshotTestingResponse(BaseModel):
+    id: UUID
+    name: str
+    preview_image_url: Optional[str] = None
+    game_type: str
+    age_group: str
+    activities: list[ActivityResponse] = []
+    status: str
+    is_favorite: bool = False
+    author_id: UUID
+    author_name: str
+    description: Optional[str] = None
+    config_data: dict
+
+    model_config = {"from_attributes": True}
+
+    @model_validator(mode='before')
+    @classmethod
+    def flatten_snapshot_data(cls, data: Any) -> Any:
+        # data здесь — это объект модели Snapshot
+        # Мы имитируем структуру GameBriefResponse, как в оригинальном файле
+        if hasattr(data, "game") and data.game:
+            return {
+                "id": data.game.id,
+                "author_id": data.game.author_id,
+                "author_name": data.game.author.username if data.game.author else None,
+                "activities": data.game.activities if hasattr(data.game, "activities") else [],
+                "is_favorite": False, # В режиме теста избранное всегда false
+                "name": data.name,
+                "preview_image_url": data.preview_image_url,
+                "game_type": data.game_type,
+                "status": data.status,
+                "description": data.description,
+                "age_group": data.age_group,
+                "config_data": data.config_data
             }
         return data

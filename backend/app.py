@@ -34,7 +34,7 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(speech_router, prefix="/speech", tags=["speech"])
 app.include_router(game_router, prefix="/games", tags=["games"])
 app.include_router(snapshot_router, prefix="/versions", tags=["versions"])
-app.include_router(admin_router, prefix="/versions", tags=["admin"])
+app.include_router(admin_router, prefix="/admin", tags=["admin"])
 app.include_router(user_router, prefix="/users", tags=["users"])
 
 

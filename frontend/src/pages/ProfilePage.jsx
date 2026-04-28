@@ -4,6 +4,8 @@ import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import PersonalDetails from "../components/profile/PersonalDetails";
 import FavoriteGames from "../components/profile/FavoriteGames";
+import CreatedGames from "../components/profile/CreatedGames";
+import AdminDashboard from "../components/profile/AdminDashboard";
 
 export const profileLoader = async () => {
   try {
@@ -45,7 +47,7 @@ const ProfilePage = () => {
     tabsConfig.push({
       id: "created",
       label: "Moje vytvorené hry",
-      // component: <CreatedGames />,
+      component: <CreatedGames />,
     });
   }
 
@@ -53,7 +55,7 @@ const ProfilePage = () => {
     tabsConfig.push({
       id: "admin",
       label: "Admin dashboard",
-      // component: <AdminDashboard />,
+      component: <AdminDashboard />,
     });
   }
 

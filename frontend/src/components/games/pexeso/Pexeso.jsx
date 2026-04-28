@@ -6,8 +6,8 @@ import PageLoading from "../../loading/PageLoading";
 import FlipCard from "./FlipCard";
 import EndGameScreen from "../EndGameScreen";
 
-const Pexeso = ({ gameId }) => {
-  const { getGame } = useGameSession(gameId);
+const Pexeso = ({ gameId, snapshotId }) => {
+  const { getGame } = useGameSession(gameId, snapshotId);
   const { data, isLoading, error } = useAsync(getGame);
   const {
     // card lists

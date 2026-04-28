@@ -126,6 +126,14 @@ class SnapshotsService:
         
         
     def submit_for_review(self, game_id: UUID, user_id: UUID, db: Session) -> None:
+        existing_pending = db.query(Snapshot).filter(
+            Snapshot.game_id == game_id,
+            Snapshot.status == VersionStatus.PENDING.value
+        ).first()
+        
+        if existing_pending:
+            raise SnapshotEditRestriction()
+            
         draft: Snapshot = self.__get_author_snapshot(game_id, user_id, db, VersionStatus.DRAFT)
         draft.status = VersionStatus.PENDING.value
         
@@ -137,6 +145,35 @@ class SnapshotsService:
             Snapshot.status == status.value
         ).all()
         return snapshots
+    
+    
+    def get_snapshot_for_testing(self, game_id: UUID, snapshot_id: UUID, user: User, db: Session) -> Snapshot:
+        # Загружаем снапшот со всеми связями, аналогично noload/joinedload в game_service
+        snapshot: Optional[Snapshot] = db.query(Snapshot).options(
+            joinedload(Snapshot.game).joinedload(Game.author),
+            joinedload(Snapshot.game).joinedload(Game.activities)
+        ).filter(
+            Snapshot.id == snapshot_id,
+            Snapshot.game_id == game_id
+        ).first()
+        
+        if not snapshot:
+            raise VersionDoesntExist()
+        
+        is_admin = user.role == Role.ADMIN.value
+        is_author = user.id == snapshot.game.author_id
+        
+        # 1. Автор может тестировать любую версию
+        if is_author:
+            return snapshot
+        
+        # 2. Админ может тестировать только если это не драфт
+        if is_admin:
+            if snapshot.status == VersionStatus.DRAFT.value:
+                raise NotEnoughRights()
+            return snapshot
+        
+        raise NotEnoughRights()
     
     
     def get_all_my_games(self, user_id: UUID, db: Session) -> list[Game]:
@@ -180,16 +217,51 @@ class SnapshotsService:
         game.published_version_id = None
         return game
             
+    
+    def reject_snapshot(self, game_id: UUID, snapshot_id: UUID, reason: str, db: Session) -> None:
+        snapshot: Optional[Snapshot] = db.query(Snapshot).filter(
+            Snapshot.id == snapshot_id, 
+            Snapshot.game_id == game_id
+        ).first()
+        
+        if not snapshot:
+            raise VersionDoesntExist()
+            
+        snapshot.status = VersionStatus.REJECTED.value
+        snapshot.admin_feedback = reason
+    
             
     def rollback_to_version(self, game_id: UUID, target_snapshot_id: UUID, reason: str, db: Session) -> Game:
-        game: Game = self.revoke_game(game_id, reason, db)
+        game: Game = self.__get_game(game_id, db)
         
+        # 1. Если сейчас есть публичная версия (которую мы заменяем откатом), отклоняем её
+        if game.published_version_id:
+            bad_snapshot: Optional[Snapshot] = db.query(Snapshot).filter(Snapshot.id == game.published_version_id).first()
+            if bad_snapshot:
+                bad_snapshot.status = VersionStatus.REJECTED.value
+                bad_snapshot.admin_feedback = reason  # Фидбек отката идет уволенной версии
+        
+        # 2. Ищем версию, к которой хотим откатиться (воскресить)
         target_snapshot: Optional[Snapshot] = db.query(Snapshot).filter(Snapshot.id == target_snapshot_id).first()
         if not target_snapshot:
             raise VersionDoesntExist()
         
+        # 3. Делаем целевую версию опубликованной
         target_snapshot.status = VersionStatus.PUBLISHED.value
+        
+        # 4. ИСПРАВЛЕНИЕ: Обновляем фидбек
+        if not game.published_version_id:
+            # Если публичной версии не было, значит причина ("передумал") предназначалась воскрешаемой версии.
+            # Мы перезаписываем старый фидбек новым.
+            target_snapshot.admin_feedback = reason
+        else:
+            # Иначе, это стандартный откат. Старый фидбек воскрешаемой версии (если она когда-то была rejected)
+            # нужно просто очистить, так как теперь она легально опубликована.
+            target_snapshot.admin_feedback = None
+
+        # 5. Привязываем игру к новой публичной версии
         game.published_version_id = target_snapshot.id
+        
         return game
 
 
