@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 
-const NextButton = ({ onClick }) => {
+const NextButton = ({ icon, onClick, isDisabled }) => {
   return (
     <button
       onClick={onClick}
+      disabled={isDisabled}
       className="
       w-14 h-14 md:w-20 md:h-20
       rounded-full
@@ -17,9 +18,9 @@ const NextButton = ({ onClick }) => {
       "
     >
       <img
-        src="/images/icons/NextButton.png"
+        src={icon || "/images/icons/NextButton.png"}
         alt="Next"
-        className="w-8 h-8 md:w-10 md:h-10 object-contain"
+        className="w-10 h-10 md:w-12 md:h-12 object-contain"
       />
     </button>
   );

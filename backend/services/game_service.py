@@ -1,113 +1,150 @@
-from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session, contains_eager, noload, Query, joinedload
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy import and_, func, CursorResult, delete
 from uuid import UUID
-from typing import List, Dict, Optional
-from models.game_model import AgeGroups, Game
-from models.activity_model import Activity
-from models.user_model import User
-from schemas.game_schema import GameCreate, GameBriefResponse, GameResponse
-from services.user_service import user_service
+from models import AgeGroups, Game, Role, Activity, User, FavoritesT, Snapshot
+from config.logger import Logger
+from typing import Optional, Any
+from config.exeptions import GameDoesntExist
 
 
-class ActivityDublicateError(Exception):
-    pass
+logger = Logger(__name__).configure()
 
 
 class GameService:
-    def create_game(self, config: GameCreate, db: Session) -> Game:
-        game = Game(**config.model_dump())
+    def mark_as_favorite(self, game_id: UUID, user_id: UUID, db: Session) -> bool:
+        stmt = insert(FavoritesT).values(
+            user_id=user_id,
+            game_id=game_id
+        ).on_conflict_do_nothing()
         
-        db.add(game)
-        db.flush()
-        db.refresh(game)
+        result: CursorResult[Any] = db.execute(stmt)
+        return result.rowcount > 0
+    
+    
+    def remove_from_favorites(self, game_id: UUID, user_id: UUID, db: Session) -> bool:
+        stmt = delete(FavoritesT).where(
+            FavoritesT.c.user_id == user_id,
+            FavoritesT.c.game_id == game_id
+        )
         
+        result: CursorResult[Any] = db.execute(stmt)
+        return result.rowcount > 0
+    
+    
+    def delete_game(self, game_id: UUID, user: User, db: Session) -> int:
+        query: Query = db.query(Game).filter(Game.id == game_id)
+        
+        if user.role != Role.ADMIN.value:
+            query = query.filter(Game.author_id == user.id)
+
+        return query.delete()
+    
+
+    def get_game(self, game_id: UUID, user: Optional[User], db: Session) -> Optional[Game]:
+        query: Query = self._build_games_query(user, db).filter(Game.id == game_id)
+        game: Game = query.first()
+
+        if not game:
+            raise GameDoesntExist()
+        
+        self._populate_is_favorite(game, user, db)
         return game
     
-    def delete_game(self, game_id: UUID, db: Session) -> int:
-        return db.query(Game).filter(Game.id == game_id).delete()
 
-    def get_game(self, game_id: UUID, user_session_id: UUID, db: Session) -> GameResponse:
-        current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        game: Game = db.query(Game).filter(Game.id == game_id).first()
+    def get_all_published_games(self, user: Optional[User], db: Session) -> list[Game]:
+        query: Query = self._build_games_query(user, db)
+        games: list[Game] = query.all()
+        self._populate_is_favorite(games, user, db)
+        return games
+    
+    
+    def get_favorite_games(self, user: User, db: Session) -> list[Game]:
+        query: Query = self._build_games_query(user, db)
         
-        activity: List[Activity] = []
-        if current_user:
-            activity = db.query(Activity).filter(Activity.user_id == current_user.id,
-                                                                 Activity.game_id == game_id).all()
-        
-        return GameResponse(
-            id=game_id,
-            name=game.name,
-            preview_image_url=game.preview_image_url,
-            activities=activity,
-            description=game.description,
-            age_group=game.age_group,
-            game_type=game.game_type,
-            config_data=game.config_data
+        query = query.join(
+            FavoritesT, Game.id == FavoritesT.c.game_id
+        ).filter(
+            FavoritesT.c.user_id == user.id
         )
-
-    def get_all_games(self, user_session_id: UUID, db: Session) -> List[GameBriefResponse]:
-        current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        games: List[Game] = db.query(Game).all()
-        return self._merge_user_with_games(current_user, games, db)
-
-    def get_games_for(self, user_session_id: UUID, age_group: AgeGroups, db: Session) -> List[GameBriefResponse]:
-        current_user: User = user_service.get_user_by_session_id(user_session_id, db)
-        games: List[Game] = db.query(Game).filter(Game.age_group == age_group.value).all()
-        return self._merge_user_with_games(current_user, games, db)
-
-    def update_game_stats(self, game_id: UUID, user_session_id: UUID, new_score: float, db: Session) -> Activity:
-        current_user: User = user_service.get_or_create_user(user_session_id, db)
-        activity: Activity = db.query(Activity).filter(Activity.user_id == current_user.id, 
-                                                       Activity.game_id == game_id).first()
-        if not activity:
-            try:
-                activity = Activity(
-                    user_id=current_user.id,
-                    game_id=game_id,
-                    last_score=new_score,
-                    best_score=new_score
-                )
-                db.add(activity)
-                db.flush()
-                db.refresh(activity)
-                return activity
-            except IntegrityError:
-                db.rollback()
-                raise ActivityDublicateError(f"Activity for {game_id=} and {current_user.id=} already exists")
         
-        activity.last_score = new_score
-        if activity.best_score < new_score:
-            activity.best_score = new_score
+        games: list[Game] = query.all()
+        self._populate_is_favorite(games, user, db)
+        return games
+    
 
-        db.flush()
-        db.refresh(activity)
+    def get_games_for(self, age_group: AgeGroups, user: Optional[User], db: Session) -> list[Game]:
+        query: Query = self._build_games_query(user, db).filter(Snapshot.age_group == age_group.value)
+        games: list[Game] = query.all()
+        self._populate_is_favorite(games, user, db)
+        return games
+    
 
+    def update_game_stats(self, game_id: UUID, user_id: UUID, new_score: float, db: Session) -> Activity:
+        stmt = insert(Activity).values(
+            user_id=user_id,
+            game_id=game_id,
+            last_score=new_score,
+            best_score=new_score
+        )
+        
+        stmt = stmt.on_conflict_do_update(
+            index_elements=['user_id', 'game_id'],
+            set_={
+                'last_score': new_score,
+                'best_score': func.greatest(Activity.best_score, new_score)
+            }
+        ).returning(Activity)
+        
+        activity: Activity = db.scalar(stmt)
         return activity
 
-    def _merge_user_with_games(self, user: User, games: List[Game], db: Session) -> List[GameBriefResponse]:
-        activities_map: Dict[UUID, Activity] = {}
+
+    def _build_games_query(self, user: Optional[User], db: Session) -> Query:
+        query: Query = db.query(Game).join(
+            Snapshot, Game.published_version_id == Snapshot.id
+        ).options(
+            contains_eager(Game.published_version),
+            joinedload(Game.author)
+        )
+        
         if user:
-            activities: List[Activity] = db.query(Activity).filter(Activity.user_id == user.id).all()
-            for activity in activities:
-                activities_map[activity.game_id] = activity
+            query = query.outerjoin(
+                Activity,
+                and_(
+                    Activity.game_id == Game.id,
+                    Activity.user_id == user.id
+                )
+            ).options(contains_eager(Game.activities))
+        else:
+            query = query.options(noload(Game.activities))
+            
+        return query
+    
+    
+    def _populate_is_favorite(self, target: list[Game] | Game | None, user: Optional[User], db: Session) -> None:
+        if not target:
+            return
 
-        response: List[GameBriefResponse] = []
+        games = target if isinstance(target, list) else [target]
+        
+        if not user:
+            for game in games:
+                game.is_favorite = False
+            return
+            
+        game_ids = [game.id for game in games]
+        if not game_ids:
+            return
+            
+        favs = db.query(FavoritesT.c.game_id).filter(
+            FavoritesT.c.user_id == user.id,
+            FavoritesT.c.game_id.in_(game_ids)
+        ).all()
+        
+        fav_set = {f[0] for f in favs}
         for game in games:
-            activity_schema_list = []
-            if activity_model := activities_map.get(game.id):
-                activity_schema_list.append(activity_model)
-
-            record = GameBriefResponse(
-                id=game.id,
-                name=game.name,
-                game_type=game.game_type,
-                preview_image_url=game.preview_image_url,
-                activities=activity_schema_list
-            )
-            response.append(record)
-
-        return response
+            game.is_favorite = game.id in fav_set
 
 
 game_service: GameService = GameService()

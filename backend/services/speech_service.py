@@ -1,7 +1,6 @@
 import whisper
 from gtts import gTTS
-from typing import Dict, Any
-import logging, os
+import os
 import io
 from fastapi import UploadFile
 import librosa
@@ -9,15 +8,11 @@ from pydub import AudioSegment
 import tempfile
 from scripts.utils import hash_string
 from services.phoneme_analyzer_service import phoneme_service
-from schemas.speech_scheema import AnalysedSpeechResponse
+from schemas import AnalysedSpeechResponse
+from config.logger import Logger
 
 
-logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.FileHandler("./logs/speech_service.log", encoding="utf-8")
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+logger = Logger(__name__).configure()
 
 
 class SpeechService:
@@ -114,4 +109,4 @@ class SpeechService:
 
 
 # ['tiny.en', 'tiny', 'base.en', 'base', 'small.en', 'small', 'medium.en', 'medium', 'large-v1', 'large-v2', 'large-v3', 'large', 'large-v3-turbo', 'turbo']
-speech_service: SpeechService = SpeechService("small")
+speech_service: SpeechService = SpeechService("base")

@@ -29,7 +29,7 @@ const RecordAudioButton = ({ onFinish, isLoading }) => {
       hover:scale-105 active:scale-95 cursor-pointer
       "
     >
-      {isRecording && <div>is recording</div>}
+      {isRecording && <div>Nahráva</div>}
       {!isLoading ? (
         <img
           src="/images/icons/RecordAudioButton.png"
@@ -37,7 +37,7 @@ const RecordAudioButton = ({ onFinish, isLoading }) => {
           className="w-10 h-10 md:w-10 md:h-10 object-contain"
         />
       ) : (
-        <div className="">Analysing...</div>
+        <div className="">Analyzuje sa...</div>
       )}
     </button>
   );

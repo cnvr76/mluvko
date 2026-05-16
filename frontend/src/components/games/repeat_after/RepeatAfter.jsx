@@ -1,7 +1,5 @@
 import React, { useCallback } from "react";
 import useAsync from "../../../hooks/useAsync";
-import { api } from "../../../services/api";
-import getSessionId from "../../../services/uuidSessionGenerator";
 import AnimalCard from "./AnimalCard";
 import PlayAudioButton from "./PlayAudioButton";
 import RecordAudioButton from "./RecordAudioButton";
@@ -9,13 +7,12 @@ import NextButton from "./NextButton";
 import PageLoading from "../../loading/PageLoading.jsx";
 import useRepeatAfter from "../../../hooks/games/useRepeatAfter";
 import EndGameScreen from "../EndGameScreen";
-// import { useQueryState, parseAsInteger } from "nuqs";
+import useGameSession from "../../../hooks/useGameSession";
 
-const RepeatAfter = ({ gameId }) => {
-  const getGame = useCallback(
-    () => api.getGameById(gameId, getSessionId()),
-    [gameId]
-  );
+const VITE_API_BASE = import.meta.env.VITE_API_BASE;
+
+const RepeatAfter = ({ gameId, snapshotId }) => {
+  const { getGame } = useGameSession(gameId, snapshotId);
   const { data, isLoading, error } = useAsync(getGame);
   const {
     // current
@@ -66,11 +63,17 @@ const RepeatAfter = ({ gameId }) => {
         flex flex-row justify-center items-center
         gap-4 md:gap-6"
       >
-        <PlayAudioButton referenceAudioLink={currentCard?.reference_audio} />
+        <PlayAudioButton
+          referenceAudioLink={`${VITE_API_BASE}/${currentCard?.reference_audio}`}
+        />
         <RecordAudioButton onFinish={onRecordingEnd} isLoading={isSubmitting} />
-        <NextButton onClick={nextCard} />
+        <NextButton
+          onClick={nextCard}
+          isDisabled={isSubmitting}
+          icon={"/images/icons/SkipButton.png"}
+        />
         {currentScore && currentScore >= threshold && (
-          <NextButton onClick={nextCard} />
+          <NextButton onClick={nextCard} isDisabled={isSubmitting} />
         )}
       </div>
     </section>
