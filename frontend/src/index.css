@@ -5,6 +5,10 @@
   font-weight: 500;
 }
 
+body {
+  background-color: rgb(159, 220, 255);
+}
+
 #root {
   overflow-x: hidden;
 }

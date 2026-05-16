@@ -1,78 +1,77 @@
-from fastapi import APIRouter, Depends, HTTPException
-from schemas.game_schema import GameResponse, GameCreate, GameBriefResponse
-from schemas.activity_schema import ActivityResponse, ActivityCreate
-from models.activity_model import Activity
-from models.game_model import AgeGroups, Game
-from typing import List, Optional
-from services.game_service import game_service
+from fastapi import APIRouter, Depends
+from schemas import GameResponse, GameBriefResponse, ActivityResponse, ActivityCreate, AuthorGameResponse
+from models import AgeGroups, Activity, User
+from services import game_service, snapshot_service
 from sqlalchemy.orm import Session
 from uuid import UUID
+from typing import Optional
 from config.database_config import get_db
+from config.dependencies import require_login, require_therapist_or_admin, get_current_user
 
 
 router = APIRouter()
 
 
-@router.get("/", response_model=List[GameBriefResponse])
-async def get_all_games(user_session_id: UUID, db: Session = Depends(get_db)):
-    try:
-        return game_service.get_all_games(user_session_id, db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.get("/", response_model=list[GameBriefResponse])
+def get_all_games(current_user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)):
+    return game_service.get_all_published_games(current_user, db)
 
 
-@router.post("/new", response_model=GameResponse)
-async def create_new_game(config_data: GameCreate, db: Session = Depends(get_db)):
-    try:
-        new_game: Game = game_service.create_game(config_data, db)
-        db.commit()
-        return new_game
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+@router.get("/favorite", response_model=list[GameBriefResponse])
+def get_all_favorites(current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    return game_service.get_favorite_games(current_user, db)
 
 
-@router.delete("/{game_id}/delete", status_code=200)
-async def delete_game(game_id: UUID, db: Session = Depends(get_db)):
-    try:
-        deleted_count: int = game_service.delete_game(game_id, db)
-        db.commit()
-        return {
-            "success": deleted_count > 0,
-            "deleted_count": deleted_count
-        }
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+@router.get("/my", response_model=list[AuthorGameResponse])
+def get_my_created_games(current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    return snapshot_service.get_all_my_games(current_user.id, db)
+
+
+@router.delete("/{game_id}", status_code=200)
+def delete_game(game_id: UUID, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    deleted_count: int = game_service.delete_game(game_id, current_user, db)
+    db.commit()
+    return {
+        "success": deleted_count > 0,
+        "deleted_count": deleted_count
+    }
 
 
 @router.get("/{game_id}", response_model=GameResponse)
-async def get_game_by_id(game_id: UUID, user_session_id: UUID, db: Session = Depends(get_db)):
-    try:
-        return game_service.get_game(game_id, user_session_id, db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def get_game_by_id(game_id: UUID, current_user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)):
+    return game_service.get_game(game_id, current_user, db)
 
 
-@router.get("/group/{age_group}", response_model=List[GameBriefResponse])
-async def get_games_for_age_group(user_session_id: UUID, age_group: AgeGroups, db: Session = Depends(get_db)):
-    try:
-        return game_service.get_games_for(user_session_id, age_group, db)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@router.get("/group/{age_group}", response_model=list[GameBriefResponse])
+def get_games_for_age_group(age_group: AgeGroups, current_user: Optional[User] = Depends(get_current_user), db: Session = Depends(get_db)):
+    return game_service.get_games_for(age_group, current_user, db)
 
 
 @router.post("/{game_id}/update-stats", response_model=ActivityResponse)
-async def update_game_stats(game_id: UUID, activity_data: ActivityCreate, db: Session = Depends(get_db)):
-    try:
-        updated_stats: Activity = game_service.update_game_stats(
+def update_game_stats(game_id: UUID, activity_data: ActivityCreate, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    updated_stats: Activity = game_service.update_game_stats(
             game_id,
-            activity_data.user_session_id,
+            current_user.id,
             activity_data.score,
             db
         )
-        db.commit()
-        return updated_stats
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
+    db.commit()
+    return updated_stats
+
+
+@router.post("/{game_id}/favorite", status_code=200)
+def mark_as_favorite(game_id: UUID, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    added: bool = game_service.mark_as_favorite(game_id, current_user.id, db)
+    db.commit()
+    return {
+        "success": added,
+    }
+    
+    
+@router.delete("/{game_id}/favorite", status_code=200)
+def remove_from_favorites(game_id: UUID, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
+    removed: bool = game_service.remove_from_favorites(game_id, current_user.id, db)
+    db.commit()
+    return {
+        "success": removed,
+    }

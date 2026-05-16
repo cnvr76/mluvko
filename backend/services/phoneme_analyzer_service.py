@@ -1,17 +1,11 @@
-from typing import Tuple, List, Dict
 from phonemizer import phonemize
 import numpy as np
 import string
 import re
-import logging
+from config.logger import Logger
 
 
-logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.FileHandler("./logs/phoneme_analyzer.log", encoding="utf-8")
-    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+logger = Logger(__name__).configure()
 
 
 SUBSTITUTION_COSTS = {
@@ -36,7 +30,7 @@ class PhonemeService:
 
         return cost if cost is not None else 0.333
     
-    def text_to_phonemas(self, text: str, lang: str = "sk") -> List[str]:
+    def text_to_phonemas(self, text: str, lang: str = "sk") -> list[str]:
         if not text:
             return []
         
@@ -51,7 +45,7 @@ class PhonemeService:
         phonemas = re.findall(r"(tʃ|dʒ|[aeiouyɪɛɔə][ː]?|ʃ|ʒ|ʇ|ɲ|ʎ|[bcdfghjklmnpqrstvwxz])", phoneme_str)
         return phonemas
     
-    def calculate_phoneme_distance(self, ref_list: List[str], rec_list: List[str]) -> Tuple[float, List]:
+    def calculate_phoneme_distance(self, ref_list: list[str], rec_list: list[str]) -> tuple[float, list]:
         n, m = len(ref_list), len(rec_list)
 
         dp = np.zeros((n + 1, m + 1))
@@ -97,8 +91,8 @@ class PhonemeService:
 
         return max(0.0, similarity), ops[n][m]
     
-    def format_errors(self, operations: List[Tuple]) -> List[Dict]:
-        errors: List[Dict] = []
+    def format_errors(self, operations: list[tuple]) -> list[dict]:
+        errors: list[dict] = []
         for op in operations:
             op_type, op_data = op
             if op_type == "substitute":

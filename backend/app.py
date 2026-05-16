@@ -1,15 +1,21 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
+from config.exeptions import CustomException
 
 from routes.speech_route import router as speech_router
 from routes.game_route import router as game_router
 from routes.user_route import router as user_router
+from routes.auth_route import router as auth_router
+from routes.snapshot_route import router as snapshot_router
+from routes.admin_route import router as admin_router
 
 
 app = FastAPI(
-    title="Mluvko"
+    title="Mluvko",
+    version="1.0.2"
 )
 
 
@@ -24,6 +30,17 @@ app.add_middleware(
 )
 
 
+app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(speech_router, prefix="/speech", tags=["speech"])
 app.include_router(game_router, prefix="/games", tags=["games"])
+app.include_router(snapshot_router, prefix="/versions", tags=["versions"])
+app.include_router(admin_router, prefix="/admin", tags=["admin"])
 app.include_router(user_router, prefix="/users", tags=["users"])
+
+
+@app.exception_handler(CustomException)
+async def custom_exception_handler(request: Request, exc: CustomException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail, "success": False}
+    )

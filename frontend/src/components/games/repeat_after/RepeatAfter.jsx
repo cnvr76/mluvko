@@ -1,7 +1,5 @@
 import React, { useCallback } from "react";
 import useAsync from "../../../hooks/useAsync";
-import { api } from "../../../services/api";
-import getSessionId from "../../../services/uuidSessionGenerator";
 import AnimalCard from "./AnimalCard";
 import PlayAudioButton from "./PlayAudioButton";
 import RecordAudioButton from "./RecordAudioButton";
@@ -10,12 +8,11 @@ import PageLoading from "../../loading/PageLoading.jsx";
 import useRepeatAfter from "../../../hooks/games/useRepeatAfter";
 import EndGameScreen from "../EndGameScreen";
 import useGameSession from "../../../hooks/useGameSession";
-// import { useQueryState, parseAsInteger } from "nuqs";
 
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 
-const RepeatAfter = ({ gameId }) => {
-  const { getGame } = useGameSession(gameId);
+const RepeatAfter = ({ gameId, snapshotId }) => {
+  const { getGame } = useGameSession(gameId, snapshotId);
   const { data, isLoading, error } = useAsync(getGame);
   const {
     // current
@@ -67,7 +64,7 @@ const RepeatAfter = ({ gameId }) => {
         gap-4 md:gap-6"
       >
         <PlayAudioButton
-          referenceAudioLink={`${VITE_API_BASE}${currentCard?.reference_audio}`}
+          referenceAudioLink={`${VITE_API_BASE}/${currentCard?.reference_audio}`}
         />
         <RecordAudioButton onFinish={onRecordingEnd} isLoading={isSubmitting} />
         <NextButton
