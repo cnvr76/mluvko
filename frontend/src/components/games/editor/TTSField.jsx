@@ -33,7 +33,14 @@ const TTSField = ({ label, currentPath, onAudioGenerated }) => {
         <button
           onClick={handleGenerate}
           disabled={loading}
-          className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600 disabled:bg-gray-400"
+          className="
+            px-3 py-1.5
+            rounded-xl
+            bg-[#ff7110]
+            hover:bg-[#e9650c]
+            text-white
+            transition-all duration-200
+          "
         >
           {loading ? "..." : "Generovať"}
         </button>
