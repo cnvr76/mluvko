@@ -32,16 +32,33 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex justify-between items-center bg-blue-50 p-4 rounded-xl">
+      <div
+        className="
+        flex justify-between items-center
+        bg-white/40
+        backdrop-blur-md
+        p-6
+        rounded-[2rem]
+        border border-white/40"
+      >
         <div>
           <h3 className="text-xl font-bold">Nastavenia Repeat After</h3>
-          <p className="text-sm text-gray-500">Logopéd povie, dieťa zopakuje</p>
         </div>
         <div className="flex items-center gap-4">
           <label className="text-sm font-bold">Limit skóre (%):</label>
           <input
             type="number"
-            className="w-20 border-2 border-blue-200 p-2 rounded-lg text-center font-bold"
+            className="
+            w-15
+  border
+  border-[#ff7110]
+  bg-white/70
+  p-2
+  rounded-xl
+  text-center
+  font-bold
+  text-[#642f37]
+  outline-none"
             value={threshold}
             onChange={(e) =>
               onChange({
@@ -52,7 +69,15 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
           />
           <button
             onClick={addCard}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold"
+            className="
+            px-5 py-2.5
+            rounded-xl
+            bg-[#ff7110]
+            hover:bg-[#e9650c]
+            text-white
+            font-bold
+            transition-all duration-200
+            "
           >
             + Pridať kartu
           </button>
@@ -63,23 +88,39 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className="relative p-6 border-2 border-gray-100 rounded-2xl bg-white shadow-md grid grid-cols-1 md:grid-cols-2 gap-6"
+            className="
+            relative
+            p-6
+            rounded-[2rem]
+            bg-white/75
+            backdrop-blur-md
+            border border-white/40
+            shadow-[0_4px_20px_rgba(0,0,0,0.08)]
+            grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             <button
               onClick={() => removeCard(index)}
-              className="absolute top-4 right-4 text-gray-300 hover:text-red-500 font-bold"
+              className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs"
             >
-              ✕ Odstrániť
+              ✕
             </button>
 
             {/* Левая колонка: Основные данные */}
             <div className="flex flex-col gap-4">
               <div className="flex gap-2">
-                <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs flex items-center">
+                <span
+                  className="  bg-[#ff7110]
+                text-white
+                  px-3 py-1
+                  rounded-full
+                  text-xs
+                  flex items-center
+                  font-bold"
+                >
                   #{card.card_id}
                 </span>
                 <input
-                  className="flex-1 border-b-2 focus:border-blue-500 outline-none p-1 font-bold text-lg"
+                  className="  flex-1 border-b-2 border-[#642f37] focus:border-[#ff7110] outline-none p-1 font-bold  text-lg  text-[#642f37]"
                   placeholder="Názov zvieratka"
                   value={card.animal_name}
                   onChange={(e) =>

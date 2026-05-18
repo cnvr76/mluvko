@@ -11,7 +11,7 @@ const SpecificGamePage = ({ children }) => {
         w-screen h-screen overflow-hidden bg-no-repeat bg-cover bg-center px-3 pt-16 sm:pt-20
         "
         style={{
-          backgroundImage: "url('/images/repeatAfter__background.png')",
+          backgroundImage: "url('/images/background.png')",
         }}
       >
         {children}

@@ -23,23 +23,20 @@ const AdminDashboard = () => {
     fetchDashboard();
   }, []);
 
-  // 1. Плоская структура: превращаем игры в список снапшотов
   const allSnapshots = games.flatMap((game) =>
     game.versions.map((v) => ({
       ...v,
       game_id: game.id,
       author_name: game.author_name,
       published_version_id: game.published_version_id,
-    }))
+    })),
   );
 
-  // 2. Фильтрация по статусу (убираем драфты для админа по умолчанию)
   const filteredSnapshots = allSnapshots.filter((s) => {
     if (statusFilter === "all") return s.status !== "draft";
     return s.status === statusFilter;
   });
 
-  // 3. Группировка по дням
   const groupedByDay = filteredSnapshots.reduce((acc, s) => {
     const day = new Date(s.created_at).toLocaleDateString();
     if (!acc[day]) acc[day] = [];
@@ -47,9 +44,8 @@ const AdminDashboard = () => {
     return acc;
   }, {});
 
-  // Сортировка дней (новые сверху)
   const sortedDays = Object.keys(groupedByDay).sort(
-    (a, b) => new Date(b) - new Date(a)
+    (a, b) => new Date(b) - new Date(a),
   );
 
   const handleAction = async (actionFn, ...args) => {
@@ -61,29 +57,49 @@ const AdminDashboard = () => {
     }
   };
 
-  if (loading) return <div className="p-8">Načítavam admin dashboard...</div>;
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4">
+        <h2 className="text-3xl font-extrabold drop-shadow">Admin Dashboard</h2>
+
+        <div
+          className="
+            rounded-[2rem]
+            bg-white/30
+            backdrop-blur-xl
+            border border-white/40
+            p-10
+            text-center
+            text-[#642f37]
+            font-semibold
+          "
+        >
+          Načítavam admin dashboard...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6 p-4">
-      <div className="flex justify-between items-center bg-white p-4 rounded shadow-sm">
-        <h2 className="text-2xl font-bold">Admin Dashboard</h2>
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm">
+        <h2 className="text-2xl font-extrabold drop-shadow">Admin Dashboard</h2>
 
-        {/* Фильтры статуса */}
-        <div className="flex gap-2 bg-gray-100 p-1 rounded">
+        <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
           {["pending", "published", "rejected", "archived", "all"].map(
             (status) => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-4 py-1 rounded text-sm font-medium transition ${
+                className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === status
-                    ? "bg-white shadow text-blue-600"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-[#F3904B] text-white "
+                    : "text-gray-500 hover:text-[#ff7110] hover:bg-white"
                 }`}
               >
                 {status.toUpperCase()}
               </button>
-            )
+            ),
           )}
         </div>
       </div>
@@ -100,15 +116,24 @@ const AdminDashboard = () => {
                 {groupedByDay[day].map((snapshot) => (
                   <div
                     key={snapshot.id}
-                    className="bg-white border rounded-lg p-4 shadow-sm flex justify-between items-center"
+                    className="
+                      bg-white
+                      border border-[#642f37]/40
+                      rounded-xl
+                      p-4
+                      shadow-sm
+                      flex justify-between items-center
+                    "
                   >
                     <div>
                       <div className="flex items-center gap-3">
                         <h4 className="font-bold text-lg">{snapshot.name}</h4>
+
                         <span className="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">
                           v{snapshot.version}
                         </span>
                       </div>
+
                       <p className="text-sm text-gray-500">
                         Autor:{" "}
                         <span className="text-gray-800">
@@ -120,6 +145,7 @@ const AdminDashboard = () => {
                           minute: "2-digit",
                         })}
                       </p>
+
                       {snapshot.admin_feedback && (
                         <p className="text-xs text-red-500 mt-1 italic">
                           Feedback: {snapshot.admin_feedback}
@@ -130,7 +156,16 @@ const AdminDashboard = () => {
                     <div className="flex gap-2">
                       <Link
                         to={`/games/${snapshot.game_id}/${snapshot.game_type}?snapshot=${snapshot.id}`}
-                        className="px-3 py-1.5 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 text-sm font-semibold"
+                        className="
+                          px-4 py-2
+                          rounded-xl
+                          bg-[#a5ad24]
+                          hover:bg-[#92991f]
+                          text-white
+                          text-sm
+                          font-semibold
+                          transition-all duration-200
+                        "
                       >
                         Testovať
                       </Link>
@@ -142,13 +177,23 @@ const AdminDashboard = () => {
                               handleAction(
                                 api.approveSnapshot,
                                 snapshot.game_id,
-                                snapshot.id
+                                snapshot.id,
                               )
                             }
-                            className="px-3 py-1.5 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-semibold"
+                            className="
+                              px-4 py-2
+                              rounded-xl
+                              bg-[#a5ad24]
+                              hover:bg-[#92991f]
+                              text-white
+                              text-sm
+                              font-semibold
+                              transition-all duration-200
+                            "
                           >
                             Schváliť
                           </button>
+
                           <button
                             onClick={() => {
                               const reason = prompt("Dôvod zamietnutia:");
@@ -161,22 +206,30 @@ const AdminDashboard = () => {
                                 api.rejectPendingSnapshot,
                                 snapshot.game_id,
                                 snapshot.id,
-                                reason
+                                reason,
                               );
                             }}
-                            className="px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 text-sm font-semibold"
+                            className="
+                              px-4 py-2
+                              rounded-xl
+                              bg-[#ffe5e5]
+                              hover:bg-[#ffd6d6]
+                              text-[#d62828]
+                              text-sm
+                              font-semibold
+                              transition-all duration-200
+                            "
                           >
                             Zamietnuť
                           </button>
                         </>
                       )}
 
-                      {/* Если это ТЕКУЩАЯ опубликованная версия (Revoke) */}
                       {snapshot.id === snapshot.published_version_id && (
                         <button
                           onClick={() => {
                             const reason = prompt(
-                              "Dôvod stiahnutia hry z webu:"
+                              "Dôvod stiahnutia hry z webu:",
                             );
                             if (reason === null) return;
                             if (reason.trim().length < 3) {
@@ -186,48 +239,74 @@ const AdminDashboard = () => {
                             handleAction(
                               api.revokeGame,
                               snapshot.game_id,
-                              reason
+                              reason,
                             );
                           }}
-                          className="px-3 py-1.5 bg-gray-600 text-white rounded hover:bg-gray-700 text-sm font-semibold"
+                          className="
+                            px-4 py-2
+                            rounded-xl
+                            bg-[#9DBBD8]
+                            hover:bg-[#8aaed0]
+                            text-white
+                            text-sm
+                            font-semibold
+                            transition-all duration-200
+                          "
                         >
-                          Stiahnuť z webu (Revoke)
+                          Stiahnuť z webu
                         </button>
                       )}
 
-                      {/* Если это СТАРАЯ или ОТКЛОНЕННАЯ версия (Rollback) */}
                       {snapshot.status !== "pending" &&
                         snapshot.status !== "draft" &&
                         snapshot.id !== snapshot.published_version_id && (
                           <button
                             onClick={() => {
                               const reason = prompt(
-                                "Dôvod rollbacku na túto verziu:"
+                                "Dôvod rollbacku na túto verziu:",
                               );
                               if (reason === null) return;
                               handleAction(
                                 api.rollbackGame,
                                 snapshot.game_id,
                                 snapshot.id,
-                                reason || "Admin rollback"
+                                reason || "Admin rollback",
                               );
                             }}
-                            className="px-3 py-1.5 bg-orange-500 text-white rounded hover:bg-orange-600 text-sm font-semibold"
+                            className="
+                              px-4 py-2
+                              rounded-xl
+                              bg-[#F3904B]
+                              hover:bg-[#e67e36]
+                              text-white
+                              text-sm
+                              font-semibold
+                              transition-all duration-200
+                            "
                           >
-                            Rollback na túto verziu
+                            Rollback
                           </button>
                         )}
 
                       <button
                         onClick={() => {
                           const isConfirmed = window.confirm(
-                            "POZOR: Naozaj chcete úplne vymazať túto hru zo systému? Vymažú sa tým absolútne VŠETKY jej verzie a dáta."
+                            "POZOR: Naozaj chcete úplne vymazať túto hru zo systému? Vymažú sa tým absolútne VŠETKY jej verzie a dáta.",
                           );
                           if (isConfirmed) {
                             handleAction(api.deleteGame, snapshot.game_id);
                           }
                         }}
-                        className="px-3 py-1.5 bg-red-800 text-white rounded hover:bg-red-900 text-sm font-semibold"
+                        className="
+                          px-4 py-2
+                          rounded-xl
+                          bg-[#ffe5e5]
+                          hover:bg-[#ffd6d6]
+                          text-[#d62828]
+                          text-sm
+                          font-semibold
+                          transition-all duration-200
+                        "
                       >
                         Vymazať celú hru
                       </button>
@@ -238,8 +317,22 @@ const AdminDashboard = () => {
             </div>
           ))
         ) : (
-          <div className="text-center py-20 text-gray-400 bg-white rounded border-2 border-dashed">
-            Žiadne záznamy pre filter: {statusFilter}
+          <div
+            className="
+            text-center
+            py-20
+            text-[#642f37]/60
+            bg-white/40
+            rounded-[2rem]
+            border border-white/40
+            backdrop-blur-xl
+          "
+          >
+            <p className="text-xl font-bold mb-2">Žiadne hry na zobrazenie</p>
+
+            <p className="text-sm">
+              pre filter: {statusFilter}
+            </p>
           </div>
         )}
       </div>

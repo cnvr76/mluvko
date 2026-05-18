@@ -19,12 +19,6 @@ export const profileLoader = async () => {
   }
 };
 
-// TODO - сделать нормальный дизайн для показа личной инфы пользователя
-/* 
-    в виде form желательно, чтобы можно было сделать после
-    еще и обновление дат здесь же по нажатию на кнопку "Обновить",
-    которая будет активной после какого либо изменения
-*/
 const ProfilePage = () => {
   const me = useLoaderData();
   const { isTherapist, isAdmin } = useAuth();
@@ -33,7 +27,7 @@ const ProfilePage = () => {
   const tabsConfig = [
     {
       id: "details",
-      label: "Profile details",
+      label: "Profil",
       component: <PersonalDetails data={me} />,
     },
     {
@@ -46,7 +40,7 @@ const ProfilePage = () => {
   if (isTherapist) {
     tabsConfig.push({
       id: "created",
-      label: "Moje vytvorené hry",
+      label: "Moje hry",
       component: <CreatedGames />,
     });
   }
@@ -54,37 +48,89 @@ const ProfilePage = () => {
   if (isAdmin) {
     tabsConfig.push({
       id: "admin",
-      label: "Admin dashboard",
+      label: "Admin",
       component: <AdminDashboard />,
     });
   }
 
   const activeComponent = tabsConfig.find(
-    (tab) => tab.id === activeTab
+    (tab) => tab.id === activeTab,
   )?.component;
 
   return (
-    <div className="w-full min-h-screen grid grid-cols-3 gap-4 p-8 pt-24 md:pt-32">
-      {/* TAB NAVIGATION */}
-      <nav className="flex flex-col gap-3 border-r pr-4">
-        {tabsConfig.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`cursor-pointer text-left p-2 rounded ${
-              activeTab === tab.id
-                ? "bg-gray-200 font-bold"
-                : "hover:bg-gray-100"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
+    <main
+      className="
+        w-full h-screen
+        bg-cover bg-no-repeat bg-center
+        px-4 pt-28 pb-12
+        
+      "
+      style={{
+        backgroundImage: "url('/images/background.png')",
+      }}
+    >
+      <div
+        className="
+          w-full max-w-6xl mx-auto
+          h-[78vh]
+          rounded-[2rem]
+          bg-white/30
+          backdrop-blur-xl
+          border border-white/40
+          shadow-[0_4px_30px_rgba(0,0,0,0.18)]
+          p-5 md:p-8
+          grid grid-cols-1 md:grid-cols-[260px_1fr]
+          gap-6
+          text-[#642f37]
+          overflow-hidden
+          items-start
+          
+        "
+      >
+        <nav
+          className="
+            flex flex-col gap-3
+            md:border-r md:border-white/40
+            md:pr-6
+            sticky top-0 self-start
+          "
+        >
+          {tabsConfig.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`
+                cursor-pointer
+                text-2xl
+                text-left
+                px-5 py-3
+                rounded-full
+                font-semibold
+                transition-all duration-200
+                ${
+                  activeTab === tab.id
+                    ? "bg-white/50 shadow-[0_4px_15px_rgba(0,0,0,0.12)] text-[#ff7110]"
+                    : "bg-white/20 hover:bg-white/40"
+                }
+              `}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
 
-      {/* CONTENT */}
-      <div className="col-span-2">{activeComponent}</div>
-    </div>
+        <section
+          className="
+            h-full
+            overflow-y-auto
+            px-8
+            pb-10
+          "
+        >
+          {activeComponent}
+        </section>
+      </div>
+    </main>
   );
 };
 

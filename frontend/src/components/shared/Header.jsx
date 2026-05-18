@@ -33,7 +33,7 @@ const Header = () => {
         >
           {isAuthenticated
             ? `Konto (${localStorage.getItem("username")})`
-            : "Registrovať"}
+            : "Prihláste sa"}
         </Link>
         {isAuthenticated && (
           <button
