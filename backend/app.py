@@ -11,6 +11,7 @@ from routes.user_route import router as user_router
 from routes.auth_route import router as auth_router
 from routes.snapshot_route import router as snapshot_router
 from routes.admin_route import router as admin_router
+from routes.role_request_route import router as role_request_router
 
 
 app = FastAPI(
@@ -36,6 +37,7 @@ app.include_router(game_router, prefix="/games", tags=["games"])
 app.include_router(snapshot_router, prefix="/versions", tags=["versions"])
 app.include_router(admin_router, prefix="/admin", tags=["admin"])
 app.include_router(user_router, prefix="/users", tags=["users"])
+app.include_router(role_request_router, prefix="/role-requests", tags=["role-requests"])
 
 
 @app.exception_handler(CustomException)

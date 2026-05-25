@@ -11,11 +11,17 @@ export const AgeGroups = {
 export const GameTypes = {
   PEXESO: "pexeso",
   REPEAT_AFTER: "repeat_after",
+  FIND_AND_REPEAT: "find_and_repeat",
 };
 export const Roles = {
   PARENT: "parent",
   ADMIN: "admin",
   THERAPIST: "therapist",
+};
+export const RoleLabels = {
+  [Roles.PARENT]: "Rodič",
+  [Roles.THERAPIST]: "Logopéd",
+  [Roles.ADMIN]: "Admin",
 };
 
 export const apiClient = axios.create({
@@ -42,6 +48,8 @@ export const api = {
 
   // functions just for requesting basic stuff
   getMyProfile: async () => GET("/users/me", "Failed to fetch my profile:"),
+  updateMyProfile: async (data) =>
+    PATCH("/users/me", data, "Chyba pri aktualizácii profilu:"),
   getMyFavoriteGames: async () =>
     GET("/games/favorite", "Failed to fetch my favorite games:"),
   getMyCreatedGames: async () =>
@@ -54,8 +62,6 @@ export const api = {
     ),
   getGameById: async (gameId) =>
     GET(`/games/${gameId}`, `Failed to fetch game by id ${gameId}:`),
-  getSnapshotInfo: async (gameId, snapshotId) =>
-    GET(`/versions/${snapshotId}/game/${gameId}`),
 
   // functions for posting basic stuff
   toggleFavorite: async (gameId, isFavorite) => {
@@ -112,6 +118,12 @@ export const api = {
       {},
       "Failed to generate TTS:"
     ),
+  deleteAudio: async (path) =>
+    DELETE(
+      `/speech/audio?path=${encodeURIComponent(path)}`,
+      {},
+      "Failed to delete audio:"
+    ),
 
   // --- ADMIN ROUTES ---
   getAdminDashboard: async () =>
@@ -138,9 +150,39 @@ export const api = {
       "Chyba rollbacku:"
     ),
 
+  // --- USER MANAGEMENT (ADMIN) ---
+  getAllUsers: async () =>
+    GET("/users/all", "Chyba načítania používateľov:"),
+  updateUser: async (userId, data) =>
+    PATCH(`/users/${userId}`, data, "Chyba pri aktualizácii používateľa:"),
+  deleteUser: async (userId) =>
+    DELETE(`/users/${userId}`, {}, "Chyba pri mazaní používateľa:"),
+
+  // --- ROLE REQUESTS ---
+  getMyRoleRequest: async () =>
+    GET("/role-requests/me", "Chyba načítania žiadosti o rolu:"),
+  requestTherapistRole: async () =>
+    POST("/role-requests/", {}, "Chyba pri odoslaní žiadosti o rolu:"),
+  getAllRoleRequests: async () =>
+    GET("/role-requests/", "Chyba načítania žiadostí o rolu:"),
+  approveRoleRequest: async (requestId) =>
+    POST(
+      `/role-requests/${requestId}/approve`,
+      {},
+      "Chyba pri schvaľovaní žiadosti:"
+    ),
+  rejectRoleRequest: async (requestId, reason) =>
+    POST(
+      `/role-requests/${requestId}/reject`,
+      { reason },
+      "Chyba pri zamietnutí žiadosti:"
+    ),
+
   // --- VERSIONS / THERAPIST ROUTES ---
   submitForReview: async (gameId) =>
     POST(`/versions/${gameId}/submit`, {}, "Chyba odosielania na kontrolu:"),
+  archiveGame: async (gameId) =>
+    POST(`/versions/${gameId}/archive`, {}, "Chyba pri archivácii hry:"),
   getSnapshotInfo: async (gameId, snapshotId) =>
     GET(
       `/versions/${snapshotId}/game/${gameId}`,

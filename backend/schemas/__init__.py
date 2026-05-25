@@ -5,3 +5,4 @@ from schemas.user_schema import UserCreate, UserResponse, UserUpdate, UserLogin,
 from schemas.snapshot_schema import SnapshotBriefResponse, DraftInitResponse, SnapshotFullResponse, SnapshotTestingResponse
 from schemas.general_schema import SuccessfulResponse
 from schemas.admin_schema import  AdminFeedbackRequest, AdminDashboardGameResponse
+from schemas.role_request_schema import RoleRequestResponse, AdminRoleRequestResponse

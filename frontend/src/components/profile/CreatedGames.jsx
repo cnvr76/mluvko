@@ -19,7 +19,15 @@ const CreatedGames = () => {
 
       (data || []).forEach((game) => {
         if (game.versions && game.versions.length > 0) {
-          initialSelected[game.id] = game.versions[game.versions.length - 1].id;
+          // prefer the published version; otherwise fall back to the latest
+          // one (highest version number — API order is not guaranteed)
+          const publishedVersion = game.versions.find(
+            (v) => v.id === game.published_version_id,
+          );
+          const latestVersion = game.versions.reduce((latest, current) =>
+            current.version > latest.version ? current : latest,
+          );
+          initialSelected[game.id] = (publishedVersion ?? latestVersion).id;
         }
       });
 
@@ -50,6 +58,21 @@ const CreatedGames = () => {
       fetchMyGames();
     } catch (error) {
       alert("Chyba pri odosielaní");
+    }
+  };
+
+  const handleArchiveGame = async (gameId) => {
+    const isConfirmed = window.confirm(
+      "Naozaj chcete archivovať túto hru? Hra zmizne zo stránky a stane sa neviditeľnou pre používateľov.",
+    );
+
+    if (!isConfirmed) return;
+
+    try {
+      await api.archiveGame(gameId);
+      fetchMyGames();
+    } catch (error) {
+      alert("Nepodarilo sa archivovať hru.");
     }
   };
 
@@ -232,18 +255,20 @@ const CreatedGames = () => {
                       text-[#642f37]
                     "
                   >
-                    {game.versions.map((v) => (
-                      <option
-                        key={v.id}
-                        value={v.id}
-                        style={{
-                          backgroundColor: "#fff7f2",
-                          color: "#642f37",
-                        }}
-                      >
-                        v{v.version} - {v.status.toUpperCase()}
-                      </option>
-                    ))}
+                    {[...game.versions]
+                      .sort((a, b) => b.version - a.version)
+                      .map((v) => (
+                        <option
+                          key={v.id}
+                          value={v.id}
+                          style={{
+                            backgroundColor: "#fff7f2",
+                            color: "#642f37",
+                          }}
+                        >
+                          v{v.version} - {v.status.toUpperCase()}
+                        </option>
+                      ))}
                   </select>
                 </div>
               </div>
@@ -269,6 +294,24 @@ const CreatedGames = () => {
                   Táto verzia je aktuálne zverejnená na stránke.
                 </div>
               )}
+
+              {currentVersion.status === "published" &&
+                currentVersion.admin_feedback && (
+                  <div
+                    className="
+                      mt-3
+                      p-3
+                      bg-blue-50
+                      text-blue-700
+                      text-sm
+                      border border-blue-200
+                      rounded-lg
+                    "
+                  >
+                    <strong>Poznámka admina:</strong>{" "}
+                    {currentVersion.admin_feedback}
+                  </div>
+                )}
 
               <div className="flex gap-2 mt-4 pt-3 border-t border-[#642f37]/40 justify-end">
                 <Link
@@ -302,7 +345,8 @@ const CreatedGames = () => {
                 </Link>
 
                 {(currentVersion.status === "draft" ||
-                  currentVersion.status === "rejected") && (
+                  currentVersion.status === "rejected" ||
+                  currentVersion.status === "archived") && (
                   <button
                     onClick={() => handleSubmitForReview(game.id)}
                     className="
@@ -316,6 +360,23 @@ const CreatedGames = () => {
                     "
                   >
                     Poslať na schválenie
+                  </button>
+                )}
+
+                {currentVersion.status === "published" && (
+                  <button
+                    onClick={() => handleArchiveGame(game.id)}
+                    className="
+                      px-6 py-2
+                      rounded-xl
+                      bg-[#9DBBD8]
+                      hover:bg-[#8aaed0]
+                      text-white
+                      font-semibold
+                      transition-all duration-200
+                    "
+                  >
+                    Archivovať
                   </button>
                 )}
 

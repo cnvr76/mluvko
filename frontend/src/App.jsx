@@ -68,6 +68,10 @@ const browserRouter = createBrowserRouter([
               </ProtectedRoute>
             ),
             loader: profileLoader,
+            // don't refetch the profile (or flash the loader) when only the
+            // ?tab= query param changes — that's an in-page tab switch
+            shouldRevalidate: ({ currentUrl, nextUrl }) =>
+              currentUrl.pathname !== nextUrl.pathname,
           },
           {},
         ],

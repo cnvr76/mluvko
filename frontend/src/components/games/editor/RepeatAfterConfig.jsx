@@ -1,5 +1,6 @@
 import React from "react";
 import TTSField from "./TTSField";
+import ImageField from "./ImageField";
 
 const RepeatAfterConfig = ({ configData, onChange }) => {
   // Защита от пустого объекта конфигурации
@@ -37,8 +38,8 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
         flex justify-between items-center
         bg-white/40
         backdrop-blur-md
-        p-6
-        rounded-[2rem]
+        p-4
+        rounded-2xl
         border border-white/40"
       >
         <div>
@@ -90,13 +91,13 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
             key={index}
             className="
             relative
-            p-6
-            rounded-[2rem]
+            p-4
+            rounded-2xl
             bg-white/75
             backdrop-blur-md
             border border-white/40
             shadow-[0_4px_20px_rgba(0,0,0,0.08)]
-            grid grid-cols-1 md:grid-cols-2 gap-6"
+            grid grid-cols-1 md:grid-cols-2 gap-4"
           >
             <button
               onClick={() => removeCard(index)}
@@ -129,12 +130,11 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
                 />
               </div>
 
-              <input
-                className="border p-2 rounded-lg text-sm bg-gray-50"
+              <ImageField
                 placeholder="URL obrázku (/images/repeat_after/...)"
                 value={card.animal_image_url}
-                onChange={(e) =>
-                  updateCard(index, "animal_image_url", e.target.value)
+                onChange={(value) =>
+                  updateCard(index, "animal_image_url", value)
                 }
               />
 

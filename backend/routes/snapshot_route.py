@@ -37,6 +37,13 @@ def get_my_problematic_games(current_user: User = Depends(require_therapist_or_a
     return snapshot_service.get_my_problematic_snapshots(current_user.id, db)
 
 
+@router.post("/{game_id}/archive", response_model=SuccessfulResponse, status_code=200)
+def archive_game(game_id: UUID, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
+    snapshot_service.archive_game(game_id, current_user, db)
+    db.commit()
+    return SuccessfulResponse(detail="Game archived and removed from the site")
+
+
 @router.get("/{snapshot_id}/game/{game_id}", response_model=SnapshotFullResponse, status_code=200)
 def get_snapshot(game_id: UUID, snapshot_id: UUID, current_user: User = Depends(require_therapist_or_admin), db: Session = Depends(get_db)):
     return snapshot_service.get_snapshot_for_testing(game_id, snapshot_id, current_user, db)

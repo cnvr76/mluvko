@@ -36,7 +36,9 @@ def get_my_profile(current_user: User = Depends(require_login)):
 @router.patch("/me", response_model=UserResponse)
 def update_user(update_data: UserUpdate, current_user: User = Depends(require_login), db: Session = Depends(get_db)):
     safe_update_data: dict[str, Any] = update_data.model_dump(exclude_unset=True, exclude={"role"})
-    return user_service.update_user(current_user, safe_update_data, db)
+    updated_user: User = user_service.update_user(current_user, safe_update_data, db)
+    db.commit()
+    return updated_user
 
 
 @router.get("/{user_id}", dependencies=[Depends(require_admin)], response_model=Optional[UserResponse])
@@ -60,4 +62,6 @@ def update_someone(update_data: UserUpdate, user_id: UUID, db: Session = Depends
     if not user:
         raise UserDoesntExist()
     admin_update_data: dict[str, Any] = update_data.model_dump(exclude_unset=True)
-    return user_service.update_user(user, admin_update_data, db)
+    updated_user: User = user_service.update_user(user, admin_update_data, db)
+    db.commit()
+    return updated_user

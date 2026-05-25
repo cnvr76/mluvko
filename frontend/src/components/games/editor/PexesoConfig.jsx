@@ -1,5 +1,6 @@
 import React from "react";
 import TTSField from "./TTSField";
+import ImageField from "./ImageField";
 
 const PexesoConfig = ({ configData, onChange }) => {
   const cards = configData.cards || [];
@@ -48,8 +49,8 @@ const PexesoConfig = ({ configData, onChange }) => {
           flex justify-between items-center
           bg-white/40
           backdrop-blur-md
-          p-6
-          rounded-[2rem]
+          p-4
+          rounded-2xl
           border border-white/40
         "
       >
@@ -73,19 +74,19 @@ const PexesoConfig = ({ configData, onChange }) => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {cards.map((card, index) => (
           <div
             key={index}
             className="
               relative
-              p-6
-              rounded-[2rem]
+              p-4
+              rounded-2xl
               bg-white/75
               backdrop-blur-md
               border border-white/40
               shadow-[0_4px_20px_rgba(0,0,0,0.08)]
-              flex flex-col gap-4
+              flex flex-col gap-3
             "
           >
            <button
@@ -121,13 +122,13 @@ const PexesoConfig = ({ configData, onChange }) => {
               />
             </div>
 
-            <input
-              className={inputClassName}
+            <ImageField
               placeholder="URL obrázku (/images/pexeso/...)"
               value={card.animal_image_url}
-              onChange={(e) =>
-                updateCard(index, "animal_image_url", e.target.value)
+              onChange={(value) =>
+                updateCard(index, "animal_image_url", value)
               }
+              inputClassName={inputClassName}
             />
 
             <TTSField

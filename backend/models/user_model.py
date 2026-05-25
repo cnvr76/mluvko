@@ -36,3 +36,4 @@ class User(Base):
     activities = relationship("Activity", back_populates="user")
     games = relationship("Game", back_populates="author")
     favorites = relationship("Game", secondary=FavoritesT)
+    role_requests = relationship("RoleRequest", back_populates="user", cascade="all, delete-orphan")

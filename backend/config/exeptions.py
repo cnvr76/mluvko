@@ -35,6 +35,25 @@ class UserDoesntExist(CustomException):
         super().__init__(self.detail, status.HTTP_404_NOT_FOUND)
         
         
+# --- ROLE REQUEST exceptions ---
+class RoleRequestDoesntExist(CustomException):
+    def __init__(self):
+        self.detail: str = "Role request not found"
+        super().__init__(self.detail, status.HTTP_404_NOT_FOUND)
+
+
+class RoleRequestNotEligible(CustomException):
+    def __init__(self):
+        self.detail: str = "Only parents can request the therapist role"
+        super().__init__(self.detail, status.HTTP_403_FORBIDDEN)
+
+
+class RoleRequestAlreadyPending(CustomException):
+    def __init__(self):
+        self.detail: str = "You already have a pending role request"
+        super().__init__(self.detail, status.HTTP_409_CONFLICT)
+
+
 # --- AUTH exceptions ---
 class UserAlreadyExists(CustomException):
     def __init__(self):

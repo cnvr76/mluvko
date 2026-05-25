@@ -1,6 +1,6 @@
 import useAudioRecorder from "../../../hooks/useAudioRecorder";
 
-const RecordAudioButton = ({ onFinish, isLoading }) => {
+const RecordAudioButton = ({ onFinish, isLoading, disabled = false }) => {
   const { isRecording, startRecording, stopRecording } = useAudioRecorder();
 
   const handleRecording = async () => {
@@ -16,7 +16,7 @@ const RecordAudioButton = ({ onFinish, isLoading }) => {
   return (
     <button
       onClick={handleRecording}
-      disabled={isLoading}
+      disabled={isLoading || (disabled && !isRecording)}
       className="
       w-14 h-14 md:w-20 md:h-20
       rounded-full
@@ -27,6 +27,7 @@ const RecordAudioButton = ({ onFinish, isLoading }) => {
       flex items-center justify-center
       transition-all duration-200
       hover:scale-105 active:scale-95 cursor-pointer
+      disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-default
       "
     >
       {isRecording && <div>Nahráva</div>}

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import { api, GameTypes, AgeGroups } from "../../../services/api";
 import PageLoading from "../../loading/PageLoading";
 import PexesoConfig from "./PexesoConfig";
 import RepeatAfterConfig from "./RepeatAfterConfig";
+import FindAndRepeatConfig from "./FindAndRepeatConfig";
+import ImageField from "./ImageField";
 
 const CONFIG_COMPONENTS = {
   [GameTypes.PEXESO]: PexesoConfig,
   [GameTypes.REPEAT_AFTER]: RepeatAfterConfig,
+  [GameTypes.FIND_AND_REPEAT]: FindAndRepeatConfig,
 };
 
 const GameEditPage = () => {
@@ -153,6 +156,16 @@ if (loading) {
           </label>
 
           <label className="flex flex-col gap-2 font-semibold">
+            Obrázok hry (obálka na stránke s hrami):
+            <ImageField
+              placeholder="URL obrázku (/images/...)"
+              value={formData.preview_image_url}
+              onChange={(value) => handleBaseChange("preview_image_url", value)}
+              inputClassName={inputClassName}
+            />
+          </label>
+
+          <label className="flex flex-col gap-2 font-semibold">
             Veková skupina:
             <select
               className={inputClassName}
@@ -203,7 +216,7 @@ if (loading) {
           )}
         </section>
 
-        <div className="flex justify-center pt-2">
+        <div className="flex flex-wrap justify-center items-center gap-4 pt-2">
           <button
             onClick={handleSave}
             className="
@@ -223,6 +236,26 @@ if (loading) {
           >
             Uložiť zmeny
           </button>
+
+          <Link
+            to={`/games/${gameId}/${formData.game_type}${
+              snapshotId ? `?snapshot=${snapshotId}` : ""
+            }`}
+            className="
+              px-12 py-5
+              rounded-full
+              bg-[#ff7110]
+              hover:bg-[#e9650c]
+              text-white
+              text-xl
+              font-bold
+              no-underline
+              shadow-[0_4px_20px_rgba(255,113,16,0.25)]
+              transition-all duration-200
+            "
+          >
+            ▶ Hrať
+          </Link>
         </div>
       </div>
     </main>

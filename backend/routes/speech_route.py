@@ -26,6 +26,15 @@ async def convert_speech_to_text(audio_file: UploadFile = File(...), reference_t
 def create_speech_from_text(speech_text: str):
     audio_filepath: str = speech_service.create_speech(speech_text)
     return audio_filepath
+
+
+@router.delete("/audio", dependencies=[Depends(require_therapist_or_admin)], status_code=200)
+def delete_generated_audio(path: str):
+    try:
+        deleted: bool = speech_service.delete_audio(path)
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    return {"success": deleted}
     
 
 @router.post("/tts/combined", dependencies=[Depends(require_therapist_or_admin)], status_code=201)

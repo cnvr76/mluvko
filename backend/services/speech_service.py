@@ -53,6 +53,24 @@ class SpeechService:
             phonemes_recognized=" ".join(rec_phonemas)
         )
     
+    def delete_audio(self, filepath: str) -> bool:
+        # Only files inside the generated-audio folders may be removed (no path traversal).
+        if not filepath:
+            return False
+
+        allowed_dirs = [os.path.abspath(d) for d in ("static/audio", "static/combined")]
+        target = os.path.abspath(filepath)
+
+        if not any(target.startswith(allowed + os.sep) for allowed in allowed_dirs):
+            raise ValueError("Refusing to delete a file outside the audio directories")
+
+        if os.path.exists(target):
+            os.remove(target)
+            logger.info(f"Deleted audio file {filepath}")
+            return True
+
+        return False
+
     def create_speech(self, text: str) -> str:
         filename: str = hash_string(text) + ".mp3"
         filepath: str = f"static/audio/{filename}"

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 const NextButton = ({ icon, onClick, isDisabled }) => {
   return (
@@ -15,6 +15,7 @@ const NextButton = ({ icon, onClick, isDisabled }) => {
       flex items-center justify-center
       transition-all duration-200
       hover:scale-105 active:scale-95 cursor-pointer
+      disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-default
       "
     >
       <img

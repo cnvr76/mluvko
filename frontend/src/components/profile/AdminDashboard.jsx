@@ -229,7 +229,7 @@ const AdminDashboard = () => {
                         <button
                           onClick={() => {
                             const reason = prompt(
-                              "Dôvod stiahnutia hry z webu:",
+                              "Dôvod zrušenia publikácie:",
                             );
                             if (reason === null) return;
                             if (reason.trim().length < 3) {
@@ -253,7 +253,32 @@ const AdminDashboard = () => {
                             transition-all duration-200
                           "
                         >
-                          Stiahnuť z webu
+                          Zrušiť publikáciu
+                        </button>
+                      )}
+
+                      {snapshot.id === snapshot.published_version_id && (
+                        <button
+                          onClick={() => {
+                            const isConfirmed = window.confirm(
+                              "Naozaj chcete archivovať túto hru? Hra zmizne zo stránky, ale verziu možno neskôr znova publikovať cez Rollback.",
+                            );
+                            if (isConfirmed) {
+                              handleAction(api.archiveGame, snapshot.game_id);
+                            }
+                          }}
+                          className="
+                            px-4 py-2
+                            rounded-xl
+                            bg-[#B89DBB]
+                            hover:bg-[#a98ead]
+                            text-white
+                            text-sm
+                            font-semibold
+                            transition-all duration-200
+                          "
+                        >
+                          Archivovať
                         </button>
                       )}
 

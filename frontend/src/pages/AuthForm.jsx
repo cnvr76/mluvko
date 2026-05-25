@@ -13,6 +13,7 @@ const AuthForm = () => {
     password: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const isLoginMode = searchParams.get("type") !== "signup";
   const from = location.state?.from?.pathname || "/";
@@ -64,6 +65,7 @@ const AuthForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     let result;
 
@@ -81,10 +83,15 @@ const AuthForm = () => {
       }
     }
 
+    if (!result.success) {
+      setError(result.error);
+    }
+
     setIsLoading(false);
   };
 
   const toggleMode = () => {
+    setError(null);
     setSearchParams({ type: isLoginMode ? "signup" : "login" });
   };
 
@@ -149,6 +156,10 @@ const AuthForm = () => {
             required
             className={inputClassName}
           />
+
+          {error && (
+            <p className="text-sm font-semibold text-red-600 -mt-1">{error}</p>
+          )}
 
           <button type="submit" disabled={isLoading} className={buttonClassName}>
             {isLoading

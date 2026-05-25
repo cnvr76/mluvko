@@ -1,11 +1,13 @@
-import React, { useState } from "react";
-import { useLoaderData, redirect } from "react-router-dom";
+import React from "react";
+import { useLoaderData, redirect, useSearchParams } from "react-router-dom";
 import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import PersonalDetails from "../components/profile/PersonalDetails";
 import FavoriteGames from "../components/profile/FavoriteGames";
 import CreatedGames from "../components/profile/CreatedGames";
 import AdminDashboard from "../components/profile/AdminDashboard";
+import UserManagement from "../components/profile/UserManagement";
+import RoleRequests from "../components/profile/RoleRequests";
 
 export const profileLoader = async () => {
   try {
@@ -22,7 +24,7 @@ export const profileLoader = async () => {
 const ProfilePage = () => {
   const me = useLoaderData();
   const { isTherapist, isAdmin } = useAuth();
-  const [activeTab, setActiveTab] = useState("details");
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const tabsConfig = [
     {
@@ -51,7 +53,28 @@ const ProfilePage = () => {
       label: "Admin",
       component: <AdminDashboard />,
     });
+
+    tabsConfig.push({
+      id: "users",
+      label: "Používatelia",
+      component: <UserManagement currentUserId={me.id} />,
+    });
+
+    tabsConfig.push({
+      id: "role-requests",
+      label: "Žiadosti o rolu",
+      component: <RoleRequests />,
+    });
   }
+
+  // keep the selected tab in the URL (?tab=...) so reloading / returning to the
+  // page restores it instead of always falling back to the first tab
+  const requestedTab = searchParams.get("tab");
+  const activeTab = tabsConfig.some((tab) => tab.id === requestedTab)
+    ? requestedTab
+    : "details";
+
+  const selectTab = (tabId) => setSearchParams({ tab: tabId }, { replace: true });
 
   const activeComponent = tabsConfig.find(
     (tab) => tab.id === activeTab,
@@ -98,7 +121,7 @@ const ProfilePage = () => {
           {tabsConfig.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => selectTab(tab.id)}
               className={`
                 cursor-pointer
                 text-2xl

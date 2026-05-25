@@ -77,13 +77,14 @@ export const AuthProvider = ({ children }) => {
 
         return { success: true, username };
       } else {
-        return { success: false, error: "Invalid response format" };
+        return { success: false, error: "Neplatná odpoveď servera." };
       }
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.message || "Login error",
-      };
+      const message =
+        error.response?.status === 401
+          ? "Nesprávny email alebo heslo."
+          : "Prihlásenie zlyhalo. Skúste to znova.";
+      return { success: false, error: message };
     }
   };
 
@@ -92,10 +93,14 @@ export const AuthProvider = ({ children }) => {
       const response = await api.signup(username, email, password);
       return { success: true };
     } catch (error) {
-      return {
-        success: false,
-        error: error.response?.data?.detail || "Registration error",
-      };
+      const detail = error.response?.data?.detail;
+      let message = "Registrácia zlyhala. Skontrolujte zadané údaje.";
+      if (error.response?.status === 409) {
+        message = "Používateľ s týmto emailom už existuje.";
+      } else if (typeof detail === "string") {
+        message = detail;
+      }
+      return { success: false, error: message };
     }
   };
 
