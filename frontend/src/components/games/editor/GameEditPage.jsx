@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useSearchParams, Link } from "react-router-dom";
 import { api, GameTypes, AgeGroups } from "../../../services/api";
 import PageLoading from "../../loading/PageLoading";
@@ -6,6 +6,11 @@ import PexesoConfig from "./PexesoConfig";
 import RepeatAfterConfig from "./RepeatAfterConfig";
 import FindAndRepeatConfig from "./FindAndRepeatConfig";
 import ImageField from "./ImageField";
+import {
+  collectMediaPaths,
+  uploadPendingFiles,
+} from "../../../utils/pendingMedia";
+import { deleteServerFile } from "../../../utils/mediaPaths";
 
 const CONFIG_COMPONENTS = {
   [GameTypes.PEXESO]: PexesoConfig,
@@ -19,7 +24,12 @@ const GameEditPage = () => {
   const snapshotId = searchParams.get("snapshot");
 
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState(null);
+  // referencia na poslednú serverom potvrdenú podobu dát – slúži na výpočet,
+  // ktoré pôvodné cesty k médiám už po uložení nie sú potrebné a treba ich
+  // zmazať zo servera.
+  const initialFormDataRef = useRef(null);
 
   const inputClassName = `
     border border-[#642f37]/30
@@ -40,6 +50,8 @@ const GameEditPage = () => {
           : await api.getGameById(gameId);
 
         setFormData(data);
+        // hlboký snapshot pôvodných serverových ciest pre neskorší diff
+        initialFormDataRef.current = JSON.parse(JSON.stringify(data));
       } catch (e) {
         console.error(e);
       } finally {
@@ -55,11 +67,39 @@ const GameEditPage = () => {
   };
 
   const handleSave = async () => {
+    if (saving) return;
+    setSaving(true);
     try {
-      await api.saveGame(gameId, formData);
+      // 1) nahrať všetky lokálne odložené súbory (PendingFile) a nahradiť ich
+      //    serverovými cestami v hlbokej kópii formData
+      const uploaded = await uploadPendingFiles(formData);
+
+      // 2) zistiť, ktoré pôvodné media cesty po novom ukladaní zmizli –
+      //    tie treba po úspešnom PATCHi zmazať zo servera (best-effort)
+      const initialPaths = collectMediaPaths(initialFormDataRef.current);
+      const updatedPaths = collectMediaPaths(uploaded);
+      const orphanPaths = [...initialPaths].filter(
+        (p) => !updatedPaths.has(p)
+      );
+
+      // 3) uložiť hru s finálnymi cestami
+      await api.saveGame(gameId, uploaded);
+
+      // 4) ako baseline pre ďalší diff si pamätáme uložený stav
+      setFormData(uploaded);
+      initialFormDataRef.current = JSON.parse(JSON.stringify(uploaded));
+
+      // 5) až po úspešnom save zahodíme osirotené súbory
+      for (const path of orphanPaths) {
+        deleteServerFile(path);
+      }
+
       alert("Hra bola úspešne uložená!");
     } catch (e) {
-      alert("Chyba pri ukladaní.");
+      const detail = e?.response?.data?.detail || "Chyba pri ukladaní.";
+      alert(detail);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -219,6 +259,7 @@ if (loading) {
         <div className="flex flex-wrap justify-center items-center gap-4 pt-2">
           <button
             onClick={handleSave}
+            disabled={saving}
             className="
               px-12 py-5
               rounded-full
@@ -232,9 +273,10 @@ if (loading) {
               transition-all duration-200
               hover:bg-white/70
               hover:text-[#ff7110]
+              disabled:opacity-50 disabled:hover:bg-white/50 disabled:hover:text-[#642f37] disabled:cursor-default
             "
           >
-            Uložiť zmeny
+            {saving ? "Ukladám..." : "Uložiť zmeny"}
           </button>
 
           <Link

@@ -1,5 +1,5 @@
 import React from "react";
-import TTSField from "./TTSField";
+import AudioSources from "./AudioSources";
 import ImageField from "./ImageField";
 
 const RepeatAfterConfig = ({ configData, onChange }) => {
@@ -170,12 +170,13 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
 
             {/* Правая колонка: Аудио */}
             <div className="flex flex-col justify-center">
-              <TTSField
+              <AudioSources
                 label="Referenčná nahrávka (generuje sa z textu)"
                 currentPath={card.reference_audio}
-                onAudioGenerated={(path) =>
+                onChange={(path) =>
                   updateCard(index, "reference_audio", path)
                 }
+                defaultText={card.reference_text}
               />
               <p className="text-[10px] text-gray-400 mt-2 text-center">
                 Tip: Do poľa generovania zadajte text, ktorý má AI očakávať

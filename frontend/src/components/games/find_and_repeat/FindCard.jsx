@@ -1,4 +1,5 @@
 import React from "react";
+import { previewUrl } from "../../../utils/pendingMedia";
 
 const FindCard = ({ card, onClick, disabled, highlighted }) => {
   return (
@@ -23,7 +24,7 @@ const FindCard = ({ card, onClick, disabled, highlighted }) => {
       `}
     >
       <img
-        src={card.image_url}
+        src={previewUrl(card.image_url)}
         alt={card.name}
         className="max-h-full max-w-full object-contain drop-shadow-lg pointer-events-none"
       />

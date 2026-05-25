@@ -1,5 +1,6 @@
 import React from "react";
 import ReactFlipCard from "react-card-flip";
+import { previewUrl } from "../../../utils/pendingMedia";
 
 const FlipCard = ({ data, isFlipped, onClick }) => {
   return (
@@ -21,7 +22,7 @@ const FlipCard = ({ data, isFlipped, onClick }) => {
         className="relative w-[96px] sm:w-[120px] md:w-[140px] aspect-[3/4] rounded-3xl overflow-hidden cursor-pointer select-none bg-white/20 backdrop-blur-xl shadow-[0_10px_30px_rgba(0,0,0,0.2)]"
       >
         <img
-          src={data.animal_image_url}
+          src={previewUrl(data.animal_image_url)}
           alt={data.animal_name}
           className="w-full h-full object-cover"
           draggable={false}

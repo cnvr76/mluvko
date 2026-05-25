@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { api } from "../../../services/api";
+import { deleteServerFile } from "../../../utils/mediaPaths";
+import { previewUrl } from "../../../utils/pendingMedia";
 
-const VITE_API_BASE = import.meta.env.VITE_API_BASE;
-
-const TTSField = ({ label, currentPath, onAudioGenerated, defaultText = "" }) => {
+const TTSField = ({
+  label,
+  currentPath,
+  onAudioGenerated,
+  defaultText = "",
+}) => {
   const [text, setText] = useState(defaultText);
   const [loading, setLoading] = useState(false);
 
@@ -17,9 +22,12 @@ const TTSField = ({ label, currentPath, onAudioGenerated, defaultText = "" }) =>
       const path = await api.generateTTS(trimmed);
       onAudioGenerated(path);
 
-      // remove the previously generated file so the server doesn't keep orphans
-      if (previousPath && previousPath !== path) {
-        api.deleteAudio(previousPath).catch(() => {});
+      if (
+        typeof previousPath === "string" &&
+        previousPath &&
+        previousPath !== path
+      ) {
+        deleteServerFile(previousPath);
       }
     } catch (e) {
       alert("Chyba pri generovaní zvuku");
@@ -31,8 +39,8 @@ const TTSField = ({ label, currentPath, onAudioGenerated, defaultText = "" }) =>
   const handleClear = () => {
     const previousPath = currentPath;
     onAudioGenerated("");
-    if (previousPath) {
-      api.deleteAudio(previousPath).catch(() => {});
+    if (typeof previousPath === "string" && previousPath) {
+      deleteServerFile(previousPath);
     }
   };
 
@@ -58,6 +66,7 @@ const TTSField = ({ label, currentPath, onAudioGenerated, defaultText = "" }) =>
             text-white
             transition-all duration-200
             disabled:opacity-50
+            font-bold
           "
         >
           {loading ? "..." : "Generovať"}
@@ -67,7 +76,7 @@ const TTSField = ({ label, currentPath, onAudioGenerated, defaultText = "" }) =>
       {currentPath && (
         <div className="flex items-center gap-2 mt-1">
           <audio
-            src={`${VITE_API_BASE}/${currentPath}`}
+            src={previewUrl(currentPath)}
             controls
             className="h-8 w-full"
           />
@@ -77,7 +86,7 @@ const TTSField = ({ label, currentPath, onAudioGenerated, defaultText = "" }) =>
             title="Vymazať nahrávku"
             className="
               shrink-0
-              px-2 py-1
+              px-3 py-2
               rounded-lg
               bg-[#ffe5e5]
               hover:bg-[#ffd6d6]
@@ -85,9 +94,10 @@ const TTSField = ({ label, currentPath, onAudioGenerated, defaultText = "" }) =>
               text-xs
               font-semibold
               transition-all duration-200
+              aspect-square
             "
           >
-            Vymazať
+            <i class="fa-solid fa-trash"></i>
           </button>
         </div>
       )}

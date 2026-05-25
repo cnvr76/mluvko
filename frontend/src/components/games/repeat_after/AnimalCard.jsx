@@ -1,4 +1,5 @@
 import React from "react";
+import { previewUrl } from "../../../utils/pendingMedia";
 
 const AnimalCard = ({ gameData, currentScore }) => {
   let barGradient = "";
@@ -31,7 +32,7 @@ const AnimalCard = ({ gameData, currentScore }) => {
     >
       <div className="flex items-center justify-center md:justify-start flex-1">
         <img
-          src={gameData?.animal_image_url}
+          src={previewUrl(gameData?.animal_image_url)}
           alt={gameData?.animal_name}
           className="h-32 md:h-60 object-contain drop-shadow-lg"
         />

@@ -1,5 +1,5 @@
 import React from "react";
-import TTSField from "./TTSField";
+import AudioSources from "./AudioSources";
 import ImageField from "./ImageField";
 
 const PexesoConfig = ({ configData, onChange }) => {
@@ -131,12 +131,11 @@ const PexesoConfig = ({ configData, onChange }) => {
               inputClassName={inputClassName}
             />
 
-            <TTSField
+            <AudioSources
               label="Hlas zvieratka (audio)"
               currentPath={card.animal_audio}
-              onAudioGenerated={(path) =>
-                updateCard(index, "animal_audio", path)
-              }
+              onChange={(path) => updateCard(index, "animal_audio", path)}
+              defaultText={card.animal_name}
             />
           </div>
         ))}

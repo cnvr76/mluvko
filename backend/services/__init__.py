@@ -5,3 +5,4 @@ from services.phoneme_analyzer_service import phoneme_service
 from services.user_service import user_service
 from services.snapshot_service import snapshot_service
 from services.role_request_service import role_request_service
+from services.upload_service import upload_service

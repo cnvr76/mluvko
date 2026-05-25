@@ -125,6 +125,28 @@ export const api = {
       "Failed to delete audio:"
     ),
 
+  // --- USER UPLOADS (vlastné audio / obrázky pre logopédov/adminov) ---
+  uploadAudio: async (file) => {
+    const formData = new FormData();
+    formData.append("audio_file", file);
+    return POST("/uploads/audio", formData, "Failed to upload audio:", {
+      "Content-Type": "multipart/form-data",
+    });
+  },
+  uploadImage: async (file) => {
+    const formData = new FormData();
+    formData.append("image_file", file);
+    return POST("/uploads/image", formData, "Failed to upload image:", {
+      "Content-Type": "multipart/form-data",
+    });
+  },
+  deleteUploadedFile: async (path) =>
+    DELETE(
+      `/uploads/file?path=${encodeURIComponent(path)}`,
+      {},
+      "Failed to delete uploaded file:"
+    ),
+
   // --- ADMIN ROUTES ---
   getAdminDashboard: async () =>
     GET("/admin/dashboard/snapshots", "Chyba načítania dashboardu:"),

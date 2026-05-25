@@ -1,5 +1,5 @@
 import React from "react";
-import TTSField from "./TTSField";
+import AudioSources from "./AudioSources";
 import ImageField from "./ImageField";
 import { FIND_PROMPT_TEXT, CONFIRM_PROMPT_TEXT } from "../find_and_repeat/prompts";
 
@@ -69,11 +69,11 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
       {/* Spoločné hlasy hry (generujú sa raz, používajú sa vo všetkých úrovniach) */}
       <div className="rounded-2xl bg-white/60 border border-white/40 p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <TTSField
+          <AudioSources
             label="Úvodná výzva (zaznie iba na prvej etape)"
             defaultText={FIND_PROMPT_TEXT}
             currentPath={configData.find_prompt_audio}
-            onAudioGenerated={(path) => update({ find_prompt_audio: path })}
+            onChange={(path) => update({ find_prompt_audio: path })}
           />
           <p className="text-[10px] text-gray-400 mt-1">
             Napr. „{FIND_PROMPT_TEXT}“.
@@ -81,11 +81,11 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
         </div>
 
         <div>
-          <TTSField
+          <AudioSources
             label="Otázka po nahrávke"
             defaultText={CONFIRM_PROMPT_TEXT}
             currentPath={configData.confirm_prompt_audio}
-            onAudioGenerated={(path) => update({ confirm_prompt_audio: path })}
+            onChange={(path) => update({ confirm_prompt_audio: path })}
           />
           <p className="text-[10px] text-gray-400 mt-1">
             Napr. „{CONFIRM_PROMPT_TEXT}“. Zaznie po prehratí nahrávky dieťaťa.
@@ -204,11 +204,11 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
 
                       {/* Pravý stĺpec: audio */}
                       <div className="flex flex-col justify-center">
-                        <TTSField
+                        <AudioSources
                           label="Zvuk kartičky (generuje sa z textu)"
                           defaultText={card.name}
                           currentPath={card.reference_audio}
-                          onAudioGenerated={(path) =>
+                          onChange={(path) =>
                             updateCard(
                               levelIndex,
                               cardIndex,
