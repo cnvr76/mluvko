@@ -14,6 +14,7 @@ const AuthForm = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isPwdVisible, setIsPwdVisible] = useState(false);
 
   const isLoginMode = searchParams.get("type") !== "signup";
   const from = location.state?.from?.pathname || "/";
@@ -75,7 +76,7 @@ const AuthForm = () => {
       result = await signup(
         formData.username,
         formData.email,
-        formData.password
+        formData.password,
       );
 
       if (result.success) {
@@ -147,26 +148,39 @@ const AuthForm = () => {
             className={inputClassName}
           />
 
-          <input
-            type="password"
-            name="password"
-            placeholder="Heslo"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className={inputClassName}
-          />
+          <div className="flex relative h-full">
+            <input
+              type={isPwdVisible ? "text" : "password"}
+              name="password"
+              placeholder="Heslo"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className={inputClassName + "pr-12"}
+            />
+            <button
+              type="button"
+              className="absolute right-4 top-3.5 w-5"
+              onClick={() => setIsPwdVisible((prev) => !prev)}
+            >
+              <i class={`fa-solid fa-eye${isPwdVisible ? "-slash" : ""}`}></i>
+            </button>
+          </div>
 
           {error && (
             <p className="text-sm font-semibold text-red-600 -mt-1">{error}</p>
           )}
 
-          <button type="submit" disabled={isLoading} className={buttonClassName}>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={buttonClassName}
+          >
             {isLoading
               ? "Načítava sa..."
               : isLoginMode
-              ? "Prihlásiť sa"
-              : "Registrovať sa"}
+                ? "Prihlásiť sa"
+                : "Registrovať sa"}
           </button>
         </form>
 

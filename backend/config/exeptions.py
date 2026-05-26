@@ -1,4 +1,5 @@
 from fastapi import status
+from typing import Iterable
 
 
 class CustomException(Exception):
@@ -86,3 +87,20 @@ class IncorrectAudioFormat(CustomException):
     def __init__(self):
         self.detail: str = "Only MP3s are allowed at the moment"
         super().__init__(self.detail, status.HTTP_406_NOT_ACCEPTABLE)
+
+
+# --- UPLOAD exceptions ---
+class FileTooLarge(CustomException):
+    def __init__(self, max_bytes: int):
+        super().__init__(
+            f"File is too large (max {max_bytes // (1024 * 1024)} MB)",
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+        )
+
+
+class UnsupportedFileType(CustomException):
+    def __init__(self, allowed: Iterable[str]):
+        super().__init__(
+            f"Unsupported file type. Allowed: {', '.join(allowed)}",
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+        )

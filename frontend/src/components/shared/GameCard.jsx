@@ -53,7 +53,6 @@ const GameCard = ({ data, onFavoriteToggle }) => {
             relative w-[220px] md:w-[260px] aspect-[3/4]
             rounded-3xl p-4
             bg-white/20
-            backdrop-blur-xl
             border border-white/30
             shadow-[0_10px_30px_rgba(0,0,0,0.2)]
             flex flex-col items-center justify-between
