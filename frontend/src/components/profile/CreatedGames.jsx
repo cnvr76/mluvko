@@ -117,16 +117,16 @@ const CreatedGames = () => {
     );
   }
   if (myGames.length === 0) {
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-extrabold drop-shadow">
-          Moje vytvorené hry
-        </h2>
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-3xl font-extrabold drop-shadow">
+            Moje vytvorené hry
+          </h2>
 
-        <button
-          onClick={handleInitDraft}
-          className="
+          <button
+            onClick={handleInitDraft}
+            className="
             px-5 py-2.5
             rounded-xl
             bg-[#ff7110]
@@ -135,13 +135,13 @@ const CreatedGames = () => {
             font-bold
             transition-all duration-200
           "
-        >
-          + Nová hra
-        </button>
-      </div>
+          >
+            + Nová hra
+          </button>
+        </div>
 
-      <div
-        className="
+        <div
+          className="
           rounded-[2rem]
           bg-white/30
           backdrop-blur-xl
@@ -150,18 +150,18 @@ const CreatedGames = () => {
           text-center
           text-[#642f37]
         "
-      >
-        <p className="text-xl font-bold mb-2">
-          Zatiaľ nemáte vytvorené žiadne hry
-        </p>
+        >
+          <p className="text-xl font-bold mb-2">
+            Zatiaľ nemáte vytvorené žiadne hry
+          </p>
 
-        <p className="opacity-70 mb-6">
-          Vytvorte svoju prvú logopedickú hru.
-        </p>
+          <p className="opacity-70 mb-6">
+            Vytvorte svoju prvú logopedickú hru.
+          </p>
 
-        <button
-          onClick={handleInitDraft}
-          className="
+          <button
+            onClick={handleInitDraft}
+            className="
             px-6 py-3
             rounded-xl
             bg-[#ff7110]
@@ -170,13 +170,13 @@ const CreatedGames = () => {
             font-bold
             transition-all duration-200
           "
-        >
-          + Vytvoriť hru
-        </button>
+          >
+            + Vytvoriť hru
+          </button>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -308,7 +308,7 @@ const CreatedGames = () => {
                       rounded-lg
                     "
                   >
-                    <strong>Poznámka admina:</strong>{" "}
+                    <strong>Dôvod rollbacku:</strong>{" "}
                     {currentVersion.admin_feedback}
                   </div>
                 )}

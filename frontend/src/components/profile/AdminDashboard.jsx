@@ -148,7 +148,10 @@ const AdminDashboard = () => {
 
                       {snapshot.admin_feedback && (
                         <p className="text-xs text-red-500 mt-1 italic">
-                          Feedback: {snapshot.admin_feedback}
+                          {snapshot.published_version_id === snapshot.id
+                            ? "Dôvod"
+                            : "Feedback"}
+                          : {snapshot.admin_feedback}
                         </p>
                       )}
                     </div>
@@ -228,9 +231,7 @@ const AdminDashboard = () => {
                       {snapshot.id === snapshot.published_version_id && (
                         <button
                           onClick={() => {
-                            const reason = prompt(
-                              "Dôvod zrušenia publikácie:",
-                            );
+                            const reason = prompt("Dôvod zrušenia publikácie:");
                             if (reason === null) return;
                             if (reason.trim().length < 3) {
                               alert("Dôvod musí mať aspoň 3 znaky!");
@@ -355,9 +356,7 @@ const AdminDashboard = () => {
           >
             <p className="text-xl font-bold mb-2">Žiadne hry na zobrazenie</p>
 
-            <p className="text-sm">
-              pre filter: {statusFilter}
-            </p>
+            <p className="text-sm">pre filter: {statusFilter}</p>
           </div>
         )}
       </div>
