@@ -163,7 +163,9 @@ const AuthForm = () => {
               className="absolute right-4 top-3.5 w-5"
               onClick={() => setIsPwdVisible((prev) => !prev)}
             >
-              <i class={`fa-solid fa-eye${isPwdVisible ? "-slash" : ""}`}></i>
+              <i
+                className={`fa-solid fa-eye${isPwdVisible ? "-slash" : ""}`}
+              ></i>
             </button>
           </div>
 

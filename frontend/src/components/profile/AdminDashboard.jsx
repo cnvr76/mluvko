@@ -10,7 +10,7 @@ const AdminDashboard = () => {
   const fetchDashboard = async () => {
     setLoading(true);
     try {
-      const data = await api.getAdminDashboard();
+      const data = await api.admin.dashboard();
       setGames(data || []);
     } catch (error) {
       console.error("Failed to fetch dashboard", error);
@@ -178,7 +178,7 @@ const AdminDashboard = () => {
                           <button
                             onClick={() =>
                               handleAction(
-                                api.approveSnapshot,
+                                api.admin.approve,
                                 snapshot.game_id,
                                 snapshot.id,
                               )
@@ -206,7 +206,7 @@ const AdminDashboard = () => {
                                 return;
                               }
                               handleAction(
-                                api.rejectPendingSnapshot,
+                                api.admin.reject,
                                 snapshot.game_id,
                                 snapshot.id,
                                 reason,
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
                               return;
                             }
                             handleAction(
-                              api.revokeGame,
+                              api.admin.revoke,
                               snapshot.game_id,
                               reason,
                             );
@@ -265,7 +265,7 @@ const AdminDashboard = () => {
                               "Naozaj chcete archivovať túto hru? Hra zmizne zo stránky, ale verziu možno neskôr znova publikovať cez Rollback.",
                             );
                             if (isConfirmed) {
-                              handleAction(api.archiveGame, snapshot.game_id);
+                              handleAction(api.versions.archive, snapshot.game_id);
                             }
                           }}
                           className="
@@ -293,7 +293,7 @@ const AdminDashboard = () => {
                               );
                               if (reason === null) return;
                               handleAction(
-                                api.rollbackGame,
+                                api.admin.rollback,
                                 snapshot.game_id,
                                 snapshot.id,
                                 reason || "Admin rollback",
@@ -320,7 +320,7 @@ const AdminDashboard = () => {
                             "POZOR: Naozaj chcete úplne vymazať túto hru zo systému? Vymažú sa tým absolútne VŠETKY jej verzie a dáta.",
                           );
                           if (isConfirmed) {
-                            handleAction(api.deleteGame, snapshot.game_id);
+                            handleAction(api.games.delete, snapshot.game_id);
                           }
                         }}
                         className="

@@ -12,7 +12,7 @@ const CreatedGames = () => {
     setLoading(true);
 
     try {
-      const data = await api.getMyCreatedGames();
+      const data = await api.games.myCreated();
       setMyGames(data || []);
 
       const initialSelected = {};
@@ -45,7 +45,7 @@ const CreatedGames = () => {
 
   const handleInitDraft = async () => {
     try {
-      const data = await api.initDraft();
+      const data = await api.versions.initDraft();
       navigate(`/games/${data.game_id}/edit?snapshot=${data.snapshot_id}`);
     } catch (error) {
       alert("Chyba pri vytváraní hry");
@@ -54,7 +54,7 @@ const CreatedGames = () => {
 
   const handleSubmitForReview = async (gameId) => {
     try {
-      await api.submitForReview(gameId);
+      await api.versions.submit(gameId);
       fetchMyGames();
     } catch (error) {
       alert("Chyba pri odosielaní");
@@ -69,7 +69,7 @@ const CreatedGames = () => {
     if (!isConfirmed) return;
 
     try {
-      await api.archiveGame(gameId);
+      await api.versions.archive(gameId);
       fetchMyGames();
     } catch (error) {
       alert("Nepodarilo sa archivovať hru.");
@@ -84,7 +84,7 @@ const CreatedGames = () => {
     if (!isConfirmed) return;
 
     try {
-      await api.deleteGame(gameId);
+      await api.games.delete(gameId);
       fetchMyGames();
     } catch (error) {
       alert("Nepodarilo sa vymazať hru.");

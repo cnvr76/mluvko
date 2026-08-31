@@ -12,7 +12,7 @@ export const gamesLoaderFactory = (ageGroup) => async () => {
       : "/images/gamepage_5_6_background.png";
 
   const [data] = await Promise.all([
-    api.getGamesFor(ageGroup),
+    api.games.forAgeGroup(ageGroup),
     preloadImage(bgImage),
   ]);
 

@@ -46,8 +46,8 @@ const GameEditPage = () => {
     const loadData = async () => {
       try {
         const data = snapshotId
-          ? await api.getSnapshotInfo(gameId, snapshotId)
-          : await api.getGameById(gameId);
+          ? await api.versions.info(gameId, snapshotId)
+          : await api.games.byId(gameId);
 
         setFormData(data);
         // hlboký snapshot pôvodných serverových ciest pre neskorší diff
@@ -83,7 +83,7 @@ const GameEditPage = () => {
       );
 
       // 3) uložiť hru s finálnymi cestami
-      await api.saveGame(gameId, uploaded);
+      await api.versions.saveDraft(gameId, uploaded);
 
       // 4) ako baseline pre ďalší diff si pamätáme uložený stav
       setFormData(uploaded);

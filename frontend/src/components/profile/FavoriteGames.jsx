@@ -9,8 +9,8 @@ const FavoriteGames = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api
-      .getMyFavoriteGames()
+    api.games
+      .favorite()
       .then((data) => {
         setGames(data);
         setLoading(false);

@@ -29,7 +29,7 @@ const PersonalDetails = ({ data }) => {
     setSaving(true);
     setStatus(null);
     try {
-      const updated = await api.updateMyProfile({ username: trimmedName });
+      const updated = await api.users.updateMe({ username: trimmedName });
       const newName = updated?.username ?? trimmedName;
       setSavedName(newName);
       setName(newName);

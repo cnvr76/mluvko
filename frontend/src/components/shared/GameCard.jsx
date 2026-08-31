@@ -22,7 +22,7 @@ const GameCard = ({ data, onFavoriteToggle }) => {
     }
 
     try {
-      await api.toggleFavorite(data.id, toggledState);
+      await api.games.toggleFavorite(data.id, toggledState);
     } catch (error) {
       setIsStarred(!toggledState);
       if (onFavoriteToggle) {

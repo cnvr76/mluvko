@@ -11,7 +11,7 @@ import RoleRequests from "../components/profile/RoleRequests";
 
 export const profileLoader = async () => {
   try {
-    const data = await api.getMyProfile();
+    const data = await api.users.me();
     return data;
   } catch (error) {
     if (error.response?.status === 401 || error.response?.status === 403) {

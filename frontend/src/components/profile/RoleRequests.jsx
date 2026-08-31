@@ -21,7 +21,7 @@ const RoleRequests = () => {
   const fetchRequests = async () => {
     setLoading(true);
     try {
-      const data = await api.getAllRoleRequests();
+      const data = await api.roleRequests.all();
       setRequests(data || []);
     } catch (error) {
       console.error("Failed to fetch role requests", error);
@@ -146,7 +146,7 @@ const RoleRequests = () => {
                         `Schváliť žiadosť používateľa „${request.username}“ a zmeniť mu rolu na ${RoleLabels[request.requested_role]}?`,
                       );
                       if (isConfirmed) {
-                        handleAction(api.approveRoleRequest, request.id);
+                        handleAction(api.roleRequests.approve, request.id);
                       }
                     }}
                     className="
@@ -171,7 +171,7 @@ const RoleRequests = () => {
                         alert("Dôvod musí mať aspoň 3 znaky!");
                         return;
                       }
-                      handleAction(api.rejectRoleRequest, request.id, reason);
+                      handleAction(api.roleRequests.reject, request.id, reason);
                     }}
                     className="
                       px-4 py-2

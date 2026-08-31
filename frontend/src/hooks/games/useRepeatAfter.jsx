@@ -43,7 +43,7 @@ const useRepeatAfter = (gameData) => {
       setIsSubmitting(true);
       let response = null;
       try {
-        response = await api.analyzeSpeech(audioBlob, referenceText);
+        response = await api.speech.analyze(audioBlob, referenceText);
         setCurrentScore(response?.score);
       } catch (error) {
         console.error("Error evaluating speech", error);

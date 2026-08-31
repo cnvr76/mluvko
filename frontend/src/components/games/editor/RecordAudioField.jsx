@@ -37,7 +37,7 @@ const RecordAudioField = ({ onAudioChange }) => {
         }
       `}
     >
-      {isRecording ? "Zastaviť" : <i class="fa-solid fa-microphone"></i>}
+      {isRecording ? "Zastaviť" : <i className="fa-solid fa-microphone"></i>}
     </button>
   );
 };

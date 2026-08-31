@@ -19,7 +19,7 @@ const TTSField = ({
     setLoading(true);
     const previousPath = currentPath;
     try {
-      const path = await api.generateTTS(trimmed);
+      const path = await api.speech.generateTTS(trimmed);
       onAudioGenerated(path);
 
       if (
@@ -97,7 +97,7 @@ const TTSField = ({
               aspect-square
             "
           >
-            <i class="fa-solid fa-trash"></i>
+            <i className="fa-solid fa-trash"></i>
           </button>
         </div>
       )}

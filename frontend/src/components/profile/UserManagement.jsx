@@ -10,7 +10,7 @@ const UserManagement = ({ currentUserId }) => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const data = await api.getAllUsers();
+      const data = await api.users.all();
       setUsers(data || []);
 
       const initialEdits = {};
@@ -186,7 +186,7 @@ const UserManagement = ({ currentUserId }) => {
 
                   <button
                     onClick={() =>
-                      handleAction(api.updateUser, user.id, {
+                      handleAction(api.users.update, user.id, {
                         username: edit.username,
                         role: edit.role,
                       })
@@ -214,7 +214,7 @@ const UserManagement = ({ currentUserId }) => {
                         `Naozaj chcete vymazať používateľa „${user.username}“? Táto akcia je nenávratná.`,
                       );
                       if (isConfirmed) {
-                        handleAction(api.deleteUser, user.id);
+                        handleAction(api.users.delete, user.id);
                       }
                     }}
                     disabled={isSelf}

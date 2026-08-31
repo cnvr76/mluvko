@@ -9,7 +9,7 @@ const RoleRequestPanel = () => {
   const fetchRequest = async () => {
     setLoading(true);
     try {
-      const data = await api.getMyRoleRequest();
+      const data = await api.roleRequests.mine();
       setRequest(data || null);
     } catch (error) {
       console.error("Failed to fetch role request", error);
@@ -25,7 +25,7 @@ const RoleRequestPanel = () => {
   const handleApply = async () => {
     setSubmitting(true);
     try {
-      await api.requestTherapistRole();
+      await api.roleRequests.create();
       await fetchRequest();
     } catch (error) {
       alert("Žiadosť sa nepodarilo odoslať.");

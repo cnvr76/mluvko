@@ -1,33 +1,20 @@
-import React, { useContext, createContext, useState, useEffect } from "react";
-import { apiClient, api, API_BASE, Roles } from "../services/api.js";
-import axios from "axios";
+import React, {
+  useContext,
+  createContext,
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
+import { apiClient, api, Roles } from "../services/api.js";
+import {
+  getAccessToken,
+  setAccessToken,
+  clearAccessToken,
+} from "./auth/tokenManager.js";
+import { createAuthInterceptors } from "./auth/authInterceptors.js";
 
 const AuthContext = createContext();
-
-const TokenManager = {
-  setAccessToken: (access) => {
-    localStorage.setItem("access_token", access);
-  },
-  getAccessToken: () => localStorage.getItem("access_token"),
-  clearTokens: () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("username");
-  },
-};
-
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,50 +22,38 @@ export const AuthProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTherapist, setIsTherapist] = useState(false);
 
-  const refreshToken = async () => {
-    const response = await axios.post(
-      `${API_BASE}/auth/refresh`,
-      {},
-      {
-        withCredentials: true,
-        timeout: 10000,
-      }
-    );
+  const interceptorsRef = useRef(null);
 
-    const newAccessToken = response.data.tokens.access_token;
-    TokenManager.setAccessToken(newAccessToken);
-
-    return newAccessToken;
+  const applyRole = (role) => {
+    setIsAuthenticated(true);
+    setIsAdmin(role === Roles.ADMIN);
+    setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
   };
 
-  const logout = async () => {
-    console.log("Logging out...");
-    TokenManager.clearTokens();
+  // Exchanges the httpOnly refresh cookie for a new access token
+  const refreshSession = useCallback(async () => {
+    const { tokens, user } = await api.auth.refresh();
+    setAccessToken(tokens.access_token);
+    return { accessToken: tokens.access_token, user };
+  }, []);
+
+  const logout = useCallback(async () => {
+    clearAccessToken();
+    localStorage.removeItem("username");
     setIsAuthenticated(false);
-    isRefreshing = false;
-    failedQueue = [];
-    await axios.post(`${API_BASE}/auth/logout`, {}, { withCredentials: true });
-  };
+    await api.auth.logout();
+  }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await api.login(email, password);
+      const { tokens, user } = await api.auth.login(email, password);
 
-      if (response.data && response.data.tokens) {
-        const { access_token } = response.data.tokens;
-        const { username, role } = response.data.user;
+      setAccessToken(tokens.access_token);
+      localStorage.setItem("username", user.username);
+      localStorage.setItem("role", user.role);
+      applyRole(user.role);
 
-        TokenManager.setAccessToken(access_token);
-        localStorage.setItem("username", username);
-        localStorage.setItem("role", role);
-        setIsAuthenticated(true);
-        setIsAdmin(role === Roles.ADMIN);
-        setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
-
-        return { success: true, username };
-      } else {
-        return { success: false, error: "Neplatná odpoveď servera." };
-      }
+      return { success: true, username: user.username };
     } catch (error) {
       const message =
         error.response?.status === 401
@@ -90,7 +65,7 @@ export const AuthProvider = ({ children }) => {
 
   const signup = async (username, email, password) => {
     try {
-      const response = await api.signup(username, email, password);
+      await api.auth.signup(username, email, password);
       return { success: true };
     } catch (error) {
       const detail = error.response?.data?.detail;
@@ -105,80 +80,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const requestInterceptor = apiClient.interceptors.request.use((config) => {
-      const token = TokenManager.getAccessToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-      return config;
+    interceptorsRef.current = createAuthInterceptors({
+      apiClient,
+      getAccessToken,
+      refreshAccessToken: async () => (await refreshSession()).accessToken,
+      onAuthFailure: () => logout(),
     });
 
-    const responseInterceptor = apiClient.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-
-        if (error.response?.status === 401 && !originalRequest._retry) {
-          if (isRefreshing) {
-            return new Promise((resolve, reject) => {
-              failedQueue.push({ resolve, reject });
-            })
-              .then((token) => {
-                originalRequest.headers.Authorization = `Bearer ${token}`;
-                return apiClient(originalRequest);
-              })
-              .catch((err) => Promise.reject(err));
-          }
-
-          originalRequest._retry = true;
-          isRefreshing = true;
-
-          try {
-            const newToken = await refreshToken();
-            processQueue(null, newToken);
-
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-            return apiClient(originalRequest);
-          } catch (refreshError) {
-            processQueue(refreshError, null);
-            logout();
-            return Promise.reject(refreshError);
-          } finally {
-            isRefreshing = false;
-          }
-        }
-
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      apiClient.interceptors.request.eject(requestInterceptor);
-      apiClient.interceptors.response.eject(responseInterceptor);
-    };
-  }, []);
+    return () => interceptorsRef.current?.eject();
+  }, [refreshSession, logout]);
 
   useEffect(() => {
     const initAuth = async () => {
-      const accessToken = TokenManager.getAccessToken();
-
-      if (accessToken) {
-        try {
-          const response = await apiClient.get("/users/me");
-          const role = response.data.role || localStorage.getItem("role");
-
-          setIsAuthenticated(true);
-          setIsAdmin(role === Roles.ADMIN);
-          setIsTherapist([Roles.ADMIN, Roles.THERAPIST].includes(role));
-        } catch (error) {
-          logout();
-        }
+      try {
+        const { user } = await refreshSession();
+        applyRole(user.role);
+      } catch {
+        // no valid refresh cookie -> just not authenticated, nothing to clean up
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     initAuth();
-  }, []);
+  }, [refreshSession]);
 
   const value = {
     isAuthenticated,

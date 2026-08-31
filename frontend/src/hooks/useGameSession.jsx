@@ -16,8 +16,8 @@ const useGameSession = (gameId, snapshotId) => {
   const getGame = useCallback(
     () =>
       snapshotId
-        ? api.getSnapshotInfo(gameId, snapshotId)
-        : api.getGameById(gameId),
+        ? api.versions.info(gameId, snapshotId)
+        : api.games.byId(gameId),
     [gameId, snapshotId]
   );
 
@@ -41,7 +41,7 @@ const useGameSession = (gameId, snapshotId) => {
       setBestScore(score);
       setIsFinished(true);
       try {
-        const response = await api.updateStats(gameId, score);
+        const response = await api.games.updateStats(gameId, score);
         setBestScore(Math.round(response?.best_score * 100) / 100);
       } catch (error) {
         console.error("Failed to update game score:", error);
