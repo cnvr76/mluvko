@@ -1,9 +1,3 @@
-// Wires the access token onto every apiClient request and, on a 401,
-// refreshes it once and retries. Concurrent 401s while a refresh is already
-// in flight just await the same refreshPromise instead of each starting
-// their own refresh call — no manual queue/flag bookkeeping needed, and
-// nothing can "hang forever": every awaiter settles when that one promise
-// settles.
 export const createAuthInterceptors = ({
   apiClient,
   getAccessToken,

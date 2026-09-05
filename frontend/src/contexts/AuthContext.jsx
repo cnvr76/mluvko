@@ -3,7 +3,6 @@ import React, {
   createContext,
   useState,
   useEffect,
-  useCallback,
   useRef,
 } from "react";
 import { apiClient, api, Roles } from "../services/api.js";
@@ -15,6 +14,15 @@ import {
 import { createAuthInterceptors } from "./auth/authInterceptors.js";
 
 const AuthContext = createContext();
+
+const attemptSilentLogin = async (refreshSession) => {
+  try {
+    const { user } = await refreshSession();
+    return user;
+  } catch {
+    return null;
+  }
+};
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -31,18 +39,18 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Exchanges the httpOnly refresh cookie for a new access token
-  const refreshSession = useCallback(async () => {
+  const refreshSession = async () => {
     const { tokens, user } = await api.auth.refresh();
     setAccessToken(tokens.access_token);
     return { accessToken: tokens.access_token, user };
-  }, []);
+  };
 
-  const logout = useCallback(async () => {
+  const logout = async () => {
     clearAccessToken();
     localStorage.removeItem("username");
     setIsAuthenticated(false);
     await api.auth.logout();
-  }, []);
+  };
 
   const login = async (email, password) => {
     try {
@@ -92,18 +100,14 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      try {
-        const { user } = await refreshSession();
-        applyRole(user.role);
-      } catch {
-        // no valid refresh cookie -> just not authenticated, nothing to clean up
-      } finally {
-        setIsLoading(false);
-      }
+      // no valid refresh cookie -> attemptSilentLogin returns null -> just not authenticated
+      const user = await attemptSilentLogin(refreshSession);
+      if (user) applyRole(user.role);
+      setIsLoading(false);
     };
 
     initAuth();
-  }, [refreshSession]);
+  }, [refreshSession, applyRole]);
 
   const value = {
     isAuthenticated,

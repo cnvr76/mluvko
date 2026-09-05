@@ -1,5 +1,4 @@
 import React from "react";
-import useAsync from "../../../hooks/useAsync";
 import useGameSession from "../../../hooks/useGameSession";
 import useFindAndRepeat, { PHASES } from "../../../hooks/games/useFindAndRepeat";
 import PageLoading from "../../loading/PageLoading.jsx";
@@ -58,8 +57,7 @@ const ReplayButton = ({ onClick, disabled }) => (
 );
 
 const FindAndRepeat = ({ gameId, snapshotId }) => {
-  const { getGame } = useGameSession(gameId, snapshotId);
-  const { data, isLoading, error } = useAsync(getGame);
+  const { data, isLoading, error, ...session } = useGameSession(gameId, snapshotId);
 
   const {
     stages,
@@ -77,7 +75,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
     isFinished,
     finalScore,
     bestScore,
-  } = useFindAndRepeat(data);
+  } = useFindAndRepeat(data, session);
 
   if (isLoading || isSaving) return <PageLoading />;
   if (error) {

@@ -1,5 +1,4 @@
-import React, { useCallback } from "react";
-import useAsync from "../../../hooks/useAsync";
+import React from "react";
 import AnimalCard from "./AnimalCard";
 import PlayAudioButton from "./PlayAudioButton";
 import RecordAudioButton from "./RecordAudioButton";
@@ -12,8 +11,10 @@ import useGameSession from "../../../hooks/useGameSession";
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 
 const RepeatAfter = ({ gameId, snapshotId }) => {
-  const { getGame } = useGameSession(gameId, snapshotId);
-  const { data, isLoading, error } = useAsync(getGame);
+  const { data, isLoading, error, ...session } = useGameSession(
+    gameId,
+    snapshotId,
+  );
   const {
     // current
     currentCard,
@@ -28,14 +29,12 @@ const RepeatAfter = ({ gameId, snapshotId }) => {
     // loading
     isSaving,
     isSubmitting,
-  } = useRepeatAfter(data);
+  } = useRepeatAfter(data, session);
 
-  const onRecordingEnd = useCallback(
-    async (audioBlob) => {
-      await evaluateSpeech(audioBlob, currentCard.reference_text);
-    },
-    [evaluateSpeech, currentCard]
-  );
+  const onRecordingEnd = async (audioBlob) => {
+    if (!currentCard) return;
+    await evaluateSpeech(audioBlob, currentCard.reference_text);
+  };
 
   if (isLoading || isSaving) return <PageLoading />;
   if (error) {

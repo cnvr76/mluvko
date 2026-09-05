@@ -1,14 +1,12 @@
 import React from "react";
 import usePexeso from "../../../hooks/games/usePexeso";
 import useGameSession from "../../../hooks/useGameSession";
-import useAsync from "../../../hooks/useAsync";
 import PageLoading from "../../loading/PageLoading";
 import FlipCard from "./FlipCard";
 import EndGameScreen from "../EndGameScreen";
 
 const Pexeso = ({ gameId, snapshotId }) => {
-  const { getGame } = useGameSession(gameId, snapshotId);
-  const { data, isLoading, error } = useAsync(getGame);
+  const { data, isLoading, error, ...session } = useGameSession(gameId, snapshotId);
   const {
     // card lists
     cards,
@@ -24,9 +22,8 @@ const Pexeso = ({ gameId, snapshotId }) => {
     isFinished,
     // loading
     isSaving,
-    isChecking,
     isPreviewing,
-  } = usePexeso(data);
+  } = usePexeso(data, session);
 
   const checkIsFlipped = (card) => {
     return flippedIds.includes(card.id) || matchedIds.has(card.matchId);

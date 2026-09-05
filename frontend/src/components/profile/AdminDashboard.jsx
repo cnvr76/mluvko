@@ -1,27 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 import { api } from "../../services/api";
+import useAdminDashboard from "../../hooks/profile/useAdminDashboard";
 
 const AdminDashboard = () => {
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState("pending");
-
-  const fetchDashboard = async () => {
-    setLoading(true);
-    try {
-      const data = await api.admin.dashboard();
-      setGames(data || []);
-    } catch (error) {
-      console.error("Failed to fetch dashboard", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
+  const { games, isLoading, statusFilter, setStatusFilter, handleAction } =
+    useAdminDashboard();
 
   const allSnapshots = games.flatMap((game) =>
     game.versions.map((v) => ({
@@ -48,16 +33,7 @@ const AdminDashboard = () => {
     (a, b) => new Date(b) - new Date(a),
   );
 
-  const handleAction = async (actionFn, ...args) => {
-    try {
-      await actionFn(...args);
-      fetchDashboard();
-    } catch (error) {
-      alert("Akcia zlyhala.");
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
         <h2 className="text-3xl font-extrabold drop-shadow">Admin Dashboard</h2>
@@ -202,7 +178,7 @@ const AdminDashboard = () => {
                               const reason = prompt("Dôvod zamietnutia:");
                               if (reason === null) return;
                               if (reason.trim().length < 3) {
-                                alert("Dôvod musí mať aspoň 3 znaky!");
+                                toast.error("Dôvod musí mať aspoň 3 znaky!");
                                 return;
                               }
                               handleAction(
@@ -234,7 +210,7 @@ const AdminDashboard = () => {
                             const reason = prompt("Dôvod zrušenia publikácie:");
                             if (reason === null) return;
                             if (reason.trim().length < 3) {
-                              alert("Dôvod musí mať aspoň 3 znaky!");
+                              toast.error("Dôvod musí mať aspoň 3 znaky!");
                               return;
                             }
                             handleAction(

@@ -1,39 +1,31 @@
-import { useEffect, useMemo, useState } from "react";
-import useGameSession from "../useGameSession";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 
-const usePexeso = (gameData) => {
-  const { isSaving, isFinished, finalScore, bestScore, finishGame } =
-    useGameSession(gameData?.id);
+const usePexeso = (gameData, { isSaving, isFinished, finalScore, bestScore, finishGame }) => {
   const [flippedIds, setFlippedIds] = useState([]);
   const [matchedIds, setMatchedIds] = useState(new Set());
   const [isChecking, setIsChecking] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(true);
   const [moves, setMoves] = useState(0);
 
-  const cards = useMemo(() => {
-    const list = gameData?.config_data.cards ?? [];
-
-    const transformCard = (card) => ({
-      ...card,
-      matchId: card.id,
-      id: uuidv4(),
-    });
-
-    const set1 = list.map(transformCard);
-    const set2 = list.map(transformCard);
-
-    return [...set1, ...set2].sort(() => Math.random() - 0.5);
-  }, [gameData]);
+  const list = gameData?.config_data.cards ?? [];
+  const transformCard = (card) => ({
+    ...card,
+    matchId: card.id,
+    id: uuidv4(),
+  });
+  const set1 = list.map(transformCard);
+  const set2 = list.map(transformCard);
+  const cards = [...set1, ...set2].sort(() => Math.random() - 0.5);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsPreviewing(false);
     }, 2500); // 2500 (2.5s) can be changed
     return () => clearTimeout(timer);
-  });
+  }, []);
 
   useEffect(() => {
     if (flippedIds.length < 2) return;

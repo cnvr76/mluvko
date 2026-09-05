@@ -1,5 +1,6 @@
 import React from "react";
 import { Outlet, useNavigation, useLocation } from "react-router-dom";
+import { NuqsAdapter } from "nuqs/adapters/react-router/v7";
 import Header from "./Header";
 import PageLoading from "../loading/PageLoading";
 import PageReady from "../loading/PageReady";
@@ -15,7 +16,7 @@ const Layout = () => {
     navigation.location?.pathname !== location.pathname;
 
   return (
-    <>
+    <NuqsAdapter>
       <Header />
       {isNavigating ? (
         <PageLoading />
@@ -24,7 +25,7 @@ const Layout = () => {
           <Outlet />
         </PageReady>
       )}
-    </>
+    </NuqsAdapter>
   );
 };
 

@@ -1,7 +1,9 @@
 import React from "react";
-import { useLoaderData, redirect, useSearchParams } from "react-router-dom";
+import { useQueryState } from "nuqs";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
+import PageLoading from "../components/loading/PageLoading";
 import PersonalDetails from "../components/profile/PersonalDetails";
 import FavoriteGames from "../components/profile/FavoriteGames";
 import CreatedGames from "../components/profile/CreatedGames";
@@ -9,22 +11,17 @@ import AdminDashboard from "../components/profile/AdminDashboard";
 import UserManagement from "../components/profile/UserManagement";
 import RoleRequests from "../components/profile/RoleRequests";
 
-export const profileLoader = async () => {
-  try {
-    const data = await api.users.me();
-    return data;
-  } catch (error) {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      return redirect("/auth?type=login");
-    }
-    throw error;
-  }
-};
-
 const ProfilePage = () => {
-  const me = useLoaderData();
+  const { data: me, isLoading } = useQuery({
+    queryKey: ["profile", "me"],
+    queryFn: api.users.me,
+  });
   const { isTherapist, isAdmin } = useAuth();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [requestedTab, setRequestedTab] = useQueryState("tab", {
+    defaultValue: "details",
+  });
+
+  if (isLoading || !me) return <PageLoading />;
 
   const tabsConfig = [
     {
@@ -48,33 +45,30 @@ const ProfilePage = () => {
   }
 
   if (isAdmin) {
-    tabsConfig.push({
-      id: "admin",
-      label: "Admin",
-      component: <AdminDashboard />,
-    });
-
-    tabsConfig.push({
-      id: "users",
-      label: "Používatelia",
-      component: <UserManagement currentUserId={me.id} />,
-    });
-
-    tabsConfig.push({
-      id: "role-requests",
-      label: "Žiadosti o rolu",
-      component: <RoleRequests />,
-    });
+    tabsConfig.push(
+      ...[
+        {
+          id: "admin",
+          label: "Admin",
+          component: <AdminDashboard />,
+        },
+        {
+          id: "users",
+          label: "Používatelia",
+          component: <UserManagement currentUserId={me.id} />,
+        },
+        {
+          id: "role-requests",
+          label: "Žiadosti o rolu",
+          component: <RoleRequests />,
+        },
+      ],
+    );
   }
 
-  // keep the selected tab in the URL (?tab=...) so reloading / returning to the
-  // page restores it instead of always falling back to the first tab
-  const requestedTab = searchParams.get("tab");
   const activeTab = tabsConfig.some((tab) => tab.id === requestedTab)
     ? requestedTab
     : "details";
-
-  const selectTab = (tabId) => setSearchParams({ tab: tabId }, { replace: true });
 
   const activeComponent = tabsConfig.find(
     (tab) => tab.id === activeTab,
@@ -121,7 +115,7 @@ const ProfilePage = () => {
           {tabsConfig.map((tab) => (
             <button
               key={tab.id}
-              onClick={() => selectTab(tab.id)}
+              onClick={() => setRequestedTab(tab.id)}
               className={`
                 cursor-pointer
                 text-2xl

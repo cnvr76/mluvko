@@ -32,7 +32,7 @@ const PlayAudioButton = ({ referenceAudioLink }) => {
   useEffect(() => {
     playAudio();
     return () => stopCurrentAudio();
-  }, [referenceAudioLink]);
+  }, [playAudio, stopCurrentAudio]);
 
   return (
     <button

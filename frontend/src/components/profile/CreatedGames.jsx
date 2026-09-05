@@ -1,97 +1,34 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { api } from "../../services/api";
+import React from "react";
+import { Link } from "react-router-dom";
+import useCreatedGames from "../../hooks/profile/useCreatedGames";
 
 const CreatedGames = () => {
-  const [myGames, setMyGames] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedVersions, setSelectedVersions] = useState({});
-  const navigate = useNavigate();
+  const {
+    myGames,
+    isLoading,
+    selectedVersions,
+    selectVersion,
+    handleInitDraft,
+    handleSubmitForReview,
+    handleArchiveGame: archiveGame,
+    handleDeleteGame: deleteGame,
+  } = useCreatedGames();
 
-  const fetchMyGames = async () => {
-    setLoading(true);
-
-    try {
-      const data = await api.games.myCreated();
-      setMyGames(data || []);
-
-      const initialSelected = {};
-
-      (data || []).forEach((game) => {
-        if (game.versions && game.versions.length > 0) {
-          // prefer the published version; otherwise fall back to the latest
-          // one (highest version number — API order is not guaranteed)
-          const publishedVersion = game.versions.find(
-            (v) => v.id === game.published_version_id,
-          );
-          const latestVersion = game.versions.reduce((latest, current) =>
-            current.version > latest.version ? current : latest,
-          );
-          initialSelected[game.id] = (publishedVersion ?? latestVersion).id;
-        }
-      });
-
-      setSelectedVersions(initialSelected);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchMyGames();
-  }, []);
-
-  const handleInitDraft = async () => {
-    try {
-      const data = await api.versions.initDraft();
-      navigate(`/games/${data.game_id}/edit?snapshot=${data.snapshot_id}`);
-    } catch (error) {
-      alert("Chyba pri vytváraní hry");
-    }
-  };
-
-  const handleSubmitForReview = async (gameId) => {
-    try {
-      await api.versions.submit(gameId);
-      fetchMyGames();
-    } catch (error) {
-      alert("Chyba pri odosielaní");
-    }
-  };
-
-  const handleArchiveGame = async (gameId) => {
+  const handleArchiveGame = (gameId) => {
     const isConfirmed = window.confirm(
       "Naozaj chcete archivovať túto hru? Hra zmizne zo stránky a stane sa neviditeľnou pre používateľov.",
     );
-
-    if (!isConfirmed) return;
-
-    try {
-      await api.versions.archive(gameId);
-      fetchMyGames();
-    } catch (error) {
-      alert("Nepodarilo sa archivovať hru.");
-    }
+    if (isConfirmed) archiveGame(gameId);
   };
 
-  const handleDeleteGame = async (gameId) => {
+  const handleDeleteGame = (gameId) => {
     const isConfirmed = window.confirm(
       "Naozaj chcete vymazať túto hru? Táto akcia je nenávratná a vymaže všetky jej verzie.",
     );
-
-    if (!isConfirmed) return;
-
-    try {
-      await api.games.delete(gameId);
-      fetchMyGames();
-    } catch (error) {
-      alert("Nepodarilo sa vymazať hru.");
-    }
+    if (isConfirmed) deleteGame(gameId);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
         <h2 className="text-3xl font-extrabold drop-shadow">
@@ -240,12 +177,7 @@ const CreatedGames = () => {
 
                   <select
                     value={selectedSnapshotId}
-                    onChange={(e) =>
-                      setSelectedVersions((prev) => ({
-                        ...prev,
-                        [game.id]: e.target.value,
-                      }))
-                    }
+                    onChange={(e) => selectVersion(game.id, e.target.value)}
                     className="
                       border border-[#642f37]/50
                       rounded-lg

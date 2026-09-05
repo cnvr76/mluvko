@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useQueryState, parseAsStringLiteral } from "nuqs";
+
+const AUTH_TYPES = ["login", "signup"];
 
 const AuthForm = () => {
   const { login, signup } = useAuth();
   const location = useLocation();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [type, setType] = useQueryState(
+    "type",
+    parseAsStringLiteral(AUTH_TYPES).withDefault("login"),
+  );
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -16,7 +22,7 @@ const AuthForm = () => {
   const [error, setError] = useState(null);
   const [isPwdVisible, setIsPwdVisible] = useState(false);
 
-  const isLoginMode = searchParams.get("type") !== "signup";
+  const isLoginMode = type !== "signup";
   const from = location.state?.from?.pathname || "/";
 
   const inputClassName = `
@@ -93,7 +99,8 @@ const AuthForm = () => {
 
   const toggleMode = () => {
     setError(null);
-    setSearchParams({ type: isLoginMode ? "signup" : "login" });
+    // keep pushing a new history entry (as before), so "back" undoes the toggle
+    setType(isLoginMode ? "signup" : "login", { history: "push" });
   };
 
   return (

@@ -1,38 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { api } from "../../services/api";
+import React from "react";
+import useRoleRequestPanel from "../../hooks/profile/useRoleRequestPanel";
 
 const RoleRequestPanel = () => {
-  const [request, setRequest] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-
-  const fetchRequest = async () => {
-    setLoading(true);
-    try {
-      const data = await api.roleRequests.mine();
-      setRequest(data || null);
-    } catch (error) {
-      console.error("Failed to fetch role request", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRequest();
-  }, []);
-
-  const handleApply = async () => {
-    setSubmitting(true);
-    try {
-      await api.roleRequests.create();
-      await fetchRequest();
-    } catch (error) {
-      alert("Žiadosť sa nepodarilo odoslať.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const { request, isLoading, submitting, handleApply } =
+    useRoleRequestPanel();
 
   const isPending = request?.status === "pending";
   const isRejected = request?.status === "rejected";
@@ -97,7 +68,7 @@ const RoleRequestPanel = () => {
           <button
             type="button"
             onClick={handleApply}
-            disabled={loading || submitting}
+            disabled={isLoading || submitting}
             className="
               self-start
               px-8 py-3

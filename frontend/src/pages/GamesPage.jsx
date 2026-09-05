@@ -1,39 +1,41 @@
 import GamesSelectionSection from "../components/games/GamesSelectionSection";
 import { api, AgeGroups } from "../services/api";
-import { useLoaderData } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { preloadImage } from "../hooks/useImagePreloader";
-import { useMemo } from "react";
 import GameCard from "../components/shared/GameCard";
+import PageLoading from "../components/loading/PageLoading";
 
-export const gamesLoaderFactory = (ageGroup) => async () => {
-  const bgImage =
-    ageGroup === AgeGroups.JUNIOR
-      ? "/images/gamepage_2_4_background.png"
-      : "/images/gamepage_5_6_background.png";
+const backgroundFor = (ageGroup) =>
+  ageGroup === AgeGroups.JUNIOR
+    ? "/images/gamepage_2_4_background.png"
+    : "/images/gamepage_5_6_background.png";
 
-  const [data] = await Promise.all([
-    api.games.forAgeGroup(ageGroup),
-    preloadImage(bgImage),
-  ]);
+const GamesPage = ({ ageGroup }) => {
+  const backgroundImage = backgroundFor(ageGroup);
 
-  return { data, backgroundImage: bgImage };
-};
+  const { data, isLoading } = useQuery({
+    queryKey: ["games", ageGroup],
+    queryFn: async () => {
+      const [games] = await Promise.all([
+        api.games.forAgeGroup(ageGroup),
+        preloadImage(backgroundImage),
+      ]);
+      return games;
+    },
+  });
 
-const GamesPage = () => {
-  const { data, backgroundImage } = useLoaderData();
+  if (isLoading) return <PageLoading />;
 
-  const games = useMemo(() => {
-    const list = data ?? [];
-    return [...list].sort((a, b) => {
-      if (a.preview_image_url && !b.preview_image_url) return -1;
-      if (!a.preview_image_url && b.preview_image_url) return 1;
-      return 0;
-    });
-  }, [data]);
+  const list = data ?? [];
+  const games = [...list].sort((a, b) => {
+    if (a.preview_image_url && !b.preview_image_url) return -1;
+    if (!a.preview_image_url && b.preview_image_url) return 1;
+    return 0;
+  });
 
   return (
     <GamesSelectionSection backgroundImage={backgroundImage}>
-      {games?.map((game, _) => (
+      {games.map((game) => (
         <GameCard key={game.id} data={game} />
       ))}
     </GamesSelectionSection>

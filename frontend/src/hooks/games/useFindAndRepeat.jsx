@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import useGameSession from "../useGameSession";
+import { useEffect, useRef, useState } from "react";
 
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -25,10 +24,6 @@ const toAudioUrl = (path) => {
   return path.startsWith("blob:") ? path : `${VITE_API_BASE}/${path}`;
 };
 
-// Build an ordered list of stages across all levels.
-// Each level plays `stages_count` rounds (default: every card once, non-repeating).
-// Each stage shows the target together with up to CARDS_PER_STAGE-1 random
-// distractors from the same level — the target is ALWAYS among the options.
 const buildStages = (levels) =>
   levels.flatMap((level) => {
     const cards = level.cards || [];
@@ -51,21 +46,12 @@ const buildStages = (levels) =>
       });
   });
 
-const useFindAndRepeat = (gameData) => {
-  const {
-    isSaving,
-    isFinished,
-    isAuthenticated,
-    finalScore,
-    bestScore,
-    finishGame,
-  } = useGameSession(gameData?.id);
-
+const useFindAndRepeat = (
+  gameData,
+  { isSaving, isFinished, isAuthenticated, finalScore, bestScore, finishGame },
+) => {
   const config = gameData?.config_data ?? {};
 
-  // Stages are built ONCE per loaded game and kept in state. They must not be
-  // rebuilt on re-render (buildStages is random) — otherwise the played target
-  // would desync from the shown cards and re-recording would pick a new card.
   const [stages, setStages] = useState([]);
   const [stageIndex, setStageIndex] = useState(0);
   const [phase, setPhase] = useState(PHASES.FINDING);
@@ -91,15 +77,15 @@ const useFindAndRepeat = (gameData) => {
     introStageRef.current = -1;
   }, [gameData]);
 
-  const stopAudio = useCallback(() => {
+  const stopAudio = () => {
     tokenRef.current += 1;
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
-  }, []);
+  };
 
-  const playOne = useCallback((url, token) => {
+  const playOne = (url, token) => {
     return new Promise((resolve) => {
       if (!url || token !== tokenRef.current) return resolve();
       const audio = new Audio(url);
@@ -108,24 +94,21 @@ const useFindAndRepeat = (gameData) => {
       audio.onerror = resolve;
       audio.play().catch(() => resolve());
     });
-  }, []);
+  };
 
-  const playSequence = useCallback(
-    async (paths) => {
-      stopAudio();
-      const token = tokenRef.current;
-      setIsBusy(true);
-      await paths.reduce(
-        (chain, path) =>
-          chain.then(() =>
-            token === tokenRef.current ? playOne(toAudioUrl(path), token) : null,
-          ),
-        Promise.resolve(),
-      );
-      if (token === tokenRef.current) setIsBusy(false);
-    },
-    [playOne, stopAudio],
-  );
+  const playSequence = async (paths) => {
+    stopAudio();
+    const token = tokenRef.current;
+    setIsBusy(true);
+    await paths.reduce(
+      (chain, path) =>
+        chain.then(() =>
+          token === tokenRef.current ? playOne(toAudioUrl(path), token) : null,
+        ),
+      Promise.resolve(),
+    );
+    if (token === tokenRef.current) setIsBusy(false);
+  };
 
   // Play the target's sound once per finding stage. The "find and repeat"
   // intro phrase is spoken only on the very first stage so it doesn't become
@@ -139,8 +122,7 @@ const useFindAndRepeat = (gameData) => {
         ? [config.find_prompt_audio, currentStage.target.reference_audio]
         : [currentStage.target.reference_audio];
     playSequence(sequence);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStage, phase, stageIndex]);
+  }, [currentStage, phase, stageIndex, config.find_prompt_audio, playSequence]);
 
   // Stop any playing audio when the game unmounts.
   useEffect(() => stopAudio, [stopAudio]);
@@ -152,74 +134,62 @@ const useFindAndRepeat = (gameData) => {
     };
   }, [recordedUrl]);
 
-  const onCardClick = useCallback(
-    (card) => {
-      if (phase !== PHASES.FINDING || !currentStage) return;
-      if (card.card_id === currentStage.target.card_id) {
-        setPhase(PHASES.RECORDING);
-        playSequence([card.reference_audio]);
-      } else {
-        playSequence([card.reference_audio]);
-      }
-    },
-    [phase, currentStage, playSequence],
-  );
+  const onCardClick = (card) => {
+    if (phase !== PHASES.FINDING || !currentStage) return;
+    if (card.card_id === currentStage.target.card_id) {
+      setPhase(PHASES.RECORDING);
+      playSequence([card.reference_audio]);
+    } else {
+      playSequence([card.reference_audio]);
+    }
+  };
 
-  const playReview = useCallback(
-    (recording) => {
-      playSequence([
-        currentStage?.target.reference_audio,
-        recording,
-        config.confirm_prompt_audio,
-      ]);
-    },
-    [currentStage, config.confirm_prompt_audio, playSequence],
-  );
+  const playReview = (recording) => {
+    playSequence([
+      currentStage?.target.reference_audio,
+      recording,
+      config.confirm_prompt_audio,
+    ]);
+  };
 
-  const onRecordingFinish = useCallback(
-    async (audioBlob) => {
-      // the previous recording URL is revoked by the recordedUrl cleanup effect
-      const url = URL.createObjectURL(audioBlob);
-      setRecordedUrl(url);
-      setPhase(PHASES.REVIEWING);
-      playReview(url);
-    },
-    [playReview],
-  );
+  const onRecordingFinish = async (audioBlob) => {
+    // the previous recording URL is revoked by the recordedUrl cleanup effect
+    const url = URL.createObjectURL(audioBlob);
+    setRecordedUrl(url);
+    setPhase(PHASES.REVIEWING);
+    playReview(url);
+  };
 
-  const replayReview = useCallback(() => {
+  const replayReview = () => {
     if (recordedUrl) playReview(recordedUrl);
-  }, [recordedUrl, playReview]);
+  };
 
-  const replayWord = useCallback(() => {
+  const replayWord = () => {
     if (currentStage) playSequence([currentStage.target.reference_audio]);
-  }, [currentStage, playSequence]);
+  };
 
-  const advance = useCallback(
-    async (wasCorrect) => {
-      stopAudio();
-      setRecordedUrl(null);
+  const advance = async (wasCorrect) => {
+    stopAudio();
+    setRecordedUrl(null);
 
-      const newCorrect = correctRef.current + (wasCorrect ? 1 : 0);
-      correctRef.current = newCorrect;
-      setCorrectCount(newCorrect);
+    const newCorrect = correctRef.current + (wasCorrect ? 1 : 0);
+    correctRef.current = newCorrect;
+    setCorrectCount(newCorrect);
 
-      const next = stageIndex + 1;
-      if (next < stages.length) {
-        setStageIndex(next);
-        setPhase(PHASES.FINDING);
-      } else {
-        const score = stages.length
-          ? Math.round((newCorrect / stages.length) * 100)
-          : 0;
-        await finishGame(score);
-      }
-    },
-    [stageIndex, stages.length, finishGame, stopAudio],
-  );
+    const next = stageIndex + 1;
+    if (next < stages.length) {
+      setStageIndex(next);
+      setPhase(PHASES.FINDING);
+    } else {
+      const score = stages.length
+        ? Math.round((newCorrect / stages.length) * 100)
+        : 0;
+      await finishGame(score);
+    }
+  };
 
-  const confirmCorrect = useCallback(() => advance(true), [advance]);
-  const skip = useCallback(() => advance(false), [advance]);
+  const confirmCorrect = () => advance(true);
+  const skip = () => advance(false);
 
   return {
     // data
