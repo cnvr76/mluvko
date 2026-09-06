@@ -1,7 +1,7 @@
 import GamesSelectionSection from "../components/games/GamesSelectionSection";
 import { api, AgeGroups } from "../services/api";
 import { useQuery } from "@tanstack/react-query";
-import { preloadImage } from "../hooks/useImagePreloader";
+import { preloadImage } from "../utils/preloadImage";
 import GameCard from "../components/shared/GameCard";
 import PageLoading from "../components/loading/PageLoading";
 

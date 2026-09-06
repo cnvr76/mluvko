@@ -1,5 +1,7 @@
 import React from "react";
 
+export const SPECIFIC_GAME_BACKGROUND = "/images/background.png";
+
 const SpecificGamePage = ({ children }) => {
   return (
     <main
@@ -7,7 +9,7 @@ const SpecificGamePage = ({ children }) => {
         w-screen h-screen overflow-hidden bg-no-repeat bg-cover bg-center px-3 pt-16 sm:pt-20
         "
       style={{
-        backgroundImage: "url('/images/background.png')",
+        backgroundImage: `url('${SPECIFIC_GAME_BACKGROUND}')`,
       }}
     >
       {children}

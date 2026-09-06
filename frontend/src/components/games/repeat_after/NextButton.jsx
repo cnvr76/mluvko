@@ -1,4 +1,5 @@
 import React from "react";
+import { NEXT_ICON } from "./media";
 
 const NextButton = ({ icon, onClick, isDisabled }) => {
   return (
@@ -19,7 +20,7 @@ const NextButton = ({ icon, onClick, isDisabled }) => {
       "
     >
       <img
-        src={icon || "/images/icons/NextButton.png"}
+        src={icon || NEXT_ICON}
         alt="Next"
         className="w-10 h-10 md:w-12 md:h-12 object-contain"
       />

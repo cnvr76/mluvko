@@ -32,27 +32,27 @@ const GameEditPage = () => {
     focus:ring-[#F3904B]
   `;
 
-if (loading) {
-  return (
-    <main
-      className="
+  if (loading) {
+    return (
+      <main
+        className="
         relative isolate
         w-full min-h-screen
         px-4 pt-28 pb-12
       "
-    >
-      <div
-        className="
+      >
+        <div
+          className="
           fixed inset-0 -z-10
           bg-cover bg-center bg-no-repeat
         "
-        style={{
-          backgroundImage: "url('/images/background.png')",
-        }}
-      />
+          style={{
+            backgroundImage: "url('/images/background.png')",
+          }}
+        />
 
-      <div
-        className="
+        <div
+          className="
           w-full max-w-5xl mx-auto
           rounded-[2rem]
           bg-white/30
@@ -63,12 +63,12 @@ if (loading) {
           text-[#642f37]
           font-semibold
         "
-      >
-        Načítavam editor hry...
-      </div>
-    </main>
-  );
-}
+        >
+          Načítavam editor hry...
+        </div>
+      </main>
+    );
+  }
 
   const SpecificConfig = CONFIG_COMPONENTS[formData.game_type];
 
@@ -176,7 +176,9 @@ if (loading) {
           {SpecificConfig ? (
             <SpecificConfig
               configData={formData.config_data}
-              onChange={(newConfig) => handleBaseChange("config_data", newConfig)}
+              onChange={(newConfig) =>
+                handleBaseChange("config_data", newConfig)
+              }
             />
           ) : (
             <p className="text-red-500 font-semibold">
