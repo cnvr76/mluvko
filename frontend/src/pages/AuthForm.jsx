@@ -2,6 +2,11 @@ import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import { useQueryState, parseAsStringLiteral } from "nuqs";
+import PageLoading from "../components/loading/PageLoading";
+import useMediaReady from "../hooks/useMediaReady";
+import { APP_BACKGROUND } from "../constants/media";
+
+const AUTH_MEDIA = [APP_BACKGROUND];
 
 const AUTH_TYPES = ["login", "signup"];
 
@@ -22,6 +27,7 @@ const AuthForm = () => {
   const [error, setError] = useState(null);
   const [isPwdVisible, setIsPwdVisible] = useState(false);
 
+  const isMediaReady = useMediaReady(AUTH_MEDIA);
   const isLoginMode = type !== "signup";
   const from = location.state?.from?.pathname || "/";
 
@@ -103,6 +109,8 @@ const AuthForm = () => {
     setType(isLoginMode ? "signup" : "login", { history: "push" });
   };
 
+  if (!isMediaReady) return <PageLoading />;
+
   return (
     <main
       className="
@@ -112,7 +120,7 @@ const AuthForm = () => {
         px-4
       "
       style={{
-        backgroundImage: "url('/images/background.png')",
+        backgroundImage: `url('${APP_BACKGROUND}')`,
       }}
     >
       <section

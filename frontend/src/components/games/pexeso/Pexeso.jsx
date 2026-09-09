@@ -4,6 +4,9 @@ import useGameSession from "../../../hooks/useGameSession";
 import PageLoading from "../../loading/PageLoading";
 import FlipCard from "./FlipCard";
 import EndGameScreen from "../EndGameScreen";
+import useMediaReady from "../../../hooks/useMediaReady";
+import { previewUrl } from "../../../utils/pendingMedia";
+import { APP_BACKGROUND, PEXESO_CARD_BACK } from "../../../constants/media";
 
 const Pexeso = ({ gameId, snapshotId }) => {
   const { data, isLoading, error, ...session } = useGameSession(gameId, snapshotId);
@@ -25,15 +28,26 @@ const Pexeso = ({ gameId, snapshotId }) => {
     isPreviewing,
   } = usePexeso(data, session);
 
+  const isMediaReady = useMediaReady(
+    [
+      APP_BACKGROUND,
+      PEXESO_CARD_BACK,
+      ...(data?.config_data?.cards ?? []).map((card) =>
+        previewUrl(card.animal_image_url),
+      ),
+    ],
+    !isLoading && !error,
+  );
+
   const checkIsFlipped = (card) => {
     return flippedIds.includes(card.id) || matchedIds.has(card.matchId);
   };
 
-  if (isLoading || isSaving) return <PageLoading />;
   if (error) {
     console.error(error);
     return null;
   }
+  if (isLoading || isSaving || !isMediaReady) return <PageLoading />;
 
   if (isFinished)
     return <EndGameScreen bestScore={bestScore} currentScore={finalScore} />;

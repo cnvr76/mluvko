@@ -7,6 +7,23 @@ import PageLoading from "../../loading/PageLoading.jsx";
 import useRepeatAfter from "../../../hooks/games/useRepeatAfter";
 import EndGameScreen from "../EndGameScreen";
 import useGameSession from "../../../hooks/useGameSession";
+import useMediaReady from "../../../hooks/useMediaReady";
+import useMediaPrefetch from "../../../hooks/useMediaPrefetch";
+import { previewUrl } from "../../../utils/pendingMedia";
+import {
+  APP_BACKGROUND,
+  NEXT_ICON,
+  PLAY_AUDIO_ICON,
+  RECORD_AUDIO_ICON,
+  SKIP_ICON,
+} from "../../../constants/media";
+
+const REPEAT_AFTER_MEDIA = [
+  APP_BACKGROUND,
+  PLAY_AUDIO_ICON,
+  RECORD_AUDIO_ICON,
+  SKIP_ICON,
+];
 
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 
@@ -31,16 +48,28 @@ const RepeatAfter = ({ gameId, snapshotId }) => {
     isSubmitting,
   } = useRepeatAfter(data, session);
 
+  const currentCardImage = previewUrl(currentCard?.animal_image_url);
+  const isMediaReady = useMediaReady(
+    [...REPEAT_AFTER_MEDIA, currentCardImage],
+    !isLoading && !error,
+  );
+  useMediaPrefetch([
+    NEXT_ICON,
+    ...(data?.config_data?.cards ?? []).map((card) =>
+      previewUrl(card.animal_image_url),
+    ),
+  ]);
+
   const onRecordingEnd = async (audioBlob) => {
     if (!currentCard) return;
     await evaluateSpeech(audioBlob, currentCard.reference_text);
   };
 
-  if (isLoading || isSaving) return <PageLoading />;
   if (error) {
     console.error(error);
     return null;
   }
+  if (isLoading || isSaving || !isMediaReady) return <PageLoading />;
 
   if (isFinished) {
     return <EndGameScreen currentScore={finalScore} bestScore={bestScore} />;
@@ -69,7 +98,7 @@ const RepeatAfter = ({ gameId, snapshotId }) => {
         <NextButton
           onClick={nextCard}
           isDisabled={isSubmitting}
-          icon={"/images/icons/SkipButton.png"}
+          icon={SKIP_ICON}
         />
         {currentScore && currentScore >= threshold && (
           <NextButton onClick={nextCard} isDisabled={isSubmitting} />

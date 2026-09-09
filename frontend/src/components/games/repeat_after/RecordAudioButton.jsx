@@ -1,4 +1,5 @@
 import useAudioRecorder from "../../../hooks/useAudioRecorder";
+import { RECORD_AUDIO_ICON } from "../../../constants/media";
 
 const RecordAudioButton = ({ onFinish, isLoading, disabled = false }) => {
   const { isRecording, startRecording, stopRecording } = useAudioRecorder();
@@ -33,7 +34,7 @@ const RecordAudioButton = ({ onFinish, isLoading, disabled = false }) => {
       {isRecording && <div>Nahráva</div>}
       {!isLoading ? (
         <img
-          src="/images/icons/RecordAudioButton.png"
+          src={RECORD_AUDIO_ICON}
           alt={isRecording ? "Stop Recording" : "Start Recording"}
           className="w-10 h-10 md:w-10 md:h-10 object-contain"
         />

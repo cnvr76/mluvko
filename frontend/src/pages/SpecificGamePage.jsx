@@ -1,4 +1,5 @@
 import React from "react";
+import { APP_BACKGROUND } from "../constants/media";
 
 const SpecificGamePage = ({ children }) => {
   return (
@@ -7,7 +8,7 @@ const SpecificGamePage = ({ children }) => {
         w-screen h-screen overflow-hidden bg-no-repeat bg-cover bg-center px-3 pt-16 sm:pt-20
         "
       style={{
-        backgroundImage: "url('/images/background.png')",
+        backgroundImage: `url('${APP_BACKGROUND}')`,
       }}
     >
       {children}
