@@ -7,6 +7,22 @@ import FindCard from "./FindCard";
 import RecordAudioButton from "../repeat_after/RecordAudioButton";
 import NextButton from "../repeat_after/NextButton";
 import { FIND_PROMPT_TEXT, CONFIRM_PROMPT_TEXT } from "./prompts";
+import useMediaReady from "../../../hooks/useMediaReady";
+import useMediaPrefetch from "../../../hooks/useMediaPrefetch";
+import { previewUrl } from "../../../utils/pendingMedia";
+import {
+  APP_BACKGROUND,
+  PLAY_AUDIO_ICON,
+  RECORD_AUDIO_ICON,
+  SKIP_ICON,
+} from "../../../constants/media";
+
+const FIND_AND_REPEAT_MEDIA = [
+  APP_BACKGROUND,
+  PLAY_AUDIO_ICON,
+  RECORD_AUDIO_ICON,
+  SKIP_ICON,
+];
 
 const ROUND_BTN = `
   w-14 h-14 md:w-20 md:h-20
@@ -36,7 +52,7 @@ const TargetCard = ({ card }) => (
     "
   >
     <img
-      src={card.image_url}
+      src={previewUrl(card.image_url)}
       alt={card.name}
       className="h-32 md:h-44 object-contain drop-shadow-lg"
     />
@@ -49,7 +65,7 @@ const TargetCard = ({ card }) => (
 const ReplayButton = ({ onClick, disabled }) => (
   <button onClick={onClick} disabled={disabled} className={ROUND_BTN}>
     <img
-      src="/images/icons/PlayAudioButton.png"
+      src={PLAY_AUDIO_ICON}
       alt="Prehrať znova"
       className="w-10 h-10 object-contain"
     />
@@ -77,11 +93,24 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
     bestScore,
   } = useFindAndRepeat(data, session);
 
-  if (isLoading || isSaving) return <PageLoading />;
+  const isMediaReady = useMediaReady(
+    [
+      ...FIND_AND_REPEAT_MEDIA,
+      ...(currentStage?.options ?? []).map((card) => previewUrl(card.image_url)),
+    ],
+    !isLoading && !error,
+  );
+  useMediaPrefetch(
+    (data?.config_data?.levels ?? []).flatMap((level) =>
+      (level.cards ?? []).map((card) => previewUrl(card.image_url)),
+    ),
+  );
+
   if (error) {
     console.error(error);
     return null;
   }
+  if (isLoading || isSaving || !isMediaReady) return <PageLoading />;
 
   if (isFinished) {
     return <EndGameScreen currentScore={finalScore} bestScore={bestScore} />;
@@ -159,7 +188,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
             <NextButton
               onClick={skip}
               isDisabled={isBusy}
-              icon="/images/icons/SkipButton.png"
+              icon={SKIP_ICON}
             />
           </div>
         </>
@@ -183,7 +212,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
             <NextButton
               onClick={skip}
               isDisabled={isBusy}
-              icon="/images/icons/SkipButton.png"
+              icon={SKIP_ICON}
             />
           </div>
         </>
@@ -228,7 +257,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
             <NextButton
               onClick={skip}
               isDisabled={isBusy}
-              icon="/images/icons/SkipButton.png"
+              icon={SKIP_ICON}
             />
           </div>
         </>

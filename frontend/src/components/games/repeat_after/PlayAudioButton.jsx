@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { PLAY_AUDIO_ICON } from "./media";
+import { PLAY_AUDIO_ICON } from "../../../constants/media";
 
 const PlayAudioButton = ({ referenceAudioLink }) => {
   const [isPlaying, setIsPlaying] = useState(false);

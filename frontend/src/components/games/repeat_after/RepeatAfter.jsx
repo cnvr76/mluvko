@@ -10,7 +10,20 @@ import useGameSession from "../../../hooks/useGameSession";
 import useMediaReady from "../../../hooks/useMediaReady";
 import useMediaPrefetch from "../../../hooks/useMediaPrefetch";
 import { previewUrl } from "../../../utils/pendingMedia";
-import { NEXT_ICON, REPEAT_AFTER_MEDIA, SKIP_ICON } from "./media";
+import {
+  APP_BACKGROUND,
+  NEXT_ICON,
+  PLAY_AUDIO_ICON,
+  RECORD_AUDIO_ICON,
+  SKIP_ICON,
+} from "../../../constants/media";
+
+const REPEAT_AFTER_MEDIA = [
+  APP_BACKGROUND,
+  PLAY_AUDIO_ICON,
+  RECORD_AUDIO_ICON,
+  SKIP_ICON,
+];
 
 const VITE_API_BASE = import.meta.env.VITE_API_BASE;
 

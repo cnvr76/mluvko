@@ -1,5 +1,5 @@
 import useAudioRecorder from "../../../hooks/useAudioRecorder";
-import { RECORD_AUDIO_ICON } from "./media";
+import { RECORD_AUDIO_ICON } from "../../../constants/media";
 
 const RecordAudioButton = ({ onFinish, isLoading, disabled = false }) => {
   const { isRecording, startRecording, stopRecording } = useAudioRecorder();

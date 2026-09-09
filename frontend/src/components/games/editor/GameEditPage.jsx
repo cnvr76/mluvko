@@ -7,6 +7,11 @@ import RepeatAfterConfig from "./RepeatAfterConfig";
 import FindAndRepeatConfig from "./FindAndRepeatConfig";
 import ImageField from "./ImageField";
 import useGameEditor from "../../../hooks/games/editor/useGameEditor";
+import PageLoading from "../../loading/PageLoading";
+import useMediaReady from "../../../hooks/useMediaReady";
+import { APP_BACKGROUND } from "../../../constants/media";
+
+const EDITOR_MEDIA = [APP_BACKGROUND];
 
 const CONFIG_COMPONENTS = {
   [GameTypes.PEXESO]: PexesoConfig,
@@ -21,6 +26,8 @@ const GameEditPage = () => {
   const { formData, loading, saving, handleBaseChange, handleSave } =
     useGameEditor(gameId, snapshotId);
 
+  const isMediaReady = useMediaReady(EDITOR_MEDIA);
+
   const inputClassName = `
     border border-[#642f37]/30
     bg-white/70
@@ -31,6 +38,8 @@ const GameEditPage = () => {
     focus:ring-2
     focus:ring-[#F3904B]
   `;
+
+  if (!isMediaReady) return <PageLoading />;
 
   if (loading) {
     return (
@@ -47,7 +56,7 @@ const GameEditPage = () => {
           bg-cover bg-center bg-no-repeat
         "
           style={{
-            backgroundImage: "url('/images/background.png')",
+            backgroundImage: `url('${APP_BACKGROUND}')`,
           }}
         />
 
@@ -86,7 +95,7 @@ const GameEditPage = () => {
           bg-cover bg-center bg-no-repeat
         "
         style={{
-          backgroundImage: "url('/images/background.png')",
+          backgroundImage: `url('${APP_BACKGROUND}')`,
         }}
       />
       <div

@@ -1,5 +1,5 @@
 import React from "react";
-import { NEXT_ICON } from "./media";
+import { NEXT_ICON } from "../../../constants/media";
 
 const NextButton = ({ icon, onClick, isDisabled }) => {
   return (

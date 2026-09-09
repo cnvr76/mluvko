@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuthAction } from "../../hooks/useAuthAction";
 import { api } from "../../services/api";
 import { previewUrl } from "../../utils/pendingMedia";
+import { GAME_CARD_FALLBACK } from "../../constants/media";
 
 const GameCard = ({ data, onFavoriteToggle }) => {
   const [isStarred, setIsStarred] = useState(data.is_favorite || false);
@@ -60,10 +61,7 @@ const GameCard = ({ data, onFavoriteToggle }) => {
         >
           <div className="w-[90%] aspect-square overflow-hidden rounded-2xl mt-4">
             <img
-              src={
-                previewUrl(data.preview_image_url) ||
-                "/images/games_page/shared/card.png"
-              }
+              src={previewUrl(data.preview_image_url) || GAME_CARD_FALLBACK}
               alt={data.name}
               className="w-full h-full object-cover"
             />

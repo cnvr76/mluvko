@@ -1,16 +1,28 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import PageLoading from "../components/loading/PageLoading";
+import useMediaReady from "../hooks/useMediaReady";
+import {
+  HOME_BACKGROUND,
+  HOME_JUNIOR_BUTTON,
+  HOME_MIDDLE_BUTTON,
+} from "../constants/media";
+
+const HOME_MEDIA = [HOME_BACKGROUND, HOME_JUNIOR_BUTTON, HOME_MIDDLE_BUTTON];
 
 const HomePage = () => {
   const navigate = useNavigate();
+  const isMediaReady = useMediaReady(HOME_MEDIA);
+
+  if (!isMediaReady) return <PageLoading />;
 
   return (
     <div
       className="
         fixed top-0 left-0 w-screen h-screen
-        bg-[url('/images/homepage_background.png')]
         bg-cover bg-no-repeat bg-center
       "
+      style={{ backgroundImage: `url('${HOME_BACKGROUND}')` }}
     >
       {/*МОБИЛКА*/}
       <div
@@ -20,7 +32,7 @@ const HomePage = () => {
     pt-50"
       >
         <img
-          src="/images/button_2_4_years.png"
+          src={HOME_JUNIOR_BUTTON}
           alt="Hry pre deti 2-4 roky"
           onClick={() => navigate("/games/2-4")}
           className="
@@ -31,7 +43,7 @@ const HomePage = () => {
         />
 
         <img
-          src="/images/button_5_6_years.png"
+          src={HOME_MIDDLE_BUTTON}
           alt="Hry pre deti 5-6 rokov"
           onClick={() => navigate("/games/5-6")}
           className="
@@ -44,7 +56,7 @@ const HomePage = () => {
 
       {/*ДЕСКТОП*/}
       <img
-        src="/images/button_2_4_years.png"
+        src={HOME_JUNIOR_BUTTON}
         alt="Hry pre deti 2-4 roky"
         onClick={() => navigate("/games/2-4")}
         className="
@@ -58,7 +70,7 @@ const HomePage = () => {
       />
 
       <img
-        src="/images/button_5_6_years.png"
+        src={HOME_MIDDLE_BUTTON}
         alt="Hry pre deti 5-6 roky"
         onClick={() => navigate("/games/5-6")}
         className="

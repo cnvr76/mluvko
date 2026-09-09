@@ -10,6 +10,8 @@ import CreatedGames from "../components/profile/CreatedGames";
 import AdminDashboard from "../components/profile/AdminDashboard";
 import UserManagement from "../components/profile/UserManagement";
 import RoleRequests from "../components/profile/RoleRequests";
+import useMediaReady from "../hooks/useMediaReady";
+import { APP_BACKGROUND } from "../constants/media";
 
 const ProfilePage = () => {
   const { data: me, isLoading } = useQuery({
@@ -21,7 +23,9 @@ const ProfilePage = () => {
     defaultValue: "details",
   });
 
-  if (isLoading || !me) return <PageLoading />;
+  const isMediaReady = useMediaReady([APP_BACKGROUND], !isLoading && !!me);
+
+  if (isLoading || !me || !isMediaReady) return <PageLoading />;
 
   const tabsConfig = [
     {
@@ -83,7 +87,7 @@ const ProfilePage = () => {
         
       "
       style={{
-        backgroundImage: "url('/images/background.png')",
+        backgroundImage: `url('${APP_BACKGROUND}')`,
       }}
     >
       <div
