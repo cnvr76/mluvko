@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import useRequireAuth from "./useRequireAuth";
 
 const fetchBestScore = async (gameId, score) => {
   try {
@@ -21,8 +21,7 @@ const useGameSession = (gameId, snapshotId) => {
   const [finalScore, setFinalScore] = useState(null);
   const [bestScore, setBestScore] = useState(null);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const requireAuthOrRedirect = useRequireAuth();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["game", gameId, snapshotId],
@@ -32,17 +31,6 @@ const useGameSession = (gameId, snapshotId) => {
         : api.games.byId(gameId),
     enabled: Boolean(gameId),
   });
-
-  const requireAuthOrRedirect = () => {
-    if (!isAuthenticated) {
-      navigate("/auth?type=login", {
-        state: { from: location },
-        replace: true,
-      });
-      return true;
-    }
-    return false;
-  };
 
   const finishGame = async (score) => {
     if (requireAuthOrRedirect()) return;

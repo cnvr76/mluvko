@@ -1,36 +1,37 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuthAction } from "../../hooks/useAuthAction";
+import useRequireAuth from "../../hooks/useRequireAuth";
+import useApiMutation from "../../hooks/useApiMutation";
 import { api } from "../../services/api";
 import { previewUrl } from "../../utils/pendingMedia";
 import { GAME_CARD_FALLBACK } from "../../constants/media";
 
 const GameCard = ({ data, onFavoriteToggle }) => {
   const [isStarred, setIsStarred] = useState(data.is_favorite || false);
-  const withAuth = useAuthAction();
+  const requireAuthOrRedirect = useRequireAuth();
 
-  const handleFavorite = async (e) => {
+  const toggleFavoriteMutation = useApiMutation(
+    ({ id, isFavorite }) => api.games.toggleFavorite(id, isFavorite),
+    {
+      errorMessage: "Nepodarilo sa uložiť obľúbenú hru.",
+      onError: (error, { id, isFavorite }) => {
+        setIsStarred(!isFavorite);
+        onFavoriteToggle?.(id, !isFavorite);
+      },
+    },
+  );
+
+  const handleFavorite = (e) => {
     if (e) {
       e.preventDefault();
       e.stopPropagation();
     }
+    if (requireAuthOrRedirect() || toggleFavoriteMutation.isPending) return;
 
-    const toggledState = !isStarred;
-    setIsStarred(toggledState);
-
-    if (onFavoriteToggle) {
-      onFavoriteToggle(data.id, toggledState);
-    }
-
-    try {
-      await api.games.toggleFavorite(data.id, toggledState);
-    } catch (error) {
-      setIsStarred(!toggledState);
-      if (onFavoriteToggle) {
-        onFavoriteToggle(data.id, !toggledState);
-      }
-      console.error("Failed to toggle favorite", error);
-    }
+    const isFavorite = !isStarred;
+    setIsStarred(isFavorite);
+    onFavoriteToggle?.(data.id, isFavorite);
+    toggleFavoriteMutation.mutate({ id: data.id, isFavorite });
   };
 
   return (
@@ -38,7 +39,7 @@ const GameCard = ({ data, onFavoriteToggle }) => {
       <div className="absolute z-30 right-5 top-5">
         <button
           className="cursor-pointer hover:scale-125 hover:rotate-12 transition-transform duration-200 ease-out"
-          onClick={withAuth(handleFavorite)}
+          onClick={handleFavorite}
         >
           <i
             className={`fa-${
