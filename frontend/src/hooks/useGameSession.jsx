@@ -1,7 +1,18 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation, useNavigate } from "react-router-dom";
+
+const fetchBestScore = async (gameId, score) => {
+  try {
+    const response = await api.games.updateStats(gameId, score);
+    return Math.round(response?.best_score * 100) / 100;
+  } catch (error) {
+    console.error("Failed to update game score:", error);
+    return score;
+  }
+};
 
 const useGameSession = (gameId, snapshotId) => {
   const { isAuthenticated } = useAuth();
@@ -13,15 +24,16 @@ const useGameSession = (gameId, snapshotId) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getGame = useCallback(
-    () =>
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["game", gameId, snapshotId],
+    queryFn: () =>
       snapshotId
-        ? api.getSnapshotInfo(gameId, snapshotId)
-        : api.getGameById(gameId),
-    [gameId, snapshotId]
-  );
+        ? api.versions.info(gameId, snapshotId)
+        : api.games.byId(gameId),
+    enabled: Boolean(gameId),
+  });
 
-  const requireAuthRedirect = useCallback(() => {
+  const requireAuthOrRedirect = () => {
     if (!isAuthenticated) {
       navigate("/auth?type=login", {
         state: { from: location },
@@ -30,37 +42,31 @@ const useGameSession = (gameId, snapshotId) => {
       return true;
     }
     return false;
-  }, [isAuthenticated, navigate, location]);
+  };
 
-  const finishGame = useCallback(
-    async (score) => {
-      if (requireAuthRedirect()) return;
+  const finishGame = async (score) => {
+    if (requireAuthOrRedirect()) return;
 
-      setIsSaving(true);
-      setFinalScore(score);
-      setBestScore(score);
-      setIsFinished(true);
-      try {
-        const response = await api.updateStats(gameId, score);
-        setBestScore(Math.round(response?.best_score * 100) / 100);
-      } catch (error) {
-        console.error("Failed to update game score:", error);
-      } finally {
-        setIsSaving(false);
-      }
-    },
-    [gameId]
-  );
+    setIsSaving(true);
+    setFinalScore(score);
+    setBestScore(score);
+    setIsFinished(true);
+    const finalBestScore = await fetchBestScore(gameId, score);
+    setBestScore(finalBestScore);
+    setIsSaving(false);
+  };
 
   return {
+    data,
+    isLoading,
+    error,
     isSaving,
     isFinished,
     isAuthenticated,
     finalScore,
     bestScore,
-    getGame,
     finishGame,
-    requireAuthOrRedirect: requireAuthRedirect,
+    requireAuthOrRedirect,
   };
 };
 

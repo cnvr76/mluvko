@@ -1,30 +1,33 @@
-import React, { useCallback, useMemo, useState } from "react";
-import useGameSession from "../useGameSession";
+import { useState } from "react";
 import { api } from "../../services/api";
 
-const useRepeatAfter = (gameData) => {
-  const {
-    isSaving,
-    isFinished,
-    isAuthenticated,
-    finalScore,
-    bestScore,
-    finishGame,
-  } = useGameSession(gameData?.id);
+const analyzeSpeech = async (audioBlob, referenceText) => {
+  try {
+    const response = await api.speech.analyze(audioBlob, referenceText);
+    return response?.score;
+  } catch (error) {
+    console.error("Error evaluating speech", error);
+    return null;
+  }
+};
+
+const useRepeatAfter = (
+  gameData,
+  { isSaving, isFinished, isAuthenticated, finalScore, bestScore, finishGame },
+) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState([]);
   const [currentScore, setCurrentScore] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const cards = useMemo(() => {
-    const list = gameData?.config_data.cards ?? [];
-    return [...list].sort((a, b) => a.card_id > b.card_id);
-  }, [gameData]);
+  const cards = [...(gameData?.config_data.cards ?? [])].sort(
+    (a, b) => a.card_id > b.card_id,
+  );
 
   const currentCard = cards[currentIndex];
   const isLastCard = currentIndex >= cards.length - 1;
 
-  const nextCard = useCallback(async () => {
+  const nextCard = async () => {
     const newScores = [...scores, currentScore || 0];
     setScores(newScores);
     setCurrentScore(null);
@@ -36,24 +39,14 @@ const useRepeatAfter = (gameData) => {
       await finishGame(averageScore);
       setCurrentIndex(0);
     }
-  }, [currentScore, isLastCard, scores, finishGame, setCurrentIndex]);
+  };
 
-  const evaluateSpeech = useCallback(
-    async (audioBlob, referenceText) => {
-      setIsSubmitting(true);
-      let response = null;
-      try {
-        response = await api.analyzeSpeech(audioBlob, referenceText);
-        setCurrentScore(response?.score);
-      } catch (error) {
-        console.error("Error evaluating speech", error);
-      } finally {
-        console.log("analyze response:", response);
-        setIsSubmitting(false);
-      }
-    },
-    [setCurrentScore]
-  );
+  const evaluateSpeech = async (audioBlob, referenceText) => {
+    setIsSubmitting(true);
+    const score = await analyzeSpeech(audioBlob, referenceText);
+    if (score != null) setCurrentScore(score);
+    setIsSubmitting(false);
+  };
 
   return {
     // current

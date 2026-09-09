@@ -1,12 +1,11 @@
-import React, { useState } from "react";
-import { api, Roles, RoleLabels } from "../../services/api";
+import React from "react";
+import { Roles, RoleLabels } from "../../services/api";
 import RoleRequestPanel from "./RoleRequestPanel";
+import usePersonalDetails from "../../hooks/profile/usePersonalDetails";
 
 const PersonalDetails = ({ data }) => {
-  const [savedName, setSavedName] = useState(data.username || "");
-  const [name, setName] = useState(data.username || "");
-  const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState(null);
+  const { name, setName, status, setStatus, isDirty, saving, handleSave } =
+    usePersonalDetails(data);
 
   const inputClassName = `
     w-full
@@ -20,27 +19,6 @@ const PersonalDetails = ({ data }) => {
     shadow-[0_4px_15px_rgba(0,0,0,0.08)]
     focus:bg-white/70
   `;
-
-  const trimmedName = name.trim();
-  const isDirty = trimmedName.length > 0 && trimmedName !== savedName;
-
-  const handleSave = async () => {
-    if (!isDirty) return;
-    setSaving(true);
-    setStatus(null);
-    try {
-      const updated = await api.updateMyProfile({ username: trimmedName });
-      const newName = updated?.username ?? trimmedName;
-      setSavedName(newName);
-      setName(newName);
-      localStorage.setItem("username", newName);
-      setStatus({ type: "success", text: "Meno bolo uložené." });
-    } catch (e) {
-      setStatus({ type: "error", text: "Nepodarilo sa uložiť meno." });
-    } finally {
-      setSaving(false);
-    }
-  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,7 +60,9 @@ const PersonalDetails = ({ data }) => {
 
         <div>
           <p className="text-sm font-semibold opacity-70">Pozícia</p>
-          <p className="text-xl font-bold">{RoleLabels[data.role] ?? "Rodič"}</p>
+          <p className="text-xl font-bold">
+            {RoleLabels[data.role] ?? "Rodič"}
+          </p>
         </div>
 
         {status && (

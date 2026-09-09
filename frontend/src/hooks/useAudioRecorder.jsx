@@ -1,11 +1,11 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 
 const useAudioRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
 
-  const startRecording = useCallback(async () => {
+  const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream);
@@ -20,11 +20,11 @@ const useAudioRecorder = () => {
       mediaRecorderRef.current.start();
       setIsRecording(true);
     } catch (error) {
-      console.log("Error accessing microphone", error);
+      console.error("Error accessing microphone", error);
     }
-  }, []);
+  };
 
-  const stopRecording = useCallback(async () => {
+  const stopRecording = async () => {
     return new Promise((resolve) => {
       if (!mediaRecorderRef.current) {
         resolve(null);
@@ -42,7 +42,7 @@ const useAudioRecorder = () => {
 
       mediaRecorderRef.current.stop();
     });
-  }, []);
+  };
 
   return {
     isRecording,

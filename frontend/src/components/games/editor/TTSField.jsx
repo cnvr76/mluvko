@@ -1,7 +1,29 @@
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { api } from "../../../services/api";
 import { deleteServerFile } from "../../../utils/mediaPaths";
 import { previewUrl } from "../../../utils/pendingMedia";
+
+const generateAndSwapAudio = async (
+  trimmedText,
+  previousPath,
+  onAudioGenerated,
+) => {
+  try {
+    const path = await api.speech.generateTTS(trimmedText);
+    onAudioGenerated(path);
+
+    if (
+      typeof previousPath === "string" &&
+      previousPath &&
+      previousPath !== path
+    ) {
+      deleteServerFile(previousPath);
+    }
+  } catch {
+    toast.error("Chyba pri generovaní zvuku");
+  }
+};
 
 const TTSField = ({
   label,
@@ -10,30 +32,15 @@ const TTSField = ({
   defaultText = "",
 }) => {
   const [text, setText] = useState(defaultText);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGenerate = async () => {
     const trimmed = text.trim();
     if (!trimmed) return;
 
-    setLoading(true);
-    const previousPath = currentPath;
-    try {
-      const path = await api.generateTTS(trimmed);
-      onAudioGenerated(path);
-
-      if (
-        typeof previousPath === "string" &&
-        previousPath &&
-        previousPath !== path
-      ) {
-        deleteServerFile(previousPath);
-      }
-    } catch (e) {
-      alert("Chyba pri generovaní zvuku");
-    } finally {
-      setLoading(false);
-    }
+    setIsLoading(true);
+    await generateAndSwapAudio(trimmed, currentPath, onAudioGenerated);
+    setIsLoading(false);
   };
 
   const handleClear = () => {
@@ -57,7 +64,7 @@ const TTSField = ({
         <button
           type="button"
           onClick={handleGenerate}
-          disabled={loading}
+          disabled={isLoading}
           className="
             px-3 py-1.5
             rounded-xl
@@ -69,7 +76,7 @@ const TTSField = ({
             font-bold
           "
         >
-          {loading ? "..." : "Generovať"}
+          {isLoading ? "..." : "Generovať"}
         </button>
       </div>
 
@@ -97,7 +104,7 @@ const TTSField = ({
               aspect-square
             "
           >
-            <i class="fa-solid fa-trash"></i>
+            <i className="fa-solid fa-trash"></i>
           </button>
         </div>
       )}

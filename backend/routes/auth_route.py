@@ -1,7 +1,9 @@
+import os
 from fastapi import APIRouter, Depends, Response, Cookie
 from schemas import UserCreate, UserLogin, UserLoginResponse, UserResponse
 from models import User
 from services import auth_service
+from services.auth_service import REFRESH_TOKEN_EXPIRE_DAYS
 from sqlalchemy.orm import Session
 from config.database_config import get_db
 from config.logger import Logger
@@ -9,6 +11,9 @@ from config.logger import Logger
 
 router = APIRouter()
 logger = Logger(__name__).configure()
+
+IS_PRODUCTION = os.getenv("ENVIRONMENT", "development") == "production"
+REFRESH_TOKEN_COOKIE_MAX_AGE = REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
 
 
 @router.post("/signup", response_model=UserResponse)
@@ -27,7 +32,8 @@ def login(response: Response, login_data: UserLogin, db: Session = Depends(get_d
         value=refresh_token,
         httponly=True,
         samesite="strict",
-        # secure=True - on deploy via https
+        secure=IS_PRODUCTION,
+        max_age=REFRESH_TOKEN_COOKIE_MAX_AGE,
     )
     
     return user_response
@@ -44,5 +50,7 @@ def refresh(refresh_token: str = Cookie(None), db: Session = Depends(get_db)):
     
 @router.post("/logout", status_code=200)
 def logout(response: Response):
-    response.delete_cookie("refresh_token", httponly=True, samesite="strict")
+    response.delete_cookie(
+        "refresh_token", httponly=True, samesite="strict", secure=IS_PRODUCTION
+    )
     return {"message": "Logged out"}

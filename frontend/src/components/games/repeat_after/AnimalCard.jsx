@@ -2,6 +2,7 @@ import React from "react";
 import { previewUrl } from "../../../utils/pendingMedia";
 
 const AnimalCard = ({ gameData, currentScore }) => {
+  const animalImage = previewUrl(gameData?.animal_image_url);
   let barGradient = "";
 
   if (currentScore < 30) {
@@ -31,11 +32,13 @@ const AnimalCard = ({ gameData, currentScore }) => {
       "
     >
       <div className="flex items-center justify-center md:justify-start flex-1">
-        <img
-          src={previewUrl(gameData?.animal_image_url)}
-          alt={gameData?.animal_name}
-          className="h-32 md:h-60 object-contain drop-shadow-lg"
-        />
+        {animalImage && (
+          <img
+            src={animalImage}
+            alt={gameData?.animal_name}
+            className="h-32 md:h-60 object-contain drop-shadow-lg"
+          />
+        )}
       </div>
 
       <div className="flex flex-col flex-1 justify-center gap-3 md:gap-4">

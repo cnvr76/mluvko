@@ -1,12 +1,23 @@
 import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { useQueryState, parseAsStringLiteral } from "nuqs";
+import PageLoading from "../components/loading/PageLoading";
+import useMediaReady from "../hooks/useMediaReady";
+import { APP_BACKGROUND } from "../constants/media";
+
+const AUTH_MEDIA = [APP_BACKGROUND];
+
+const AUTH_TYPES = ["login", "signup"];
 
 const AuthForm = () => {
   const { login, signup } = useAuth();
   const location = useLocation();
 
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [type, setType] = useQueryState(
+    "type",
+    parseAsStringLiteral(AUTH_TYPES).withDefault("login"),
+  );
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -16,7 +27,8 @@ const AuthForm = () => {
   const [error, setError] = useState(null);
   const [isPwdVisible, setIsPwdVisible] = useState(false);
 
-  const isLoginMode = searchParams.get("type") !== "signup";
+  const isMediaReady = useMediaReady(AUTH_MEDIA);
+  const isLoginMode = type !== "signup";
   const from = location.state?.from?.pathname || "/";
 
   const inputClassName = `
@@ -93,8 +105,11 @@ const AuthForm = () => {
 
   const toggleMode = () => {
     setError(null);
-    setSearchParams({ type: isLoginMode ? "signup" : "login" });
+    // keep pushing a new history entry (as before), so "back" undoes the toggle
+    setType(isLoginMode ? "signup" : "login", { history: "push" });
   };
+
+  if (!isMediaReady) return <PageLoading />;
 
   return (
     <main
@@ -105,7 +120,7 @@ const AuthForm = () => {
         px-4
       "
       style={{
-        backgroundImage: "url('/images/background.png')",
+        backgroundImage: `url('${APP_BACKGROUND}')`,
       }}
     >
       <section
@@ -163,7 +178,9 @@ const AuthForm = () => {
               className="absolute right-4 top-3.5 w-5"
               onClick={() => setIsPwdVisible((prev) => !prev)}
             >
-              <i class={`fa-solid fa-eye${isPwdVisible ? "-slash" : ""}`}></i>
+              <i
+                className={`fa-solid fa-eye${isPwdVisible ? "-slash" : ""}`}
+              ></i>
             </button>
           </div>
 

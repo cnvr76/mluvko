@@ -71,8 +71,8 @@ export const collectMediaPaths = (node, acc = new Set()) => {
  * Hlboký klon, ktorý po ceste nahradí každý PendingFile výsledkom uploadu.
  * Nemení pôvodný objekt.
  *
- * `kind === 'audio'` → api.uploadAudio,
- * `kind === 'image'` → api.uploadImage.
+ * `kind === 'audio'` → api.uploads.audio,
+ * `kind === 'image'` → api.uploads.image.
  *
  * Ak ktorýkoľvek upload zlyhá, chyba sa propaguje hore – volajúci to spracuje
  * (napr. ukáže alert a NEzavolá PATCH).
@@ -82,10 +82,10 @@ export const uploadPendingFiles = async (root) => {
     if (node == null) return node;
     if (isPendingFile(node)) {
       if (node.kind === PENDING_IMAGE) {
-        return await api.uploadImage(node.file);
+        return await api.uploads.image(node.file);
       }
       // default = audio
-      return await api.uploadAudio(node.file);
+      return await api.uploads.audio(node.file);
     }
     if (Array.isArray(node)) {
       const out = new Array(node.length);

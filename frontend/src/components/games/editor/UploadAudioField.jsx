@@ -34,7 +34,7 @@ const UploadAudioField = ({ onAudioChange }) => {
           transition-all duration-200
         "
       >
-        <i class="fa-solid fa-folder-open"></i>
+        <i className="fa-solid fa-folder-open"></i>
       </button>
     </>
   );

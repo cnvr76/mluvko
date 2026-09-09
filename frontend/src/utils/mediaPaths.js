@@ -32,12 +32,12 @@ export const deleteServerFile = async (path) => {
 
   try {
     if (path.startsWith("static/uploads/")) {
-      await api.deleteUploadedFile(path);
+      await api.uploads.deleteFile(path);
     } else if (
       path.startsWith("static/audio/") ||
       path.startsWith("static/combined/")
     ) {
-      await api.deleteAudio(path);
+      await api.speech.deleteAudio(path);
     }
   } catch {
     // mazanie je best-effort – neblokujeme UX kvôli osirelému súboru

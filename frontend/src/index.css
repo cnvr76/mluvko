@@ -22,3 +22,16 @@ body {
 button {
   cursor: pointer;
 }
+
+/* sonner toasts, themed with the project palette (no new colors) */
+[data-sonner-toaster] {
+  --normal-bg: #ffffff;
+  --normal-border: rgba(100, 47, 55, 0.25);
+  --normal-text: #642f37;
+  --success-bg: #a5ad24;
+  --success-border: #a5ad24;
+  --success-text: #ffffff;
+  --error-bg: #ffe5e5;
+  --error-border: #d62828;
+  --error-text: #d62828;
+}

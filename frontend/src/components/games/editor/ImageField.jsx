@@ -80,7 +80,7 @@ const ImageField = ({
             aspect-square
           "
         >
-          <i class="fa-solid fa-folder-open"></i>
+          <i className="fa-solid fa-folder-open"></i>
         </button>
 
         {value && (
@@ -100,7 +100,7 @@ const ImageField = ({
               aspect-square
             "
           >
-            <i class="fa-solid fa-trash"></i>
+            <i className="fa-solid fa-trash"></i>
           </button>
         )}
       </div>

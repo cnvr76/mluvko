@@ -1,39 +1,50 @@
 import GamesSelectionSection from "../components/games/GamesSelectionSection";
 import { api, AgeGroups } from "../services/api";
-import { useLoaderData } from "react-router-dom";
-import { preloadImage } from "../hooks/useImagePreloader";
-import { useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import GameCard from "../components/shared/GameCard";
+import PageLoading from "../components/loading/PageLoading";
+import useMediaReady from "../hooks/useMediaReady";
+import { previewUrl } from "../utils/pendingMedia";
+import {
+  GAMES_JUNIOR_BACKGROUND,
+  GAMES_MIDDLE_BACKGROUND,
+  GAME_CARD_FALLBACK,
+} from "../constants/media";
 
-export const gamesLoaderFactory = (ageGroup) => async () => {
-  const bgImage =
-    ageGroup === AgeGroups.JUNIOR
-      ? "/images/gamepage_2_4_background.png"
-      : "/images/gamepage_5_6_background.png";
+const backgroundFor = (ageGroup) =>
+  ageGroup === AgeGroups.JUNIOR
+    ? GAMES_JUNIOR_BACKGROUND
+    : GAMES_MIDDLE_BACKGROUND;
 
-  const [data] = await Promise.all([
-    api.getGamesFor(ageGroup),
-    preloadImage(bgImage),
-  ]);
+const GamesPage = ({ ageGroup }) => {
+  const backgroundImage = backgroundFor(ageGroup);
 
-  return { data, backgroundImage: bgImage };
-};
+  const { data, isLoading } = useQuery({
+    queryKey: ["games", ageGroup],
+    queryFn: () => api.games.forAgeGroup(ageGroup),
+  });
 
-const GamesPage = () => {
-  const { data, backgroundImage } = useLoaderData();
+  const games = [...(data ?? [])].sort((a, b) => {
+    if (a.preview_image_url && !b.preview_image_url) return -1;
+    if (!a.preview_image_url && b.preview_image_url) return 1;
+    return 0;
+  });
 
-  const games = useMemo(() => {
-    const list = data ?? [];
-    return [...list].sort((a, b) => {
-      if (a.preview_image_url && !b.preview_image_url) return -1;
-      if (!a.preview_image_url && b.preview_image_url) return 1;
-      return 0;
-    });
-  }, [data]);
+  const isMediaReady = useMediaReady(
+    [
+      backgroundImage,
+      ...games.map(
+        (game) => previewUrl(game.preview_image_url) || GAME_CARD_FALLBACK,
+      ),
+    ],
+    !isLoading,
+  );
+
+  if (isLoading || !isMediaReady) return <PageLoading />;
 
   return (
     <GamesSelectionSection backgroundImage={backgroundImage}>
-      {games?.map((game, _) => (
+      {games.map((game) => (
         <GameCard key={game.id} data={game} />
       ))}
     </GamesSelectionSection>

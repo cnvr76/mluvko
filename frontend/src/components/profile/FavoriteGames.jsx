@@ -1,30 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { api } from "../../services/api";
+import useFavoriteGames from "../../hooks/profile/useFavoriteGames";
 import GameCard from "../shared/GameCard";
 import PageLoading from "../loading/PageLoading";
 
 const FavoriteGames = () => {
-  const [games, setGames] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { games, isLoading, handleFavoriteToggle } = useFavoriteGames();
 
-  useEffect(() => {
-    api
-      .getMyFavoriteGames()
-      .then((data) => {
-        setGames(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
-
-  const handleFavoriteToggle = (gameId, isNowFavorite) => {
-    if (!isNowFavorite) {
-      setGames((prev) => prev.filter((game) => game.id !== gameId));
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
         <h2 className="text-3xl font-bold">Obľúbené hry</h2>

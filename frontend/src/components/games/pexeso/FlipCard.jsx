@@ -1,6 +1,7 @@
 import React from "react";
 import ReactFlipCard from "react-card-flip";
 import { previewUrl } from "../../../utils/pendingMedia";
+import { PEXESO_CARD_BACK } from "../../../constants/media";
 
 const FlipCard = ({ data, isFlipped, onClick }) => {
   return (
@@ -10,7 +11,7 @@ const FlipCard = ({ data, isFlipped, onClick }) => {
         className="relative w-[96px] sm:w-[120px] md:w-[140px] aspect-[3/4] rounded-3xl overflow-hidden cursor-pointer select-none bg-[#ff7110]"
       >
         <img
-          src="/images/pexeso/card_Pexeso.png"
+          src={PEXESO_CARD_BACK}
           alt="Card back"
           className="w-full h-full object-cover"
           draggable={false}

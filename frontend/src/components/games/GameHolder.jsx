@@ -1,5 +1,6 @@
 import React from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import { useQueryState } from "nuqs";
 import Pexeso from "./pexeso/Pexeso";
 import RepeatAfter from "./repeat_after/RepeatAfter";
 import FindAndRepeat from "./find_and_repeat/FindAndRepeat";
@@ -8,8 +9,7 @@ import SpecificGamePage from "../../pages/SpecificGamePage";
 
 const GameHolder = () => {
   const { gameId, gameType } = useParams();
-  const [searchParams] = useSearchParams();
-  const snapshotId = searchParams.get("snapshot");
+  const [snapshotId] = useQueryState("snapshot");
 
   const getCorrectGameComponent = () => {
     switch (gameType) {

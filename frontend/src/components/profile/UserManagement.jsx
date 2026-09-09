@@ -1,67 +1,22 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { api, Roles, RoleLabels } from "../../services/api";
+import useUserManagement from "../../hooks/profile/useUserManagement";
 
 const UserManagement = ({ currentUserId }) => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [edits, setEdits] = useState({});
   const [search, setSearch] = useState("");
+  const { users, isLoading, edits, updateEdit, isDirty, handleAction } =
+    useUserManagement();
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const data = await api.getAllUsers();
-      setUsers(data || []);
+  const query = search.trim().toLowerCase();
+  const filteredUsers = !query
+    ? users
+    : users.filter(
+        (user) =>
+          user.username?.toLowerCase().includes(query) ||
+          user.email?.toLowerCase().includes(query),
+      );
 
-      const initialEdits = {};
-      (data || []).forEach((user) => {
-        initialEdits[user.id] = { username: user.username, role: user.role };
-      });
-      setEdits(initialEdits);
-    } catch (error) {
-      console.error("Failed to fetch users", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const updateEdit = (userId, field, value) => {
-    setEdits((prev) => ({
-      ...prev,
-      [userId]: { ...prev[userId], [field]: value },
-    }));
-  };
-
-  const handleAction = async (actionFn, ...args) => {
-    try {
-      await actionFn(...args);
-      fetchUsers();
-    } catch (error) {
-      alert("Akcia zlyhala.");
-    }
-  };
-
-  const isDirty = (user) => {
-    const edit = edits[user.id];
-    if (!edit) return false;
-    return edit.username !== user.username || edit.role !== user.role;
-  };
-
-  const filteredUsers = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return users;
-    return users.filter(
-      (user) =>
-        user.username?.toLowerCase().includes(query) ||
-        user.email?.toLowerCase().includes(query),
-    );
-  }, [users, search]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
         <h2 className="text-3xl font-extrabold drop-shadow">Používatelia</h2>
@@ -186,7 +141,7 @@ const UserManagement = ({ currentUserId }) => {
 
                   <button
                     onClick={() =>
-                      handleAction(api.updateUser, user.id, {
+                      handleAction(api.users.update, user.id, {
                         username: edit.username,
                         role: edit.role,
                       })
@@ -214,7 +169,7 @@ const UserManagement = ({ currentUserId }) => {
                         `Naozaj chcete vymazať používateľa „${user.username}“? Táto akcia je nenávratná.`,
                       );
                       if (isConfirmed) {
-                        handleAction(api.deleteUser, user.id);
+                        handleAction(api.users.delete, user.id);
                       }
                     }}
                     disabled={isSelf}

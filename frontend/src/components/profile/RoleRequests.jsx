@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { toast } from "sonner";
 import { api, RoleLabels } from "../../services/api";
+import useRoleRequests from "../../hooks/profile/useRoleRequests";
 
 const STATUS_LABELS = {
   pending: "Čaká",
@@ -14,41 +16,15 @@ const STATUS_BADGE = {
 };
 
 const RoleRequests = () => {
-  const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState("pending");
-
-  const fetchRequests = async () => {
-    setLoading(true);
-    try {
-      const data = await api.getAllRoleRequests();
-      setRequests(data || []);
-    } catch (error) {
-      console.error("Failed to fetch role requests", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRequests();
-  }, []);
-
-  const handleAction = async (actionFn, ...args) => {
-    try {
-      await actionFn(...args);
-      fetchRequests();
-    } catch (error) {
-      alert("Akcia zlyhala.");
-    }
-  };
+  const { requests, isLoading, statusFilter, setStatusFilter, handleAction } =
+    useRoleRequests();
 
   const filteredRequests = requests.filter((r) => {
     if (statusFilter === "all") return true;
     return r.status === statusFilter;
   });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
         <h2 className="text-3xl font-extrabold drop-shadow">Žiadosti o rolu</h2>
@@ -146,7 +122,7 @@ const RoleRequests = () => {
                         `Schváliť žiadosť používateľa „${request.username}“ a zmeniť mu rolu na ${RoleLabels[request.requested_role]}?`,
                       );
                       if (isConfirmed) {
-                        handleAction(api.approveRoleRequest, request.id);
+                        handleAction(api.roleRequests.approve, request.id);
                       }
                     }}
                     className="
@@ -168,10 +144,10 @@ const RoleRequests = () => {
                       const reason = prompt("Dôvod zamietnutia:");
                       if (reason === null) return;
                       if (reason.trim().length < 3) {
-                        alert("Dôvod musí mať aspoň 3 znaky!");
+                        toast.error("Dôvod musí mať aspoň 3 znaky!");
                         return;
                       }
-                      handleAction(api.rejectRoleRequest, request.id, reason);
+                      handleAction(api.roleRequests.reject, request.id, reason);
                     }}
                     className="
                       px-4 py-2

@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
-import { api, GameTypes, AgeGroups } from "../../../services/api";
-import PageLoading from "../../loading/PageLoading";
+import React from "react";
+import { useParams, Link } from "react-router-dom";
+import { useQueryState } from "nuqs";
+import { GameTypes, AgeGroups } from "../../../services/api";
 import PexesoConfig from "./PexesoConfig";
 import RepeatAfterConfig from "./RepeatAfterConfig";
 import FindAndRepeatConfig from "./FindAndRepeatConfig";
 import ImageField from "./ImageField";
-import {
-  collectMediaPaths,
-  uploadPendingFiles,
-} from "../../../utils/pendingMedia";
-import { deleteServerFile } from "../../../utils/mediaPaths";
+import useGameEditor from "../../../hooks/games/editor/useGameEditor";
+import PageLoading from "../../loading/PageLoading";
+import useMediaReady from "../../../hooks/useMediaReady";
+import { APP_BACKGROUND } from "../../../constants/media";
+
+const EDITOR_MEDIA = [APP_BACKGROUND];
 
 const CONFIG_COMPONENTS = {
   [GameTypes.PEXESO]: PexesoConfig,
@@ -20,16 +21,12 @@ const CONFIG_COMPONENTS = {
 
 const GameEditPage = () => {
   const { gameId } = useParams();
-  const [searchParams] = useSearchParams();
-  const snapshotId = searchParams.get("snapshot");
+  const [snapshotId] = useQueryState("snapshot");
 
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState(null);
-  // referencia na poslednú serverom potvrdenú podobu dát – slúži na výpočet,
-  // ktoré pôvodné cesty k médiám už po uložení nie sú potrebné a treba ich
-  // zmazať zo servera.
-  const initialFormDataRef = useRef(null);
+  const { formData, loading, saving, handleBaseChange, handleSave } =
+    useGameEditor(gameId, snapshotId);
+
+  const isMediaReady = useMediaReady(EDITOR_MEDIA);
 
   const inputClassName = `
     border border-[#642f37]/30
@@ -42,88 +39,29 @@ const GameEditPage = () => {
     focus:ring-[#F3904B]
   `;
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = snapshotId
-          ? await api.getSnapshotInfo(gameId, snapshotId)
-          : await api.getGameById(gameId);
+  if (!isMediaReady) return <PageLoading />;
 
-        setFormData(data);
-        // hlboký snapshot pôvodných serverových ciest pre neskorší diff
-        initialFormDataRef.current = JSON.parse(JSON.stringify(data));
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadData();
-  }, [gameId, snapshotId]);
-
-  const handleBaseChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSave = async () => {
-    if (saving) return;
-    setSaving(true);
-    try {
-      // 1) nahrať všetky lokálne odložené súbory (PendingFile) a nahradiť ich
-      //    serverovými cestami v hlbokej kópii formData
-      const uploaded = await uploadPendingFiles(formData);
-
-      // 2) zistiť, ktoré pôvodné media cesty po novom ukladaní zmizli –
-      //    tie treba po úspešnom PATCHi zmazať zo servera (best-effort)
-      const initialPaths = collectMediaPaths(initialFormDataRef.current);
-      const updatedPaths = collectMediaPaths(uploaded);
-      const orphanPaths = [...initialPaths].filter(
-        (p) => !updatedPaths.has(p)
-      );
-
-      // 3) uložiť hru s finálnymi cestami
-      await api.saveGame(gameId, uploaded);
-
-      // 4) ako baseline pre ďalší diff si pamätáme uložený stav
-      setFormData(uploaded);
-      initialFormDataRef.current = JSON.parse(JSON.stringify(uploaded));
-
-      // 5) až po úspešnom save zahodíme osirotené súbory
-      for (const path of orphanPaths) {
-        deleteServerFile(path);
-      }
-
-      alert("Hra bola úspešne uložená!");
-    } catch (e) {
-      const detail = e?.response?.data?.detail || "Chyba pri ukladaní.";
-      alert(detail);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-if (loading) {
-  return (
-    <main
-      className="
+  if (loading) {
+    return (
+      <main
+        className="
         relative isolate
         w-full min-h-screen
         px-4 pt-28 pb-12
       "
-    >
-      <div
-        className="
+      >
+        <div
+          className="
           fixed inset-0 -z-10
           bg-cover bg-center bg-no-repeat
         "
-        style={{
-          backgroundImage: "url('/images/background.png')",
-        }}
-      />
+          style={{
+            backgroundImage: `url('${APP_BACKGROUND}')`,
+          }}
+        />
 
-      <div
-        className="
+        <div
+          className="
           w-full max-w-5xl mx-auto
           rounded-[2rem]
           bg-white/30
@@ -134,12 +72,12 @@ if (loading) {
           text-[#642f37]
           font-semibold
         "
-      >
-        Načítavam editor hry...
-      </div>
-    </main>
-  );
-}
+        >
+          Načítavam editor hry...
+        </div>
+      </main>
+    );
+  }
 
   const SpecificConfig = CONFIG_COMPONENTS[formData.game_type];
 
@@ -157,7 +95,7 @@ if (loading) {
           bg-cover bg-center bg-no-repeat
         "
         style={{
-          backgroundImage: "url('/images/background.png')",
+          backgroundImage: `url('${APP_BACKGROUND}')`,
         }}
       />
       <div
@@ -247,7 +185,9 @@ if (loading) {
           {SpecificConfig ? (
             <SpecificConfig
               configData={formData.config_data}
-              onChange={(newConfig) => handleBaseChange("config_data", newConfig)}
+              onChange={(newConfig) =>
+                handleBaseChange("config_data", newConfig)
+              }
             />
           ) : (
             <p className="text-red-500 font-semibold">
