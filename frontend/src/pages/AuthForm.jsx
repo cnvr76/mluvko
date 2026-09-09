@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "react-router-dom";
 import { useQueryState, parseAsStringLiteral } from "nuqs";
@@ -23,7 +24,6 @@ const AuthForm = () => {
     email: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isPwdVisible, setIsPwdVisible] = useState(false);
 
@@ -75,32 +75,30 @@ const AuthForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    let result;
-
-    if (isLoginMode) {
-      result = await login(formData.email, formData.password);
-    } else {
-      result = await signup(
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      if (isLoginMode) {
+        return login(formData.email, formData.password);
+      }
+      const signupResult = await signup(
         formData.username,
         formData.email,
         formData.password,
       );
+      return signupResult.success
+        ? login(formData.email, formData.password)
+        : signupResult;
+    },
+  });
+  const isLoading = submitMutation.isPending;
 
-      if (result.success) {
-        result = await login(formData.email, formData.password);
-      }
-    }
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    const result = await submitMutation.mutateAsync();
     if (!result.success) {
       setError(result.error);
     }
-
-    setIsLoading(false);
   };
 
   const toggleMode = () => {

@@ -1,27 +1,23 @@
 import React, { useState } from "react";
-import { toast } from "sonner";
 import { api } from "../../../services/api";
 import { deleteServerFile } from "../../../utils/mediaPaths";
 import { previewUrl } from "../../../utils/pendingMedia";
+import useApiMutation from "../../../hooks/useApiMutation";
 
 const generateAndSwapAudio = async (
   trimmedText,
   previousPath,
   onAudioGenerated,
 ) => {
-  try {
-    const path = await api.speech.generateTTS(trimmedText);
-    onAudioGenerated(path);
+  const path = await api.speech.generateTTS(trimmedText);
+  onAudioGenerated(path);
 
-    if (
-      typeof previousPath === "string" &&
-      previousPath &&
-      previousPath !== path
-    ) {
-      deleteServerFile(previousPath);
-    }
-  } catch {
-    toast.error("Chyba pri generovaní zvuku");
+  if (
+    typeof previousPath === "string" &&
+    previousPath &&
+    previousPath !== path
+  ) {
+    deleteServerFile(previousPath);
   }
 };
 
@@ -32,15 +28,18 @@ const TTSField = ({
   defaultText = "",
 }) => {
   const [text, setText] = useState(defaultText);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleGenerate = async () => {
+  const generateMutation = useApiMutation(
+    ({ trimmedText, previousPath }) =>
+      generateAndSwapAudio(trimmedText, previousPath, onAudioGenerated),
+    { errorMessage: "Chyba pri generovaní zvuku" },
+  );
+  const isLoading = generateMutation.isPending;
+
+  const handleGenerate = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
-
-    setIsLoading(true);
-    await generateAndSwapAudio(trimmed, currentPath, onAudioGenerated);
-    setIsLoading(false);
+    generateMutation.mutate({ trimmedText: trimmed, previousPath: currentPath });
   };
 
   const handleClear = () => {

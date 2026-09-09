@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { api } from "../../services/api";
+import useApiMutation from "../useApiMutation";
 
-const analyzeSpeech = async (audioBlob, referenceText) => {
+const resolveSpeechScore = async (mutateAsync, audioBlob, referenceText) => {
   try {
-    const response = await api.speech.analyze(audioBlob, referenceText);
-    return response?.score;
-  } catch (error) {
-    console.error("Error evaluating speech", error);
+    const response = await mutateAsync({ audioBlob, referenceText });
+    return response?.score ?? null;
+  } catch {
     return null;
   }
 };
@@ -18,7 +18,11 @@ const useRepeatAfter = (
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState([]);
   const [currentScore, setCurrentScore] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const analyzeSpeechMutation = useApiMutation(
+    ({ audioBlob, referenceText }) => api.speech.analyze(audioBlob, referenceText),
+    { errorMessage: "Nepodarilo sa vyhodnotiť nahrávku." },
+  );
 
   const cards = [...(gameData?.config_data.cards ?? [])].sort(
     (a, b) => a.card_id > b.card_id,
@@ -42,10 +46,12 @@ const useRepeatAfter = (
   };
 
   const evaluateSpeech = async (audioBlob, referenceText) => {
-    setIsSubmitting(true);
-    const score = await analyzeSpeech(audioBlob, referenceText);
+    const score = await resolveSpeechScore(
+      analyzeSpeechMutation.mutateAsync,
+      audioBlob,
+      referenceText,
+    );
     if (score != null) setCurrentScore(score);
-    setIsSubmitting(false);
   };
 
   return {
@@ -63,7 +69,7 @@ const useRepeatAfter = (
     isAuthenticated,
     // loading
     isSaving,
-    isSubmitting,
+    isSubmitting: analyzeSpeechMutation.isPending,
   };
 };
 

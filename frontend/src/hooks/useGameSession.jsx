@@ -3,20 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
 import useRequireAuth from "./useRequireAuth";
+import useApiMutation from "./useApiMutation";
 
-const fetchBestScore = async (gameId, score) => {
+const resolveBestScore = async (mutateAsync, score) => {
   try {
-    const response = await api.games.updateStats(gameId, score);
+    const response = await mutateAsync(score);
     return Math.round(response?.best_score * 100) / 100;
-  } catch (error) {
-    console.error("Failed to update game score:", error);
+  } catch {
     return score;
   }
 };
 
 const useGameSession = (gameId, snapshotId) => {
   const { isAuthenticated } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [finalScore, setFinalScore] = useState(null);
   const [bestScore, setBestScore] = useState(null);
@@ -32,23 +31,25 @@ const useGameSession = (gameId, snapshotId) => {
     enabled: Boolean(gameId),
   });
 
+  const updateStatsMutation = useApiMutation(
+    (score) => api.games.updateStats(gameId, score),
+    { errorMessage: "Nepodarilo sa uložiť skóre." },
+  );
+
   const finishGame = async (score) => {
     if (requireAuthOrRedirect()) return;
 
-    setIsSaving(true);
     setFinalScore(score);
     setBestScore(score);
     setIsFinished(true);
-    const finalBestScore = await fetchBestScore(gameId, score);
-    setBestScore(finalBestScore);
-    setIsSaving(false);
+    setBestScore(await resolveBestScore(updateStatsMutation.mutateAsync, score));
   };
 
   return {
     data,
     isLoading,
     error,
-    isSaving,
+    isSaving: updateStatsMutation.isPending,
     isFinished,
     isAuthenticated,
     finalScore,
