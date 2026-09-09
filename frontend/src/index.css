@@ -1,12 +1,48 @@
 @import "tailwindcss";
 
+@theme {
+  --color-text: #642f37;
+
+  /* primary accent (orange) */
+  --color-accent: #ff7110;
+  --color-accent-hover: #e9650c;
+  /* softer accent variant (e.g. secondary/"test" actions) */
+  --color-accent-soft: #f3904b;
+  --color-accent-soft-hover: #e67e36;
+
+  /* success / approve */
+  --color-success: #a5ad24;
+  --color-success-hover: #92991f;
+
+  /* danger — solid fill (e.g. active recording, irreversible confirm) */
+  --color-danger: #d62828;
+  --color-danger-hover: #b81f1f;
+  /* danger — light background (e.g. reject/delete buttons) */
+  --color-danger-bg: #ffe5e5;
+  --color-danger-bg-hover: #ffd6d6;
+
+  --color-blue: #9dbbd8;
+  --color-blue-hover: #8aaed0;
+
+  --color-lavender: #b89dbb;
+  --color-lavender-hover: #a98ead;
+
+  --color-yellow: #f7c767;
+  --color-yellow-hover: #efbb50;
+
+  /* surfaces */
+  --color-page-bg: #9fdcff;
+  --color-surface: #fff7f2;
+  --color-loading-bar: #1f0a94;
+}
+
 :root {
   font-family: "Rajdhani", sans-serif;
   font-weight: 500;
 }
 
 body {
-  background-color: rgb(159, 220, 255);
+  background-color: var(--color-page-bg);
 }
 
 #root {
@@ -27,11 +63,11 @@ button {
 [data-sonner-toaster] {
   --normal-bg: #ffffff;
   --normal-border: rgba(100, 47, 55, 0.25);
-  --normal-text: #642f37;
-  --success-bg: #a5ad24;
-  --success-border: #a5ad24;
+  --normal-text: var(--color-text);
+  --success-bg: var(--color-success);
+  --success-border: var(--color-success);
   --success-text: #ffffff;
-  --error-bg: #ffe5e5;
-  --error-border: #d62828;
-  --error-text: #d62828;
+  --error-bg: var(--color-danger-bg);
+  --error-border: var(--color-danger);
+  --error-text: var(--color-danger);
 }

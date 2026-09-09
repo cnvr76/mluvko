@@ -72,8 +72,8 @@ const ImageField = ({
             shrink-0
             px-3 py-2
             rounded-lg
-            bg-[#9DBBD8]
-            hover:bg-[#88a9c9]
+            bg-blue
+            hover:bg-blue-hover
             text-white
             text-sm font-semibold
             transition-all duration-200

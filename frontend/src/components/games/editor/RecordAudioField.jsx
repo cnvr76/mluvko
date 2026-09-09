@@ -32,8 +32,8 @@ const RecordAudioField = ({ onAudioChange }) => {
         transition-all duration-200
         ${
           isRecording
-            ? "bg-[#d62828] hover:bg-[#b81f1f]"
-            : "bg-[#B89DBB] hover:bg-[#a489a7]"
+            ? "bg-danger hover:bg-danger-hover"
+            : "bg-lavender hover:bg-lavender-hover"
         }
       `}
     >

@@ -27,8 +27,8 @@ const UploadAudioField = ({ onAudioChange }) => {
         className="
           px-3 py-1.5
           rounded-xl
-          bg-[#9DBBD8]
-          hover:bg-[#88a9c9]
+          bg-blue
+          hover:bg-blue-hover
           text-white
           text-sm font-semibold
           transition-all duration-200
