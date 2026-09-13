@@ -35,7 +35,7 @@ const HomePage = () => {
         style={{ backgroundImage: `url('${HOME_BACKGROUND}')` }}
       />
 
-      <div className="mt-[4vh] w-full max-w-[52rem] flex flex-col gap-cloud-gap">
+      <div className="mt-[4vh] w-full max-w-[48rem] flex flex-col gap-cloud-gap">
         {CLOUD_BUTTONS.map(({ path, image, label }, index) => (
           <Link
             key={path}
@@ -43,7 +43,7 @@ const HomePage = () => {
             aria-label={label}
             className={`${index % 2 === 0 ? "self-end" : "self-start"} w-cloud-width transition-transform duration-200 ease-out hover:scale-110`}
           >
-            <img src={image} alt={label} className="w-full h-auto" />
+            <img src={image} alt={label} className="w-full h-auto scale-105" />
           </Link>
         ))}
       </div>

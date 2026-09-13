@@ -2,19 +2,27 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-const MENU_ITEMS = [{ key: "contact", label: "Kontakt", to: null }];
+const MENU_ITEMS = [
+  { key: "contact", label: "Kontakt", to: null },
+  { key: "about", label: "O nás", to: null },
+];
 
-const LINK_CLASS =
-  "font-semibold text-text no-underline whitespace-nowrap transition-colors duration-200 hover:text-accent";
+const BAR_ITEM_CLASS =
+  "flex items-center gap-2 font-semibold text-fluid-2xl leading-none text-text no-underline whitespace-nowrap transition-colors duration-200 hover:text-accent cursor-pointer";
+
+const BAR_ICON_CLASS = "fa-fw shrink-0 text-fluid-xl -translate-y-[0.14em]";
+
+const PANEL_ITEM_CLASS =
+  "block w-full text-left rounded-full px-6 py-3 font-semibold text-fluid-2xl leading-none text-text no-underline bg-white/30 transition-colors duration-200 hover:text-accent cursor-pointer";
 
 const renderMenuItems = (itemClass) =>
   MENU_ITEMS.map(({ key, label, to }) =>
     to ? (
-      <Link key={key} to={to} className={`${LINK_CLASS} ${itemClass}`}>
+      <Link key={key} to={to} className={itemClass}>
         {label}
       </Link>
     ) : (
-      <span key={key} className={`${LINK_CLASS} ${itemClass}`}>
+      <span key={key} className={itemClass}>
         {label}
       </span>
     ),
@@ -25,29 +33,34 @@ const AccountControls = () => {
 
   if (!isAuthenticated)
     return (
-      <Link to="/auth?type=signup" className={`${LINK_CLASS} text-fluid-xl`}>
+      <Link to="/auth?type=signup" className={BAR_ITEM_CLASS}>
         Prihláste sa
       </Link>
     );
 
   return (
-    <div className="flex items-center gap-3">
-      <Link
-        to="/profile"
-        className={`${LINK_CLASS} text-fluid-xl flex items-center gap-2 min-w-0`}
-      >
-        <i className="fa-solid fa-user shrink-0" aria-hidden="true" />
-        <span className="truncate max-w-24 sm:max-w-48">{username}</span>
+    <>
+      <Link to="/profile" className={`${BAR_ITEM_CLASS} min-w-0`}>
+        <i
+          className={`fa-solid fa-user ${BAR_ICON_CLASS}`}
+          aria-hidden="true"
+        />
+        <span className="truncate max-w-[clamp(3rem,18vw,12rem)]">
+          {username}
+        </span>
       </Link>
       <button
         type="button"
         onClick={logout}
         aria-label="Odhlásiť sa"
-        className={`${LINK_CLASS} text-fluid-xl`}
+        className={BAR_ITEM_CLASS}
       >
-        <i className="fa-solid fa-right-from-bracket" aria-hidden="true" />
+        <i
+          className={`fa-solid fa-right-from-bracket ${BAR_ICON_CLASS}`}
+          aria-hidden="true"
+        />
       </button>
-    </div>
+    </>
   );
 };
 
@@ -72,36 +85,41 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 h-header flex items-center justify-between gap-4 px-4 sm:px-6">
-        <Link to="/" className="shrink-0">
-          <img src="/images/logo.png" alt="Mluvko" className="h-7 sm:h-8 w-auto" />
+      <header className="fixed inset-x-0 top-0 z-50 h-header grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-6 px-4 sm:px-6">
+        <Link to="/" className="col-start-1 justify-self-start shrink-0">
+          <img
+            src="/images/logo.png"
+            alt="Mluvko"
+            className="h-7 sm:h-8 w-auto"
+          />
         </Link>
 
-        <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {renderMenuItems("text-fluid-2xl")}
-          </nav>
+        <nav className="col-start-2 hidden md:flex items-center gap-6">
+          {renderMenuItems(BAR_ITEM_CLASS)}
+        </nav>
 
+        <div className="col-start-3 justify-self-end flex items-center gap-4 min-w-0">
           <AccountControls />
 
           <button
             type="button"
             onClick={() => setIsMenuOpen(true)}
-            className="md:hidden flex flex-col justify-center gap-1.5 p-2 -mr-2 shrink-0"
+            className={`${BAR_ITEM_CLASS} md:hidden`}
             aria-label="Otvoriť menu"
             aria-expanded={isMenuOpen}
             aria-controls="site-menu"
           >
-            <span className="w-6 h-0.5 bg-text rounded-full" />
-            <span className="w-6 h-0.5 bg-text rounded-full" />
-            <span className="w-6 h-0.5 bg-text rounded-full" />
+            <i
+              className={`fa-solid fa-bars ${BAR_ICON_CLASS}`}
+              aria-hidden="true"
+            />
           </button>
         </div>
       </header>
 
       <div
         onClick={() => setIsMenuOpen(false)}
-        className={`md:hidden fixed inset-0 z-50 bg-black/40 transition-opacity duration-300 ${
+        className={`md:hidden fixed inset-0 z-50 bg-text/25 backdrop-blur-[2px] transition-opacity duration-300 ${
           isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         aria-hidden="true"
@@ -113,20 +131,20 @@ const Header = () => {
         tabIndex={-1}
         inert={!isMenuOpen}
         aria-label="Hlavné menu"
-        className={`md:hidden fixed top-0 right-0 z-50 h-dvh w-[min(80vw,20rem)] surface-glass bg-white/85 border-y-0 border-r-0 shadow-panel-strong flex flex-col gap-6 px-6 pt-6 transition-transform duration-300 ease-out outline-none ${
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        className={`md:hidden fixed top-3 right-3 bottom-3 z-50 w-[min(78vw,17rem)] surface-glass bg-white/45 rounded-panel shadow-panel-strong flex flex-col gap-3 p-3 transition-transform duration-300 ease-out outline-none ${
+          isMenuOpen ? "translate-x-0" : "translate-x-[calc(100%+0.75rem)]"
         }`}
       >
         <button
           type="button"
           onClick={() => setIsMenuOpen(false)}
           aria-label="Zavrieť menu"
-          className="self-end text-fluid-2xl text-text hover:text-accent transition-colors duration-200"
+          className="self-end shrink-0 size-10 rounded-full surface-glass bg-white/40 hover:bg-white/70 text-fluid-xl text-text hover:text-accent transition-colors duration-200 cursor-pointer"
         >
-          <i className="fa-solid fa-xmark" aria-hidden="true" />
+          <i className="fa-solid fa-xmark fa-fw" aria-hidden="true" />
         </button>
 
-        {renderMenuItems("text-fluid-2xl")}
+        {renderMenuItems(PANEL_ITEM_CLASS)}
       </nav>
     </>
   );
