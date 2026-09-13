@@ -44,6 +44,9 @@
   --spacing-header: clamp(4rem, 3.5rem + 2vw, 5rem);
   --spacing-page-top: calc(var(--spacing-header) + 1.5rem);
 
+  --spacing-cloud-width: min(80%, 20rem);
+  --spacing-cloud-gap: clamp(1rem, 2vw, 2rem);
+
   /* ---------- radii ---------- */
   --radius-panel: 2rem; /* page-level containers and cards */
 

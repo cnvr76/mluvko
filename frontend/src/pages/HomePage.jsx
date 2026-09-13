@@ -10,18 +10,16 @@ import {
 
 const HOME_MEDIA = [HOME_BACKGROUND, HOME_JUNIOR_BUTTON, HOME_MIDDLE_BUTTON];
 
-const AGE_GROUPS = [
-  {
-    path: "/games/2-4",
-    image: HOME_JUNIOR_BUTTON,
-    label: "Hry pre deti 2-4 roky",
-    position: "order-2 self-start",
-  },
+const CLOUD_BUTTONS = [
   {
     path: "/games/5-6",
     image: HOME_MIDDLE_BUTTON,
     label: "Hry pre deti 5-6 rokov",
-    position: "order-1 self-end",
+  },
+  {
+    path: "/games/2-4",
+    image: HOME_JUNIOR_BUTTON,
+    label: "Hry pre deti 2-4 roky",
   },
 ];
 
@@ -37,13 +35,13 @@ const HomePage = () => {
         style={{ backgroundImage: `url('${HOME_BACKGROUND}')` }}
       />
 
-      <div className="mt-[4vh] w-full max-w-[52rem] flex flex-col gap-4 sm:gap-6">
-        {AGE_GROUPS.map(({ path, image, label, position }) => (
+      <div className="mt-[4vh] w-full max-w-[52rem] flex flex-col gap-cloud-gap">
+        {CLOUD_BUTTONS.map(({ path, image, label }, index) => (
           <Link
             key={path}
             to={path}
             aria-label={label}
-            className={`${position} w-[min(80%,20rem)] transition-transform duration-200 ease-out hover:scale-110`}
+            className={`${index % 2 === 0 ? "self-end" : "self-start"} w-cloud-width transition-transform duration-200 ease-out hover:scale-110`}
           >
             <img src={image} alt={label} className="w-full h-auto" />
           </Link>
