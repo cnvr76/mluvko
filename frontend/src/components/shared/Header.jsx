@@ -2,18 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-/*
-  Fixed site header.
-
-  The menu is defined once and rendered twice: inline from md up, inside a
-  disclosure panel below it. Only the container differs — the entries, their
-  labels and their targets have a single definition, so the two widths can no
-  longer drift apart the way they had (the phone menu used to list three dead
-  headings and offer no way to sign in at all).
-
-  Pending: "Kontakt" has no destination yet and is rendered as plain text.
-*/
-
 const ITEM_CLASS =
   "text-fluid-2xl font-semibold text-text whitespace-nowrap transition-colors duration-200";
 
@@ -23,7 +11,6 @@ const Header = () => {
   const location = useLocation();
   const menuRef = useRef(null);
 
-  // a menu left open across a navigation hides the page it just opened
   useEffect(() => setIsMenuOpen(false), [location.key]);
 
   useEffect(() => {

@@ -10,20 +10,6 @@ import {
 
 const HOME_MEDIA = [HOME_BACKGROUND, HOME_JUNIOR_BUTTON, HOME_MIDDLE_BUTTON];
 
-/*
-  Landing page: pick an age group.
-
-  One set of buttons for every width. The diagonal of the original desktop
-  composition (5-6 up and to the right, 2-4 down and to the left) is kept with
-  order and self-alignment rather than percentage offsets, so it survives any
-  viewport instead of only the one it was measured on. DOM order stays by age,
-  which is the order a keyboard or screen reader follows.
-
-  The pair is deliberately top-aligned rather than centred: the background is
-  a 1.97:1 illustration whose horizon sits around 55% of the height at every
-  aspect ratio, and centring would drop the lower button onto the grass.
-*/
-
 const AGE_GROUPS = [
   {
     path: "/games/2-4",
@@ -47,7 +33,7 @@ const HomePage = () => {
   return (
     <main className="relative isolate min-h-dvh flex flex-col items-center px-4 pt-page-top pb-10">
       <div
-        className="fixed inset-0 -z-10 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 -z-10 bg-cover bg-no-repeat bg-[position:75%_center]"
         style={{ backgroundImage: `url('${HOME_BACKGROUND}')` }}
       />
 
