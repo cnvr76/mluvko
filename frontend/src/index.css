@@ -1,26 +1,6 @@
 @import "tailwindcss";
 
-/*
-  Design tokens and the shared UI primitives of the site.
-
-  Layout of this file:
-    @theme            — tokens Tailwind turns into utilities (colors, breakpoints,
-                        radii, shadows, fluid type). Change a value here and it
-                        propagates everywhere; nothing outside this file should
-                        carry a raw hex, shadow or radius.
-    :root / body      — document-level defaults.
-    @layer components — composite primitives (glass surface, buttons, fields).
-                        They sit in the components layer on purpose, so any
-                        Tailwind utility at a call site wins over them:
-                        `surface-glass bg-white/20` is a valid override.
-*/
-
 @theme {
-  /* ---------- breakpoints ----------
-     Tailwind's own values, restated so the scale is visible and editable.
-     md is tablet portrait and lg is tablet landscape: a layout that only
-     branches at md leaves both tablet orientations on the phone or the
-     desktop variant, which is what this scale exists to prevent. */
   --breakpoint-sm: 40rem; /* 640px  — large phone, landscape phone */
   --breakpoint-md: 48rem; /* 768px  — tablet portrait */
   --breakpoint-lg: 64rem; /* 1024px — tablet landscape, small laptop */
@@ -61,19 +41,13 @@
   --color-surface: #fff7f2;
   --color-loading-bar: #1f0a94;
 
-  /* ---------- layout ----------
-     The header is fixed, so every page has to reserve room for it. Both the
-     bar and that reservation come from one token instead of the pt-16/24/28
-     guesses that used to be spread across the pages. */
   --spacing-header: clamp(4rem, 3.5rem + 2vw, 5rem);
   --spacing-page-top: calc(var(--spacing-header) + 1.5rem);
 
   /* ---------- radii ---------- */
   --radius-panel: 2rem; /* page-level containers and cards */
 
-  /* ---------- elevation ----------
-     Named by the role that casts the shadow, not by depth, so a redesign
-     can restyle "every field" or "every card" in one edit. */
+  /* ---------- elevation ---------- */
   --shadow-field: 0 4px 15px rgb(0 0 0 / 0.08);
   --shadow-panel: 0 4px 20px rgb(0 0 0 / 0.12);
   --shadow-control: 0 4px 20px rgb(0 0 0 / 0.15);
@@ -81,10 +55,7 @@
   --shadow-card: 0 10px 30px rgb(0 0 0 / 0.2);
   --shadow-accent: 0 4px 12px rgb(255 113 16 / 0.25);
 
-  /* ---------- fluid type ----------
-     Each step grows continuously between a 375px phone and a 1280px desktop,
-     so tablets land on an in-between size instead of snapping at one
-     breakpoint. `text-fluid-3xl` peaks at the static `text-3xl`. */
+  /* ---------- fluid type ---------- */
   --text-fluid-sm: clamp(0.875rem, 0.823rem + 0.22vw, 1rem);
   --text-fluid-sm--line-height: 1.5;
   --text-fluid-lg: clamp(1rem, 0.948rem + 0.22vw, 1.125rem);
@@ -104,13 +75,11 @@
 :root {
   font-family: "Rajdhani", sans-serif;
   font-weight: 500;
-  /* iOS inflates text on rotation unless this is pinned */
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--color-page-bg);
-  /* the site is a full-bleed illustration; grey flash on overscroll looks broken */
   overscroll-behavior-y: none;
 }
 
@@ -126,15 +95,10 @@ body {
 
 button {
   cursor: pointer;
-  /* touch devices otherwise paint a grey box over every tappable card */
   -webkit-tap-highlight-color: transparent;
 }
 
 @layer components {
-  /*
-    Frosted surface behind every card, panel and glass control.
-    Tint, border colour and shadow are overridable per call site.
-  */
   .surface-glass {
     background-color: rgb(255 255 255 / 0.3);
     border: 1px solid rgb(255 255 255 / 0.4);
@@ -143,10 +107,6 @@ button {
     box-shadow: var(--shadow-panel);
   }
 
-  /*
-    Pill button: shape and interaction only, no colour. Pair it with a fill
-    (`bg-accent text-white`) or with `surface-glass` for the glass variant.
-  */
   .btn-pill {
     display: inline-flex;
     align-items: center;
@@ -157,14 +117,11 @@ button {
     font-weight: 600;
     text-align: center;
     text-decoration: none;
-    transition-property: transform, background-color, border-color, color, opacity;
+    transition-property:
+      transform, background-color, border-color, color, opacity;
     transition-duration: 200ms;
   }
 
-  /*
-    Circular media button (play / record / skip). Sized fluidly instead of
-    snapping between a phone and a desktop size at one breakpoint.
-  */
   .btn-round {
     --btn-round-size: clamp(3.5rem, 2.75rem + 3vw, 5rem);
     display: inline-flex;
@@ -183,8 +140,6 @@ button {
     transform: scale(0.95);
   }
 
-  /* hover lift only where a pointer can actually hover, so a tap on a phone
-     does not leave the control stuck in its hover state */
   @media (hover: hover) {
     .btn-pill:hover:not(:disabled),
     .btn-round:hover:not(:disabled) {
@@ -199,10 +154,6 @@ button {
     transform: none;
   }
 
-  /*
-    Form field. Radius is deliberately left out: rounded-full for the auth and
-    profile forms, rounded-xl for the dense editor forms.
-  */
   .field {
     width: 100%;
     padding: 0.75rem 1.25rem;
@@ -228,7 +179,6 @@ button {
   }
 }
 
-/* sonner toasts, themed with the project palette (no new colors) */
 [data-sonner-toaster] {
   --normal-bg: #ffffff;
   --normal-border: rgb(100 47 55 / 0.25);
