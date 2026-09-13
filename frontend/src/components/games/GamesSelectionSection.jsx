@@ -8,7 +8,7 @@ const GamesSelectionSection = ({ children, backgroundImage }) => {
         w-full min-h-screen
         bg-cover bg-no-repeat bg-center
         flex flex-col
-        pt-24 pb-32 px-3
+        pt-page-top pb-32 px-3
       "
       style={{
         backgroundImage: `url("${backgroundImage}")`,

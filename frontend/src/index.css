@@ -61,6 +61,13 @@
   --color-surface: #fff7f2;
   --color-loading-bar: #1f0a94;
 
+  /* ---------- layout ----------
+     The header is fixed, so every page has to reserve room for it. Both the
+     bar and that reservation come from one token instead of the pt-16/24/28
+     guesses that used to be spread across the pages. */
+  --spacing-header: clamp(4rem, 3.5rem + 2vw, 5rem);
+  --spacing-page-top: calc(var(--spacing-header) + 1.5rem);
+
   /* ---------- radii ---------- */
   --radius-panel: 2rem; /* page-level containers and cards */
 

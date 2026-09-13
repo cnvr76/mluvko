@@ -83,7 +83,7 @@ const ProfilePage = () => {
       className="
         w-full h-screen
         bg-cover bg-no-repeat bg-center
-        px-4 pt-28 pb-12
+        px-4 pt-page-top pb-12
         
       "
       style={{

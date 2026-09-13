@@ -5,7 +5,7 @@ const SpecificGamePage = ({ children }) => {
   return (
     <main
       className="
-        w-screen h-screen overflow-hidden bg-no-repeat bg-cover bg-center px-3 pt-16 sm:pt-20
+        w-screen h-screen overflow-hidden bg-no-repeat bg-cover bg-center px-3 pt-header
         "
       style={{
         backgroundImage: `url('${APP_BACKGROUND}')`,

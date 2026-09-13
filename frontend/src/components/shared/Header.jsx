@@ -1,90 +1,134 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
+/*
+  Fixed site header.
+
+  The menu is defined once and rendered twice: inline from md up, inside a
+  disclosure panel below it. Only the container differs — the entries, their
+  labels and their targets have a single definition, so the two widths can no
+  longer drift apart the way they had (the phone menu used to list three dead
+  headings and offer no way to sign in at all).
+
+  Pending: "Kontakt" has no destination yet and is rendered as plain text.
+*/
+
+const ITEM_CLASS =
+  "text-fluid-2xl font-semibold text-text whitespace-nowrap transition-colors duration-200";
+
 const Header = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleMenu = () => setIsOpen((prev) => !prev);
-  const { isAuthenticated, logout } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, username, logout } = useAuth();
+  const location = useLocation();
+  const menuRef = useRef(null);
+
+  // a menu left open across a navigation hides the page it just opened
+  useEffect(() => setIsMenuOpen(false), [location.key]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    const closeOnOutsideClick = (event) => {
+      if (!menuRef.current?.contains(event.target)) setIsMenuOpen(false);
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+    document.addEventListener("pointerdown", closeOnOutsideClick);
+    return () => {
+      document.removeEventListener("keydown", closeOnEscape);
+      document.removeEventListener("pointerdown", closeOnOutsideClick);
+    };
+  }, [isMenuOpen]);
+
+  const menuItems = [
+    <span key="contact" className={ITEM_CLASS}>
+      Kontakt
+    </span>,
+
+    isAuthenticated ? (
+      <Link
+        key="account"
+        to="/profile"
+        className={`${ITEM_CLASS} no-underline hover:text-accent`}
+      >
+        Konto{username && ` (${username})`}
+      </Link>
+    ) : (
+      <Link
+        key="account"
+        to="/auth?type=signup"
+        className={`${ITEM_CLASS} no-underline hover:text-accent`}
+      >
+        Prihláste sa
+      </Link>
+    ),
+
+    isAuthenticated && (
+      <button
+        key="logout"
+        type="button"
+        onClick={logout}
+        className={`${ITEM_CLASS} flex items-center gap-2 hover:text-accent`}
+      >
+        <i className="fa-solid fa-right-from-bracket" aria-hidden="true" />
+        Odhlásiť sa
+      </button>
+    ),
+  ].filter(Boolean);
 
   return (
     <header
+      ref={menuRef}
       className="
-        fixed top-0 left-0
-        w-full h-16 md:h-20
-        flex items-center justify-between
-        px-4 py-3 md:px-6 md:py-6
-        z-50
-        bg-transparent
+        fixed inset-x-0 top-0 z-50
+        h-header
+        flex items-center justify-between gap-4
+        px-4 sm:px-6
       "
     >
-      <Link to="/">
-        <img src="/images/logo.png" alt="Logo" className="h-8 w-auto" />
+      <Link to="/" className="shrink-0">
+        <img
+          src="/images/logo.png"
+          alt="Mluvko"
+          className="h-7 sm:h-8 w-auto"
+        />
       </Link>
 
-      {/* desktop */}
-      <nav className="hidden md:flex gap-8 mr-4 font-[600] text-text">
-        <h3 className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-accent">
-          Kontakt
-        </h3>
-        <Link
-          to="/auth?type=signup"
-          className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-accent"
-        >
-          {isAuthenticated
-            ? `Konto (${localStorage.getItem("username")})`
-            : "Prihláste sa"}
-        </Link>
-        {isAuthenticated && (
-          <button
-            onClick={logout}
-            className="cursor-pointer hover:text-accent transition-colors duration-300"
-          >
-            <i className="fa-solid fa-right-from-bracket text-2xl"></i>
-          </button>
-        )}
+      <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+        {menuItems}
       </nav>
 
-      {/* burger */}
       <button
         type="button"
-        onClick={toggleMenu}
-        className="md:hidden flex flex-col gap-1.5 mr-1"
-        aria-label="Otvoriť menu"
+        onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
+        className="md:hidden flex flex-col justify-center gap-1.5 p-2 -mr-2"
+        aria-label={isMenuOpen ? "Zavrieť menu" : "Otvoriť menu"}
+        aria-expanded={isMenuOpen}
+        aria-controls="site-menu"
       >
         <span className="w-6 h-0.5 bg-text rounded-full" />
         <span className="w-6 h-0.5 bg-text rounded-full" />
         <span className="w-6 h-0.5 bg-text rounded-full" />
       </button>
 
-      {/* mobile dropdown */}
-      {isOpen && (
+      {isMenuOpen && (
         <nav
+          id="site-menu"
           className="
             md:hidden
-            absolute top-full right-0 mt-2 mr-4
-            bg-white/90 backdrop-blur-xl
-            rounded-2xl shadow-control
-            flex flex-col items-start gap-3
-            px-5 py-4 font-[600]
+            absolute top-full right-4
+            surface-glass bg-white/80
+            rounded-panel shadow-control
+            flex flex-col items-stretch gap-3
+            px-5 py-4
+            max-w-[calc(100vw-2rem)]
           "
         >
-          <button
-            onClick={() => setIsOpen(false)}
-            className="self-end text-sm text-text"
-          >
-            ✕
-          </button>
-
-          <h3 className="text-lg text-text m-0 hover:text-accent">
-            Aktuality
-          </h3>
-          <h3 className="text-lg text-text m-0 hover:text-accent">
-            Všetky hry
-          </h3>
-          <h3 className="text-lg text-text m-0 hover:text-accent">
-            Kontakt
-          </h3>
+          {menuItems}
         </nav>
       )}
     </header>

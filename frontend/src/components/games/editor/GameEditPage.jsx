@@ -47,7 +47,7 @@ const GameEditPage = () => {
         className="
         relative isolate
         w-full min-h-screen
-        px-4 pt-28 pb-12
+        px-4 pt-page-top pb-12
       "
       >
         <div
@@ -86,7 +86,7 @@ const GameEditPage = () => {
       className="
         relative isolate
         w-full min-h-screen
-        px-4 pt-28 pb-12
+        px-4 pt-page-top pb-12
       "
     >
       <div
