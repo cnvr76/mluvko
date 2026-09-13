@@ -11,11 +11,11 @@ const RoleRequestPanel = () => {
   return (
     <div
       className="
-        rounded-[2rem]
+        rounded-panel
         bg-white/30
         backdrop-blur-xl
         border border-white/40
-        shadow-[0_4px_20px_rgba(0,0,0,0.12)]
+        shadow-panel
         p-6
         flex flex-col gap-4
       "
@@ -37,7 +37,7 @@ const RoleRequestPanel = () => {
             bg-white/50
             border border-white/60
             px-5 py-4
-            text-[#642f37]
+            text-text
             font-semibold
           "
         >
@@ -73,11 +73,11 @@ const RoleRequestPanel = () => {
               self-start
               px-8 py-3
               rounded-full
-              bg-[#ff7110]
-              hover:bg-[#e9650c]
+              bg-accent
+              hover:bg-accent-hover
               text-white
               font-bold text-lg
-              shadow-[0_4px_12px_rgba(255,113,16,0.25)]
+              shadow-accent
               transition-all duration-200
               hover:scale-105
               active:scale-95

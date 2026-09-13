@@ -94,15 +94,15 @@ const ProfilePage = () => {
         className="
           w-full max-w-6xl mx-auto
           h-[78vh]
-          rounded-[2rem]
+          rounded-panel
           bg-white/30
           backdrop-blur-xl
           border border-white/40
-          shadow-[0_4px_30px_rgba(0,0,0,0.18)]
+          shadow-panel-strong
           p-5 md:p-8
           grid grid-cols-1 md:grid-cols-[260px_1fr]
           gap-6
-          text-[#642f37]
+          text-text
           overflow-hidden
           items-start
           
@@ -130,7 +130,7 @@ const ProfilePage = () => {
                 transition-all duration-200
                 ${
                   activeTab === tab.id
-                    ? "bg-white/50 shadow-[0_4px_15px_rgba(0,0,0,0.12)] text-[#ff7110]"
+                    ? "bg-white/50 shadow-panel text-accent"
                     : "bg-white/20 hover:bg-white/40"
                 }
               `}

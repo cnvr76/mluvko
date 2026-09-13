@@ -14,14 +14,14 @@ const FavoriteGames = () => {
 
         <div
           className="
-          rounded-[2rem]
+          rounded-panel
           bg-white/30
           backdrop-blur-xl
           border border-white/40
-          shadow-[0_4px_20px_rgba(0,0,0,0.12)]
+          shadow-panel
           p-8
           text-center
-          text-[#642f37]
+          text-text
           font-semibold
         "
         >
@@ -38,13 +38,13 @@ const FavoriteGames = () => {
 
         <div
           className="
-            rounded-[2rem]
+            rounded-panel
             bg-white/30
             backdrop-blur-xl
             border border-white/40
             p-10
             text-center
-            text-[#642f37]
+            text-text
           "
         >
           <p className="text-xl font-bold mb-2">
@@ -62,8 +62,8 @@ const FavoriteGames = () => {
               inline-block
               px-6 py-3
               rounded-xl
-              bg-[#ff7110]
-              hover:bg-[#e9650c]
+              bg-accent
+              hover:bg-accent-hover
               text-white
               font-bold
               no-underline

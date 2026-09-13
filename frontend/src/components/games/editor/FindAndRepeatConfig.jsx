@@ -60,7 +60,7 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
 
         <button
           onClick={addLevel}
-          className="px-5 py-2.5 rounded-xl bg-[#ff7110] hover:bg-[#e9650c] text-white font-bold transition-all duration-200"
+          className="px-5 py-2.5 rounded-xl bg-accent hover:bg-accent-hover text-white font-bold transition-all duration-200"
         >
           + Pridať úroveň
         </button>
@@ -94,7 +94,7 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
       </div>
 
       {levels.length === 0 && (
-        <div className="text-center py-10 text-[#642f37]/60 bg-white/40 rounded-2xl border border-white/40">
+        <div className="text-center py-10 text-text/60 bg-white/40 rounded-2xl border border-white/40">
           <p className="font-bold">Zatiaľ žiadne úrovne</p>
           <p className="text-sm">Pridajte úroveň a do nej kartičky.</p>
         </div>
@@ -112,11 +112,11 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
               {/* sticky header so the controls stay reachable in long levels */}
               <div className="sticky top-24 z-10 flex flex-wrap justify-between items-center gap-2 bg-white/85 backdrop-blur-md rounded-xl px-3 py-2 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <span className="bg-[#642f37] text-white px-4 py-1.5 rounded-full text-sm font-bold">
+                  <span className="bg-text text-white px-4 py-1.5 rounded-full text-sm font-bold">
                     Úroveň {levelIndex + 1}
                   </span>
 
-                  <label className="flex items-center gap-1.5 text-sm font-semibold text-[#642f37]/80">
+                  <label className="flex items-center gap-1.5 text-sm font-semibold text-text/80">
                     Etáp:
                     <input
                       type="number"
@@ -131,7 +131,7 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
                             v === "" ? null : Math.max(1, parseInt(v, 10) || 1),
                         });
                       }}
-                      className="w-16 border border-[#642f37]/30 bg-white rounded-lg px-2 py-1 text-center text-[#642f37] outline-none focus:border-[#ff7110]"
+                      className="w-16 border border-text/30 bg-white rounded-lg px-2 py-1 text-center text-text outline-none focus:border-accent"
                       title="Koľko etáp z tejto úrovne hrať (prázdne = všetky kartičky)"
                     />
                   </label>
@@ -140,13 +140,13 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => addCard(levelIndex)}
-                    className="px-4 py-2 rounded-xl bg-[#ff7110] hover:bg-[#e9650c] text-white text-sm font-bold transition-all duration-200"
+                    className="px-4 py-2 rounded-xl bg-accent hover:bg-accent-hover text-white text-sm font-bold transition-all duration-200"
                   >
                     + Pridať kartu
                   </button>
                   <button
                     onClick={() => removeLevel(levelIndex)}
-                    className="px-4 py-2 rounded-xl bg-[#ffe5e5] hover:bg-[#ffd6d6] text-[#d62828] text-sm font-bold transition-all duration-200"
+                    className="px-4 py-2 rounded-xl bg-danger-bg hover:bg-danger-bg-hover text-danger text-sm font-bold transition-all duration-200"
                   >
                     Vymazať úroveň
                   </button>
@@ -154,7 +154,7 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
               </div>
 
               {cards.length === 0 ? (
-                <p className="text-sm text-[#642f37]/60 italic px-1">
+                <p className="text-sm text-text/60 italic px-1">
                   Pridajte kartičky do tejto úrovne.
                 </p>
               ) : (
@@ -174,11 +174,11 @@ const FindAndRepeatConfig = ({ configData, onChange }) => {
                       {/* Ľavý stĺpec: text a obrázok */}
                       <div className="flex flex-col gap-3">
                         <div className="flex gap-2">
-                          <span className="bg-[#ff7110] text-white px-3 py-1 rounded-full text-xs flex items-center font-bold">
+                          <span className="bg-accent text-white px-3 py-1 rounded-full text-xs flex items-center font-bold">
                             #{card.card_id}
                           </span>
                           <input
-                            className="flex-1 border-b-2 border-[#642f37] focus:border-[#ff7110] outline-none p-1 font-bold text-lg text-[#642f37]"
+                            className="flex-1 border-b-2 border-text focus:border-accent outline-none p-1 font-bold text-lg text-text"
                             placeholder="Slovo / veta (napr. ryba)"
                             value={card.name}
                             onChange={(e) =>

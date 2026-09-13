@@ -13,10 +13,10 @@ const PersonalDetails = ({ data }) => {
     bg-white/50
     border border-white/60
     px-5 py-3
-    text-[#642f37]
-    placeholder:text-[#642f37]/60
+    text-text
+    placeholder:text-text/60
     outline-none
-    shadow-[0_4px_15px_rgba(0,0,0,0.08)]
+    shadow-field
     focus:bg-white/70
   `;
 
@@ -26,11 +26,11 @@ const PersonalDetails = ({ data }) => {
 
       <div
         className="
-          rounded-[2rem]
+          rounded-panel
           bg-white/30
           backdrop-blur-xl
           border border-white/40
-          shadow-[0_4px_20px_rgba(0,0,0,0.12)]
+          shadow-panel
           p-6
           flex flex-col gap-5
         "
@@ -87,19 +87,19 @@ const PersonalDetails = ({ data }) => {
             bg-white/40
             backdrop-blur-xl
             border border-white/50
-            shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+            shadow-control
             font-semibold text-lg
-            text-[#642f37]
+            text-text
             transition-all duration-200
             hover:scale-105
             active:scale-95
             hover:bg-white/50
-            hover:text-[#ff7110]
+            hover:text-accent
             disabled:opacity-50
             disabled:cursor-not-allowed
             disabled:hover:scale-100
             disabled:hover:bg-white/40
-            disabled:hover:text-[#642f37]
+            disabled:hover:text-text
           "
         >
           {saving ? "Ukladám..." : "Uložiť zmeny"}

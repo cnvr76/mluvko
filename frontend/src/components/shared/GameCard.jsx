@@ -56,7 +56,7 @@ const GameCard = ({ data, onFavoriteToggle }) => {
             rounded-3xl p-4
             bg-white/20
             border border-white/30
-            shadow-[0_10px_30px_rgba(0,0,0,0.2)]
+            shadow-card
             flex flex-col items-center justify-between
           "
         >

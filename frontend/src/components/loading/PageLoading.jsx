@@ -53,11 +53,11 @@ const PageLoading = () => {
         fixed top-0 left-0 w-screen h-screen
         z-50
         flex flex-col items-center justify-center
-        bg-[#9fdcff]
+        bg-page-bg
         "
       >
         <div className="relative w-72 h-24">
-          <div className="absolute bottom-6 w-64 h-2 rounded-full bg-[#1f0a94]" />
+          <div className="absolute bottom-6 w-64 h-2 rounded-full bg-loading-bar" />
 
           <img
             src="/images/duck.png"

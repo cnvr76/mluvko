@@ -29,14 +29,14 @@ const GameEditPage = () => {
   const isMediaReady = useMediaReady(EDITOR_MEDIA);
 
   const inputClassName = `
-    border border-[#642f37]/30
+    border border-text/30
     bg-white/70
     rounded-xl
     px-4 py-3
     outline-none
-    text-[#642f37]
+    text-text
     focus:ring-2
-    focus:ring-[#F3904B]
+    focus:ring-accent-soft
   `;
 
   if (!isMediaReady) return <PageLoading />;
@@ -63,13 +63,13 @@ const GameEditPage = () => {
         <div
           className="
           w-full max-w-5xl mx-auto
-          rounded-[2rem]
+          rounded-panel
           bg-white/30
           backdrop-blur-xl
           border border-white/40
           p-10
           text-center
-          text-[#642f37]
+          text-text
           font-semibold
         "
         >
@@ -101,14 +101,14 @@ const GameEditPage = () => {
       <div
         className="
           w-full max-w-5xl mx-auto
-          rounded-[2rem]
+          rounded-panel
           bg-white/30
           backdrop-blur-xl
           border border-white/40
-          shadow-[0_4px_30px_rgba(0,0,0,0.18)]
+          shadow-panel-strong
           p-6 md:p-8
           flex flex-col gap-6
-          text-[#642f37]
+          text-text
         "
       >
         <h1 className="text-3xl font-extrabold drop-shadow">
@@ -117,7 +117,7 @@ const GameEditPage = () => {
 
         <section
           className="
-            rounded-[2rem]
+            rounded-panel
             bg-white/40
             border border-white/50
             p-6
@@ -176,7 +176,7 @@ const GameEditPage = () => {
 
         <section
           className="
-            rounded-[2rem]
+            rounded-panel
             bg-white/40
             border border-white/50
             p-6
@@ -206,14 +206,14 @@ const GameEditPage = () => {
               bg-white/50
               backdrop-blur-xl
               border border-white/60
-              shadow-[0_4px_20px_rgba(0,0,0,0.12)]
-              text-[#642f37]
+              shadow-panel
+              text-text
               text-xl
               font-bold
               transition-all duration-200
               hover:bg-white/70
-              hover:text-[#ff7110]
-              disabled:opacity-50 disabled:hover:bg-white/50 disabled:hover:text-[#642f37] disabled:cursor-default
+              hover:text-accent
+              disabled:opacity-50 disabled:hover:bg-white/50 disabled:hover:text-text disabled:cursor-default
             "
           >
             {saving ? "Ukladám..." : "Uložiť zmeny"}
@@ -226,13 +226,13 @@ const GameEditPage = () => {
             className="
               px-12 py-5
               rounded-full
-              bg-[#ff7110]
-              hover:bg-[#e9650c]
+              bg-accent
+              hover:bg-accent-hover
               text-white
               text-xl
               font-bold
               no-underline
-              shadow-[0_4px_20px_rgba(255,113,16,0.25)]
+              shadow-accent
               transition-all duration-200
             "
           >

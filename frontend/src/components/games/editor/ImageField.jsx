@@ -12,15 +12,15 @@ import {
 //   2) file upload from the user's computer — odložené ako PendingFile,
 //      skutočný upload prebehne až pri „Uložiť zmeny" v GameEditPage.
 const DEFAULT_INPUT_CLASS = `
-  border border-[#642f37]/30
+  border border-text/30
   bg-white/70
   rounded-lg
   px-3 py-2
   text-sm
-  text-[#642f37]
+  text-text
   outline-none
-  focus:border-[#ff7110]
-  placeholder:text-[#642f37]/40
+  focus:border-accent
+  placeholder:text-text/40
 `;
 
 const ImageField = ({
@@ -91,9 +91,9 @@ const ImageField = ({
             className="
               shrink-0
               rounded-lg
-              bg-[#ffe5e5]
-              hover:bg-[#ffd6d6]
-              text-[#d62828]
+              bg-danger-bg
+              hover:bg-danger-bg-hover
+              text-danger
               text-[0.9rem]
               font-semibold
               transition-all duration-200

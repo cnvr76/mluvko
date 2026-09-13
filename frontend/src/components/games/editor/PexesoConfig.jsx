@@ -32,14 +32,14 @@ const PexesoConfig = ({ configData, onChange }) => {
 
   const inputClassName = `
     border
-    border-[#642f37]
+    border-text
     bg-white/70
     p-3
     rounded-xl
-    text-[#642f37]
+    text-text
     outline-none
-    placeholder:text-[#642f37]/40
-    focus:border-[#ff7110]
+    placeholder:text-text/40
+    focus:border-accent
   `;
 
   return (
@@ -54,7 +54,7 @@ const PexesoConfig = ({ configData, onChange }) => {
           border border-white/40
         "
       >
-        <h3 className="text-xl font-bold text-[#642f37]">
+        <h3 className="text-xl font-bold text-text">
           Kartičky Pexesa
         </h3>
 
@@ -63,8 +63,8 @@ const PexesoConfig = ({ configData, onChange }) => {
           className="
             px-5 py-2.5
             rounded-xl
-            bg-[#ff7110]
-            hover:bg-[#e9650c]
+            bg-accent
+            hover:bg-accent-hover
             text-white
             font-bold
             transition-all duration-200
@@ -85,7 +85,7 @@ const PexesoConfig = ({ configData, onChange }) => {
               bg-white/75
               backdrop-blur-md
               border border-white/40
-              shadow-[0_4px_20px_rgba(0,0,0,0.08)]
+              shadow-field
               flex flex-col gap-3
             "
           >
@@ -109,7 +109,7 @@ const PexesoConfig = ({ configData, onChange }) => {
               <input
                 className="
                   w-16
-                  border border-[#642f37]/30
+                  border border-text/30
                   bg-white/70
                   p-3
                   rounded-xl

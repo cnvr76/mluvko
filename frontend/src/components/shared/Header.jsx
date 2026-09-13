@@ -23,13 +23,13 @@ const Header = () => {
       </Link>
 
       {/* desktop */}
-      <nav className="hidden md:flex gap-8 mr-4 font-[600] text-[#642f37]">
-        <h3 className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]">
+      <nav className="hidden md:flex gap-8 mr-4 font-[600] text-text">
+        <h3 className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-accent">
           Kontakt
         </h3>
         <Link
           to="/auth?type=signup"
-          className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]"
+          className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-accent"
         >
           {isAuthenticated
             ? `Konto (${localStorage.getItem("username")})`
@@ -38,7 +38,7 @@ const Header = () => {
         {isAuthenticated && (
           <button
             onClick={logout}
-            className="cursor-pointer hover:text-[#ff7110] transition-colors duration-300"
+            className="cursor-pointer hover:text-accent transition-colors duration-300"
           >
             <i className="fa-solid fa-right-from-bracket text-2xl"></i>
           </button>
@@ -52,9 +52,9 @@ const Header = () => {
         className="md:hidden flex flex-col gap-1.5 mr-1"
         aria-label="Otvoriť menu"
       >
-        <span className="w-6 h-0.5 bg-[#642f37] rounded-full" />
-        <span className="w-6 h-0.5 bg-[#642f37] rounded-full" />
-        <span className="w-6 h-0.5 bg-[#642f37] rounded-full" />
+        <span className="w-6 h-0.5 bg-text rounded-full" />
+        <span className="w-6 h-0.5 bg-text rounded-full" />
+        <span className="w-6 h-0.5 bg-text rounded-full" />
       </button>
 
       {/* mobile dropdown */}
@@ -64,25 +64,25 @@ const Header = () => {
             md:hidden
             absolute top-full right-0 mt-2 mr-4
             bg-white/90 backdrop-blur-xl
-            rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+            rounded-2xl shadow-control
             flex flex-col items-start gap-3
             px-5 py-4 font-[600]
           "
         >
           <button
             onClick={() => setIsOpen(false)}
-            className="self-end text-sm text-[#642f37]"
+            className="self-end text-sm text-text"
           >
             ✕
           </button>
 
-          <h3 className="text-lg text-[#642f37] m-0 hover:text-[#ff7110]">
+          <h3 className="text-lg text-text m-0 hover:text-accent">
             Aktuality
           </h3>
-          <h3 className="text-lg text-[#642f37] m-0 hover:text-[#ff7110]">
+          <h3 className="text-lg text-text m-0 hover:text-accent">
             Všetky hry
           </h3>
-          <h3 className="text-lg text-[#642f37] m-0 hover:text-[#ff7110]">
+          <h3 className="text-lg text-text m-0 hover:text-accent">
             Kontakt
           </h3>
         </nav>

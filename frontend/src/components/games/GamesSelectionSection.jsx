@@ -45,15 +45,15 @@ const GamesSelectionSection = ({ children, backgroundImage }) => {
             bg-white/30
             backdrop-blur-xl
             border border-white/40
-            shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+            shadow-control
             font-semibold text-lg
             no-underline
-            text-[#642f37]
+            text-text
             transition-all duration-200
             hover:scale-105
             active:scale-95
             hover:bg-white/40
-            hover:text-[#ff7110]
+            hover:text-accent
           "
         >
           Alebo späť

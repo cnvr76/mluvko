@@ -40,13 +40,13 @@ const AdminDashboard = () => {
 
         <div
           className="
-            rounded-[2rem]
+            rounded-panel
             bg-white/30
             backdrop-blur-xl
             border border-white/40
             p-10
             text-center
-            text-[#642f37]
+            text-text
             font-semibold
           "
         >
@@ -69,8 +69,8 @@ const AdminDashboard = () => {
                 onClick={() => setStatusFilter(status)}
                 className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                   statusFilter === status
-                    ? "bg-[#F3904B] text-white "
-                    : "text-gray-500 hover:text-[#ff7110] hover:bg-white"
+                    ? "bg-accent-soft text-white "
+                    : "text-gray-500 hover:text-accent hover:bg-white"
                 }`}
               >
                 {status.toUpperCase()}
@@ -94,7 +94,7 @@ const AdminDashboard = () => {
                     key={snapshot.id}
                     className="
                       bg-white
-                      border border-[#642f37]/40
+                      border border-text/40
                       rounded-xl
                       p-4
                       shadow-sm
@@ -138,8 +138,8 @@ const AdminDashboard = () => {
                         className="
                           px-4 py-2
                           rounded-xl
-                          bg-[#a5ad24]
-                          hover:bg-[#92991f]
+                          bg-success
+                          hover:bg-success-hover
                           text-white
                           text-sm
                           font-semibold
@@ -162,8 +162,8 @@ const AdminDashboard = () => {
                             className="
                               px-4 py-2
                               rounded-xl
-                              bg-[#a5ad24]
-                              hover:bg-[#92991f]
+                              bg-success
+                              hover:bg-success-hover
                               text-white
                               text-sm
                               font-semibold
@@ -191,9 +191,9 @@ const AdminDashboard = () => {
                             className="
                               px-4 py-2
                               rounded-xl
-                              bg-[#ffe5e5]
-                              hover:bg-[#ffd6d6]
-                              text-[#d62828]
+                              bg-danger-bg
+                              hover:bg-danger-bg-hover
+                              text-danger
                               text-sm
                               font-semibold
                               transition-all duration-200
@@ -222,8 +222,8 @@ const AdminDashboard = () => {
                           className="
                             px-4 py-2
                             rounded-xl
-                            bg-[#9DBBD8]
-                            hover:bg-[#8aaed0]
+                            bg-blue
+                            hover:bg-blue-hover
                             text-white
                             text-sm
                             font-semibold
@@ -247,8 +247,8 @@ const AdminDashboard = () => {
                           className="
                             px-4 py-2
                             rounded-xl
-                            bg-[#B89DBB]
-                            hover:bg-[#a98ead]
+                            bg-lavender
+                            hover:bg-lavender-hover
                             text-white
                             text-sm
                             font-semibold
@@ -278,8 +278,8 @@ const AdminDashboard = () => {
                             className="
                               px-4 py-2
                               rounded-xl
-                              bg-[#F3904B]
-                              hover:bg-[#e67e36]
+                              bg-accent-soft
+                              hover:bg-accent-soft-hover
                               text-white
                               text-sm
                               font-semibold
@@ -302,9 +302,9 @@ const AdminDashboard = () => {
                         className="
                           px-4 py-2
                           rounded-xl
-                          bg-[#ffe5e5]
-                          hover:bg-[#ffd6d6]
-                          text-[#d62828]
+                          bg-danger-bg
+                          hover:bg-danger-bg-hover
+                          text-danger
                           text-sm
                           font-semibold
                           transition-all duration-200
@@ -323,9 +323,9 @@ const AdminDashboard = () => {
             className="
             text-center
             py-20
-            text-[#642f37]/60
+            text-text/60
             bg-white/40
-            rounded-[2rem]
+            rounded-panel
             border border-white/40
             backdrop-blur-xl
           "

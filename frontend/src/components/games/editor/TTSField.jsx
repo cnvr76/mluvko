@@ -67,8 +67,8 @@ const TTSField = ({
           className="
             px-3 py-1.5
             rounded-xl
-            bg-[#ff7110]
-            hover:bg-[#e9650c]
+            bg-accent
+            hover:bg-accent-hover
             text-white
             transition-all duration-200
             disabled:opacity-50
@@ -94,9 +94,9 @@ const TTSField = ({
               shrink-0
               px-3 py-2
               rounded-lg
-              bg-[#ffe5e5]
-              hover:bg-[#ffd6d6]
-              text-[#d62828]
+              bg-danger-bg
+              hover:bg-danger-bg-hover
+              text-danger
               text-xs
               font-semibold
               transition-all duration-200

@@ -24,7 +24,7 @@ const AnimalCard = ({ gameData, currentScore }) => {
       bg-white/20
       backdrop-blur-xl
       border border-white/30
-      shadow-[0_10px_30px_rgba(0,0,0,0.2)]
+      shadow-card
       flex flex-col md:flex-row
       px-4 md:px-8          
       py-4 md:py-6
@@ -42,15 +42,15 @@ const AnimalCard = ({ gameData, currentScore }) => {
       </div>
 
       <div className="flex flex-col flex-1 justify-center gap-3 md:gap-4">
-        <h2 className="text-2xl md:text-4xl font-semibold text-[#642f37]">
+        <h2 className="text-2xl md:text-4xl font-semibold text-text">
           Ako hovorí {gameData?.animal_name}?
         </h2>
 
-        <div className="text-3xl md:text-5xl font-bold text-[#642f37]">
+        <div className="text-3xl md:text-5xl font-bold text-text">
           {gameData?.display_text}
         </div>
 
-        <div className="text-lg md:text-2xl font-semibold text-[#642f37]">
+        <div className="text-lg md:text-2xl font-semibold text-text">
           {currentScore}/100%
         </div>
 

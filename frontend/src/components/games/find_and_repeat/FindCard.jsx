@@ -13,8 +13,8 @@ const FindCard = ({ card, onClick, disabled, highlighted }) => {
         bg-white/30
         backdrop-blur-xl
         border
-        ${highlighted ? "border-[#ff7110] ring-4 ring-[#ff7110]/40" : "border-white/40"}
-        shadow-[0_10px_30px_rgba(0,0,0,0.18)]
+        ${highlighted ? "border-accent ring-4 ring-accent/40" : "border-white/40"}
+        shadow-card
         flex items-center justify-center
         p-4 md:p-6
         transition-all duration-200

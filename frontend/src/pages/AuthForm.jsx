@@ -37,10 +37,10 @@ const AuthForm = () => {
     bg-white/50
     border border-white/60
     px-5 py-3
-    text-[#642f37]
-    placeholder:text-[#642f37]/60
+    text-text
+    placeholder:text-text/60
     outline-none
-    shadow-[0_4px_15px_rgba(0,0,0,0.08)]
+    shadow-field
     focus:bg-white/70
   `;
 
@@ -51,14 +51,14 @@ const AuthForm = () => {
     bg-white/40
     backdrop-blur-xl
     border border-white/50
-    shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+    shadow-control
     font-semibold text-xl
-    text-[#642f37]
+    text-text
     transition-all duration-200
     hover:scale-105
     active:scale-95
     hover:bg-white/50
-    hover:text-[#ff7110]
+    hover:text-accent
     disabled:opacity-60
   `;
 
@@ -66,9 +66,9 @@ const AuthForm = () => {
     bg-transparent
     border-none
     font-semibold
-    text-[#ff7110]
+    text-accent
     cursor-pointer
-    hover:text-[#642f37]
+    hover:text-text
   `;
 
   const handleChange = (e) => {
@@ -124,14 +124,14 @@ const AuthForm = () => {
       <section
         className="
           w-full max-w-md
-          rounded-[2rem]
+          rounded-panel
           bg-white/30
           backdrop-blur-xl
           border border-white/40
-          shadow-[0_4px_30px_rgba(0,0,0,0.18)]
+          shadow-panel-strong
           px-8 py-10
           text-center
-          text-[#642f37]
+          text-text
         "
       >
         <h2 className="text-3xl font-extrabold mb-8 drop-shadow">
@@ -199,7 +199,7 @@ const AuthForm = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-[#642f37]">
+        <div className="mt-6 text-center text-text">
           {isLoginMode ? "Nemáte účet? " : "Už máte účet? "}
 
           <button

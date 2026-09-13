@@ -37,14 +37,14 @@ const CreatedGames = () => {
 
         <div
           className="
-            rounded-[2rem]
+            rounded-panel
             bg-white/30
             backdrop-blur-xl
             border border-white/40
-            shadow-[0_4px_20px_rgba(0,0,0,0.12)]
+            shadow-panel
             p-10
             text-center
-            text-[#642f37]
+            text-text
             font-semibold
           "
         >
@@ -66,8 +66,8 @@ const CreatedGames = () => {
             className="
             px-5 py-2.5
             rounded-xl
-            bg-[#ff7110]
-            hover:bg-[#e9650c]
+            bg-accent
+            hover:bg-accent-hover
             text-white
             font-bold
             transition-all duration-200
@@ -79,13 +79,13 @@ const CreatedGames = () => {
 
         <div
           className="
-          rounded-[2rem]
+          rounded-panel
           bg-white/30
           backdrop-blur-xl
           border border-white/40
           p-10
           text-center
-          text-[#642f37]
+          text-text
         "
         >
           <p className="text-xl font-bold mb-2">
@@ -101,8 +101,8 @@ const CreatedGames = () => {
             className="
             px-6 py-3
             rounded-xl
-            bg-[#ff7110]
-            hover:bg-[#e9650c]
+            bg-accent
+            hover:bg-accent-hover
             text-white
             font-bold
             transition-all duration-200
@@ -127,11 +127,11 @@ const CreatedGames = () => {
           className="
             px-5 py-2.5
             rounded-xl
-            bg-[#ff7110]
-            hover:bg-[#e9650c]
+            bg-accent
+            hover:bg-accent-hover
             text-white
             font-bold
-            shadow-[0_4px_12px_rgba(255,113,16,0.25)]
+            shadow-accent
             transition-all duration-200
           "
         >
@@ -154,7 +154,7 @@ const CreatedGames = () => {
               key={game.id}
               className="
                 p-4
-                border border-[#642f37]/40
+                border border-text/40
                 rounded-lg
                 shadow-sm
                 bg-white
@@ -179,12 +179,12 @@ const CreatedGames = () => {
                     value={selectedSnapshotId}
                     onChange={(e) => selectVersion(game.id, e.target.value)}
                     className="
-                      border border-[#642f37]/50
+                      border border-text/50
                       rounded-lg
                       p-2
                       text-sm
                       bg-white
-                      text-[#642f37]
+                      text-text
                     "
                   >
                     {[...game.versions]
@@ -194,8 +194,8 @@ const CreatedGames = () => {
                           key={v.id}
                           value={v.id}
                           style={{
-                            backgroundColor: "#fff7f2",
-                            color: "#642f37",
+                            backgroundColor: "var(--color-surface)",
+                            color: "var(--color-text)",
                           }}
                         >
                           v{v.version} - {v.status.toUpperCase()}
@@ -245,14 +245,14 @@ const CreatedGames = () => {
                   </div>
                 )}
 
-              <div className="flex gap-2 mt-4 pt-3 border-t border-[#642f37]/40 justify-end">
+              <div className="flex gap-2 mt-4 pt-3 border-t border-text/40 justify-end">
                 <Link
                   to={`/games/${game.id}/${currentVersion.game_type}?snapshot=${currentVersion.id}`}
                   className="
                     px-4 py-2
                     rounded-xl
-                    bg-[#F3904B]
-                    hover:bg-[#e67e36]
+                    bg-accent-soft
+                    hover:bg-accent-soft-hover
                     text-white
                     font-semibold
                     transition-all duration-200
@@ -266,8 +266,8 @@ const CreatedGames = () => {
                   className="
                     px-5 py-2
                     rounded-xl
-                    bg-[#F7C767]
-                    hover:bg-[#efbb50]
+                    bg-yellow
+                    hover:bg-yellow-hover
                     text-white
                     font-semibold
                     transition-all duration-200
@@ -284,8 +284,8 @@ const CreatedGames = () => {
                     className="
                       px-6 py-2
                       rounded-xl
-                      bg-[#B89DBB]
-                      hover:bg-[#a98ead]
+                      bg-lavender
+                      hover:bg-lavender-hover
                       text-white
                       font-semibold
                       transition-all duration-200
@@ -301,8 +301,8 @@ const CreatedGames = () => {
                     className="
                       px-6 py-2
                       rounded-xl
-                      bg-[#9DBBD8]
-                      hover:bg-[#8aaed0]
+                      bg-blue
+                      hover:bg-blue-hover
                       text-white
                       font-semibold
                       transition-all duration-200
@@ -317,9 +317,9 @@ const CreatedGames = () => {
                   className="
                     px-5 py-2
                     rounded-xl
-                    bg-[#ffe5e5]
-                    hover:bg-[#ffd6d6]
-                    text-[#d62828]
+                    bg-danger-bg
+                    hover:bg-danger-bg-hover
+                    text-danger
                     font-semibold
                     transition-all duration-200
                   "

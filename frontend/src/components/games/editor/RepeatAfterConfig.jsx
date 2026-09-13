@@ -52,13 +52,13 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
             className="
             w-15
   border
-  border-[#ff7110]
+  border-accent
   bg-white/70
   p-2
   rounded-xl
   text-center
   font-bold
-  text-[#642f37]
+  text-text
   outline-none"
             value={threshold}
             onChange={(e) =>
@@ -73,8 +73,8 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
             className="
             px-5 py-2.5
             rounded-xl
-            bg-[#ff7110]
-            hover:bg-[#e9650c]
+            bg-accent
+            hover:bg-accent-hover
             text-white
             font-bold
             transition-all duration-200
@@ -96,7 +96,7 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
             bg-white/75
             backdrop-blur-md
             border border-white/40
-            shadow-[0_4px_20px_rgba(0,0,0,0.08)]
+            shadow-field
             grid grid-cols-1 md:grid-cols-2 gap-4"
           >
             <button
@@ -110,7 +110,7 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
             <div className="flex flex-col gap-4">
               <div className="flex gap-2">
                 <span
-                  className="  bg-[#ff7110]
+                  className="  bg-accent
                 text-white
                   px-3 py-1
                   rounded-full
@@ -121,7 +121,7 @@ const RepeatAfterConfig = ({ configData, onChange }) => {
                   #{card.card_id}
                 </span>
                 <input
-                  className="  flex-1 border-b-2 border-[#642f37] focus:border-[#ff7110] outline-none p-1 font-bold  text-lg  text-[#642f37]"
+                  className="  flex-1 border-b-2 border-text focus:border-accent outline-none p-1 font-bold  text-lg  text-text"
                   placeholder="Názov zvieratka"
                   value={card.animal_name}
                   onChange={(e) =>

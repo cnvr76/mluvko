@@ -30,7 +30,7 @@ const ROUND_BTN = `
   bg-white/30
   backdrop-blur-xl
   border border-white/40
-  shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+  shadow-control
   flex items-center justify-center
   transition-all duration-200
   hover:scale-105 active:scale-95 cursor-pointer
@@ -46,7 +46,7 @@ const TargetCard = ({ card }) => (
       bg-white/20
       backdrop-blur-xl
       border border-white/30
-      shadow-[0_10px_30px_rgba(0,0,0,0.2)]
+      shadow-card
       flex flex-col items-center
       px-6 py-5 gap-3
     "
@@ -56,7 +56,7 @@ const TargetCard = ({ card }) => (
       alt={card.name}
       className="h-32 md:h-44 object-contain drop-shadow-lg"
     />
-    <span className="text-2xl md:text-3xl font-bold text-[#642f37]">
+    <span className="text-2xl md:text-3xl font-bold text-text">
       {card.name}
     </span>
   </div>
@@ -124,7 +124,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
     if (hasCards) return <PageLoading />;
 
     return (
-      <div className="text-[#642f37] text-2xl font-bold text-center px-6">
+      <div className="text-text text-2xl font-bold text-center px-6">
         Táto hra zatiaľ nemá žiadne kartičky.
       </div>
     );
@@ -152,23 +152,23 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
           className="
             px-6 py-2
             rounded-full
-            bg-[#642f37]
+            bg-text
             text-white
             text-xl md:text-2xl
             font-extrabold
-            shadow-[0_4px_15px_rgba(0,0,0,0.2)]
+            shadow-control
           "
         >
           Úroveň {currentStage.levelId}
         </span>
-        <span className="text-[#642f37]/80 text-sm md:text-base font-semibold">
+        <span className="text-text/80 text-sm md:text-base font-semibold">
           Etapa {stageInLevel}/{stagesInLevel}
         </span>
       </div>
 
       {phase === PHASES.FINDING && (
         <>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#642f37] text-center">
+          <h2 className="text-2xl md:text-3xl font-bold text-text text-center">
             {FIND_PROMPT_TEXT}
           </h2>
 
@@ -198,7 +198,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
         <>
           <TargetCard card={currentStage.target} />
 
-          <p className="text-lg md:text-xl font-semibold text-[#642f37] text-center">
+          <p className="text-lg md:text-xl font-semibold text-text text-center">
             Stlač mikrofón a zopakuj slovo.
           </p>
 
@@ -222,7 +222,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
         <>
           <TargetCard card={currentStage.target} />
 
-          <p className="text-lg md:text-xl font-semibold text-[#642f37] text-center">
+          <p className="text-lg md:text-xl font-semibold text-text text-center">
             {CONFIRM_PROMPT_TEXT}
           </p>
 
@@ -241,11 +241,11 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
               className="
                 px-7 py-4
                 rounded-full
-                bg-[#a5ad24]
-                hover:bg-[#92991f]
+                bg-success
+                hover:bg-success-hover
                 text-white
                 text-lg font-bold
-                shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+                shadow-control
                 transition-all duration-200
                 hover:scale-105 active:scale-95
                 disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-default

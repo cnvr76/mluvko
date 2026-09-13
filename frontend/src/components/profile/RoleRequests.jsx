@@ -10,9 +10,9 @@ const STATUS_LABELS = {
 };
 
 const STATUS_BADGE = {
-  pending: "bg-[#F7C767] text-white",
-  approved: "bg-[#a5ad24] text-white",
-  rejected: "bg-[#ffe5e5] text-[#d62828]",
+  pending: "bg-yellow text-white",
+  approved: "bg-success text-white",
+  rejected: "bg-danger-bg text-danger",
 };
 
 const RoleRequests = () => {
@@ -31,13 +31,13 @@ const RoleRequests = () => {
 
         <div
           className="
-            rounded-[2rem]
+            rounded-panel
             bg-white/30
             backdrop-blur-xl
             border border-white/40
             p-10
             text-center
-            text-[#642f37]
+            text-text
             font-semibold
           "
         >
@@ -61,8 +61,8 @@ const RoleRequests = () => {
               onClick={() => setStatusFilter(status)}
               className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 statusFilter === status
-                  ? "bg-[#F3904B] text-white"
-                  : "text-gray-500 hover:text-[#ff7110] hover:bg-white"
+                  ? "bg-accent-soft text-white"
+                  : "text-gray-500 hover:text-accent hover:bg-white"
               }`}
             >
               {status === "all" ? "VŠETKY" : STATUS_LABELS[status].toUpperCase()}
@@ -78,7 +78,7 @@ const RoleRequests = () => {
               key={request.id}
               className="
                 bg-white
-                border border-[#642f37]/40
+                border border-text/40
                 rounded-xl
                 p-4
                 shadow-sm
@@ -101,7 +101,7 @@ const RoleRequests = () => {
 
                 <p className="text-sm text-gray-500">
                   {request.email} • {RoleLabels[request.current_role]} →{" "}
-                  <span className="font-semibold text-[#642f37]">
+                  <span className="font-semibold text-text">
                     {RoleLabels[request.requested_role]}
                   </span>{" "}
                   • {new Date(request.created_at).toLocaleDateString()}
@@ -128,8 +128,8 @@ const RoleRequests = () => {
                     className="
                       px-4 py-2
                       rounded-xl
-                      bg-[#a5ad24]
-                      hover:bg-[#92991f]
+                      bg-success
+                      hover:bg-success-hover
                       text-white
                       text-sm
                       font-semibold
@@ -152,9 +152,9 @@ const RoleRequests = () => {
                     className="
                       px-4 py-2
                       rounded-xl
-                      bg-[#ffe5e5]
-                      hover:bg-[#ffd6d6]
-                      text-[#d62828]
+                      bg-danger-bg
+                      hover:bg-danger-bg-hover
+                      text-danger
                       text-sm
                       font-semibold
                       transition-all duration-200
@@ -171,9 +171,9 @@ const RoleRequests = () => {
             className="
               text-center
               py-20
-              text-[#642f37]/60
+              text-text/60
               bg-white/40
-              rounded-[2rem]
+              rounded-panel
               border border-white/40
               backdrop-blur-xl
             "

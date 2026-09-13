@@ -23,13 +23,13 @@ const UserManagement = ({ currentUserId }) => {
 
         <div
           className="
-            rounded-[2rem]
+            rounded-panel
             bg-white/30
             backdrop-blur-xl
             border border-white/40
             p-10
             text-center
-            text-[#642f37]
+            text-text
             font-semibold
           "
         >
@@ -52,15 +52,15 @@ const UserManagement = ({ currentUserId }) => {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="
-            border border-[#642f37]/30
+            border border-text/30
             bg-white/70
             rounded-xl
             px-4 py-2
             text-sm
-            text-[#642f37]
+            text-text
             outline-none
             focus:ring-2
-            focus:ring-[#F3904B]
+            focus:ring-accent-soft
             md:w-72
           "
         />
@@ -77,7 +77,7 @@ const UserManagement = ({ currentUserId }) => {
                 key={user.id}
                 className="
                   bg-white
-                  border border-[#642f37]/40
+                  border border-text/40
                   rounded-xl
                   p-4
                   shadow-sm
@@ -90,12 +90,12 @@ const UserManagement = ({ currentUserId }) => {
                     <input
                       className="
                         flex-1 min-w-0
-                        border-b-2 border-[#642f37]
-                        focus:border-[#ff7110]
+                        border-b-2 border-text
+                        focus:border-accent
                         outline-none
                         p-1
                         font-bold text-lg
-                        text-[#642f37]
+                        text-text
                       "
                       value={edit.username ?? ""}
                       onChange={(e) =>
@@ -104,7 +104,7 @@ const UserManagement = ({ currentUserId }) => {
                     />
 
                     {isSelf && (
-                      <span className="text-xs bg-[#F3904B] text-white px-2 py-0.5 rounded-full font-bold">
+                      <span className="text-xs bg-accent-soft text-white px-2 py-0.5 rounded-full font-bold">
                         Vy
                       </span>
                     )}
@@ -122,12 +122,12 @@ const UserManagement = ({ currentUserId }) => {
                     onChange={(e) => updateEdit(user.id, "role", e.target.value)}
                     disabled={isSelf}
                     className="
-                      border border-[#642f37]/50
+                      border border-text/50
                       rounded-lg
                       p-2
                       text-sm
                       bg-white
-                      text-[#642f37]
+                      text-text
                       disabled:opacity-50
                       disabled:cursor-not-allowed
                     "
@@ -150,8 +150,8 @@ const UserManagement = ({ currentUserId }) => {
                     className="
                       px-4 py-2
                       rounded-xl
-                      bg-[#a5ad24]
-                      hover:bg-[#92991f]
+                      bg-success
+                      hover:bg-success-hover
                       text-white
                       text-sm
                       font-semibold
@@ -176,9 +176,9 @@ const UserManagement = ({ currentUserId }) => {
                     className="
                       px-4 py-2
                       rounded-xl
-                      bg-[#ffe5e5]
-                      hover:bg-[#ffd6d6]
-                      text-[#d62828]
+                      bg-danger-bg
+                      hover:bg-danger-bg-hover
+                      text-danger
                       text-sm
                       font-semibold
                       transition-all duration-200
@@ -197,9 +197,9 @@ const UserManagement = ({ currentUserId }) => {
             className="
               text-center
               py-20
-              text-[#642f37]/60
+              text-text/60
               bg-white/40
-              rounded-[2rem]
+              rounded-panel
               border border-white/40
               backdrop-blur-xl
             "

@@ -58,27 +58,27 @@ const Pexeso = ({ gameId, snapshotId }) => {
         {isPreviewing ? (
           <h2
             className="absolute left-1/2 -translate-x-1/2 -top-10 sm:-top-12
-          text-xl sm:text-3xl font-bold text-[#642f37] text-center
+          text-xl sm:text-3xl font-bold text-text text-center
           leading-tight whitespace-nowrap"
           >
             Zapamätaj si kartičky!
           </h2>
         ) : (
           <>
-            <h2 className="hidden md:block absolute -left-10 top-1/2 -translate-x-full -translate-y-1/2 pr-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+            <h2 className="hidden md:block absolute -left-10 top-1/2 -translate-x-full -translate-y-1/2 pr-6 text-5xl font-bold text-text leading-tight whitespace-nowrap">
               Nájdi páry!
             </h2>
 
-            <h2 className="hidden md:block absolute -right-10 top-1/2 translate-x-full -translate-y-1/2 pl-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+            <h2 className="hidden md:block absolute -right-10 top-1/2 translate-x-full -translate-y-1/2 pl-6 text-5xl font-bold text-text leading-tight whitespace-nowrap">
               Pohybov: {moves}
             </h2>
 
             {/* телефон  */}
             <div className="md:hidden mb-1 flex items-end justify-between gap-3">
-              <h2 className="text-xl font-bold text-[#642f37] leading-tight">
+              <h2 className="text-xl font-bold text-text leading-tight">
                 Nájdi páry!
               </h2>
-              <h2 className="text-xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+              <h2 className="text-xl font-bold text-text leading-tight whitespace-nowrap">
                 Pohybov: {moves}
               </h2>
             </div>

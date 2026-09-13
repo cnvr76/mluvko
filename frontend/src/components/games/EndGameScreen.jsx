@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 const EndGameScreen = ({ currentScore, bestScore }) => {
   return (
-    <section className="flex flex-col justify-center items-center text-center  text-[#642f37]">
+    <section className="flex flex-col justify-center items-center text-center  text-text">
       <h1 className="text-4xl font-bold mb-10">Ďakujeme za hru!</h1>
 
       <div className="text-2xl flex flex-col gap-2 mb-10">
@@ -23,17 +23,17 @@ const EndGameScreen = ({ currentScore, bestScore }) => {
           bg-white/30
           backdrop-blur-xl
           border border-white/40
-          shadow-[0_4px_20px_rgba(0,0,0,0.15)]
+          shadow-control
           font-semibold text-2xl
           no-underline
-          text-[#642f37]
+          text-text
 
           transition-all duration-200
           hover:scale-105
           active:scale-95
           hover:bg-white/40
 
-          hover:text-[#ff7110]
+          hover:text-accent
         "
       >
         Späť na hry
