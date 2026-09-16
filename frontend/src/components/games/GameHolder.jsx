@@ -25,10 +25,9 @@ const GameHolder = () => {
         );
     }
   };
-  //priamouholnik
   return (
     <SpecificGamePage>
-      <section className="w-full h-full flex justify-center items-center">
+      <section className="w-full flex-1 flex justify-center items-center">
         {getCorrectGameComponent()}
       </section>
     </SpecificGamePage>
