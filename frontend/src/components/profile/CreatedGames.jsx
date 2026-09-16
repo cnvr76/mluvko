@@ -1,6 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import useCreatedGames from "../../hooks/profile/useCreatedGames";
+import ActionButton from "./ActionButton";
+import PanelHeader from "./PanelHeader";
+import Notice from "./Notice";
+import { actionButtonClass } from "./actionButtonClass";
 
 const CreatedGames = () => {
   const {
@@ -31,17 +35,11 @@ const CreatedGames = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
-        <h2 className="text-3xl font-extrabold drop-shadow">
-          Moje vytvorené hry
-        </h2>
+        <PanelHeader title="Moje vytvorené hry" />
 
         <div
           className="
-            rounded-panel
-            bg-white/30
-            backdrop-blur-xl
-            border border-white/40
-            shadow-panel
+            surface-glass rounded-card
             p-10
             text-center
             text-text
@@ -56,34 +54,20 @@ const CreatedGames = () => {
   if (myGames.length === 0) {
     return (
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-3xl font-extrabold drop-shadow">
-            Moje vytvorené hry
-          </h2>
-
+        <PanelHeader title="Moje vytvorené hry">
           <button
             onClick={handleInitDraft}
-            className="
-            px-5 py-2.5
-            rounded-xl
-            bg-accent
-            hover:bg-accent-hover
-            text-white
-            font-bold
-            transition-all duration-200
-          "
+            className="btn-pill bg-accent-soft hover:bg-accent-hover text-white font-bold shadow-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            + Nová hra
+            <i className="fa-solid fa-plus fa-fw" aria-hidden="true" />
+            Nová hra
           </button>
-        </div>
+        </PanelHeader>
 
         <div
           className="
-          rounded-panel
-          bg-white/30
-          backdrop-blur-xl
-          border border-white/40
-          p-10
+          surface-glass rounded-card
+          p-8
           text-center
           text-text
         "
@@ -98,17 +82,10 @@ const CreatedGames = () => {
 
           <button
             onClick={handleInitDraft}
-            className="
-            px-6 py-3
-            rounded-xl
-            bg-accent
-            hover:bg-accent-hover
-            text-white
-            font-bold
-            transition-all duration-200
-          "
+            className="btn-pill bg-accent hover:bg-accent-hover text-white font-bold shadow-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            + Vytvoriť hru
+            <i className="fa-solid fa-plus fa-fw" aria-hidden="true" />
+            Vytvoriť hru
           </button>
         </div>
       </div>
@@ -117,27 +94,15 @@ const CreatedGames = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-extrabold drop-shadow">
-          Moje vytvorené hry
-        </h2>
-
+      <PanelHeader title="Moje vytvorené hry">
         <button
           onClick={handleInitDraft}
-          className="
-            px-5 py-2.5
-            rounded-xl
-            bg-accent
-            hover:bg-accent-hover
-            text-white
-            font-bold
-            shadow-accent
-            transition-all duration-200
-          "
+          className="btn-pill bg-accent hover:bg-accent-hover text-white font-bold shadow-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          + Nová hra
+          <i className="fa-solid fa-plus fa-fw" aria-hidden="true" />
+          Nová hra
         </button>
-      </div>
+      </PanelHeader>
 
       <div className="flex flex-col gap-4">
         {myGames.map((game) => {
@@ -152,40 +117,29 @@ const CreatedGames = () => {
           return (
             <div
               key={game.id}
-              className="
-                p-4
-                border border-text/40
-                rounded-lg
-                shadow-sm
-                bg-white
-              "
+              className="surface-glass bg-white/40 rounded-card p-4"
             >
-              <div className="flex justify-between items-start">
+              <div className="flex flex-wrap gap-3 justify-between items-start">
                 <div>
-                  <h3 className="text-lg font-bold">{currentVersion.name}</h3>
+                  <h3 className="text-fluid-lg font-bold">
+                    {currentVersion.name}
+                  </h3>
 
-                  <p className="text-sm text-gray-500">
+                  <p className="text-fluid-sm text-text/60">
                     Vytvorené:{" "}
                     {new Date(currentVersion.created_at).toLocaleDateString()}
                   </p>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-600">
+                  <span className="text-fluid-sm font-semibold text-text/60">
                     Verzia:
                   </span>
 
                   <select
                     value={selectedSnapshotId}
                     onChange={(e) => selectVersion(game.id, e.target.value)}
-                    className="
-                      border border-text/50
-                      rounded-lg
-                      p-2
-                      text-sm
-                      bg-white
-                      text-text
-                    "
+                    className="field rounded-full w-auto py-2 text-fluid-sm"
                   >
                     {[...game.versions]
                       .sort((a, b) => b.version - a.version)
@@ -206,126 +160,75 @@ const CreatedGames = () => {
               </div>
 
               {currentVersion.status === "rejected" && (
-                <div
-                  className="
-                    mt-3
-                    p-3
-                    bg-red-50
-                    text-red-700
-                    text-sm
-                    border border-red-200
-                    rounded-lg
-                  "
-                >
-                  <strong>Zamietnuté:</strong> {currentVersion.admin_feedback}
+                <div className="mt-3">
+                  <Notice tone="danger" title="Zamietnuté">
+                    {currentVersion.admin_feedback}
+                  </Notice>
                 </div>
               )}
 
               {currentVersion.status === "published" && (
-                <div className="mt-3 text-green-600 text-sm font-semibold">
-                  Táto verzia je aktuálne zverejnená na stránke.
+                <div className="mt-3">
+                  <Notice tone="success">
+                    Táto verzia je aktuálne zverejnená na stránke.
+                  </Notice>
                 </div>
               )}
 
               {currentVersion.status === "published" &&
                 currentVersion.admin_feedback && (
-                  <div
-                    className="
-                      mt-3
-                      p-3
-                      bg-blue-50
-                      text-blue-700
-                      text-sm
-                      border border-blue-200
-                      rounded-lg
-                    "
-                  >
-                    <strong>Dôvod rollbacku:</strong>{" "}
-                    {currentVersion.admin_feedback}
+                  <div className="mt-3">
+                    <Notice tone="info" title="Dôvod rollbacku">
+                      {currentVersion.admin_feedback}
+                    </Notice>
                   </div>
                 )}
 
-              <div className="flex gap-2 mt-4 pt-3 border-t border-text/40 justify-end">
+              <div className="flex flex-wrap gap-2 mt-4 justify-end">
                 <Link
                   to={`/games/${game.id}/${currentVersion.game_type}?snapshot=${currentVersion.id}`}
-                  className="
-                    px-4 py-2
-                    rounded-xl
-                    bg-accent-soft
-                    hover:bg-accent-soft-hover
-                    text-white
-                    font-semibold
-                    transition-all duration-200
-                  "
+                  aria-label="Hrať"
+                  title="Hrať"
+                  className={actionButtonClass("accentSoft")}
                 >
-                  Hrať
+                  <i className="fa-solid fa-play fa-fw" aria-hidden="true" />
                 </Link>
 
                 <Link
                   to={`/games/${game.id}/edit?snapshot=${currentVersion.id}`}
-                  className="
-                    px-5 py-2
-                    rounded-xl
-                    bg-yellow
-                    hover:bg-yellow-hover
-                    text-white
-                    font-semibold
-                    transition-all duration-200
-                  "
+                  aria-label="Upraviť"
+                  title="Upraviť"
+                  className={actionButtonClass("yellow")}
                 >
-                  Upraviť
+                  <i className="fa-solid fa-pen fa-fw" aria-hidden="true" />
                 </Link>
 
                 {(currentVersion.status === "draft" ||
                   currentVersion.status === "rejected" ||
                   currentVersion.status === "archived") && (
-                  <button
+                  <ActionButton
+                    icon="fa-paper-plane"
+                    label="Poslať na schválenie"
+                    tone="lavender"
                     onClick={() => handleSubmitForReview(game.id)}
-                    className="
-                      px-6 py-2
-                      rounded-xl
-                      bg-lavender
-                      hover:bg-lavender-hover
-                      text-white
-                      font-semibold
-                      transition-all duration-200
-                    "
-                  >
-                    Poslať na schválenie
-                  </button>
+                  />
                 )}
 
                 {currentVersion.status === "published" && (
-                  <button
+                  <ActionButton
+                    icon="fa-box-archive"
+                    label="Archivovať"
+                    tone="blue"
                     onClick={() => handleArchiveGame(game.id)}
-                    className="
-                      px-6 py-2
-                      rounded-xl
-                      bg-blue
-                      hover:bg-blue-hover
-                      text-white
-                      font-semibold
-                      transition-all duration-200
-                    "
-                  >
-                    Archivovať
-                  </button>
+                  />
                 )}
 
-                <button
+                <ActionButton
+                  icon="fa-trash"
+                  label="Vymazať hru"
+                  tone="danger"
                   onClick={() => handleDeleteGame(game.id)}
-                  className="
-                    px-5 py-2
-                    rounded-xl
-                    bg-danger-bg
-                    hover:bg-danger-bg-hover
-                    text-danger
-                    font-semibold
-                    transition-all duration-200
-                  "
-                >
-                  Vymazať
-                </button>
+                />
               </div>
             </div>
           );

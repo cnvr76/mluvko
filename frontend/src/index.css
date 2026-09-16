@@ -48,7 +48,8 @@
   --spacing-cloud-gap: clamp(1rem, 2vw, 2rem);
 
   /* ---------- radii ---------- */
-  --radius-panel: 2rem; /* page-level containers and cards */
+  --radius-panel: 2rem;
+  --radius-card: 1.25rem; /* page-level containers and cards */
 
   /* ---------- elevation ---------- */
   --shadow-field: 0 4px 15px rgb(0 0 0 / 0.08);

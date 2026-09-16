@@ -79,55 +79,46 @@ const ProfilePage = () => {
   )?.component;
 
   return (
-    <main
-      className="
-        w-full h-screen
-        bg-cover bg-no-repeat bg-center
-        px-4 pt-page-top pb-12
-        
-      "
-      style={{
-        backgroundImage: `url('${APP_BACKGROUND}')`,
-      }}
-    >
+    <main className="relative isolate w-full min-h-dvh px-4 pt-page-top pb-12">
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-no-repeat bg-center"
+        style={{ backgroundImage: `url('${APP_BACKGROUND}')` }}
+      />
+
       <div
         className="
           w-full max-w-6xl mx-auto
-          h-[78vh]
-          rounded-panel
-          bg-white/30
-          backdrop-blur-xl
-          border border-white/40
-          shadow-panel-strong
+          surface-glass rounded-panel shadow-panel-strong
           p-5 md:p-8
-          grid grid-cols-1 md:grid-cols-[260px_1fr]
+          grid grid-cols-1 md:grid-cols-[minmax(0,15rem)_minmax(0,1fr)]
           gap-6
           text-text
-          overflow-hidden
-          items-start
-          
+          md:h-[min(78vh,48rem)] md:overflow-hidden
         "
       >
         <nav
           className="
-            flex flex-col gap-3
-            md:border-r md:border-white/40
-            md:pr-6
-            sticky top-0 self-start
+            flex flex-row md:flex-col gap-3
+            overflow-x-auto md:overflow-visible
+            -mx-1 px-1 pb-1 md:mx-0 md:px-0 md:pb-0
+            md:border-r md:border-white/40 md:pr-6
+            md:self-start
           "
         >
           {tabsConfig.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setRequestedTab(tab.id)}
+              aria-current={activeTab === tab.id ? "page" : undefined}
               className={`
+                shrink-0 whitespace-nowrap
                 cursor-pointer
-                text-2xl
-                text-left
-                px-5 py-3
+                text-fluid-lg md:text-left
+                px-4 py-2.5
                 rounded-full
                 font-semibold
                 transition-all duration-200
+                focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
                 ${
                   activeTab === tab.id
                     ? "bg-white/50 shadow-panel text-accent"
@@ -140,14 +131,7 @@ const ProfilePage = () => {
           ))}
         </nav>
 
-        <section
-          className="
-            h-full
-            overflow-y-auto
-            px-8
-            pb-10
-          "
-        >
+        <section className="min-w-0 md:overflow-y-auto md:p-5 md:-m-5">
           {activeComponent}
         </section>
       </div>
