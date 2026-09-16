@@ -1,3 +1,5 @@
+import React from "react";
+import RoundIconButton from "../RoundIconButton";
 import useAudioRecorder from "../../../hooks/useAudioRecorder";
 import { RECORD_AUDIO_ICON } from "../../../constants/media";
 
@@ -14,34 +16,27 @@ const RecordAudioButton = ({ onFinish, isLoading, disabled = false }) => {
     }
   };
 
+  const label = isLoading
+    ? "Analyzuje sa..."
+    : isRecording
+      ? "Zastaviť nahrávanie"
+      : "Nahrať";
+
   return (
-    <button
+    <RoundIconButton
+      icon={RECORD_AUDIO_ICON}
+      label={label}
       onClick={handleRecording}
       disabled={isLoading || (disabled && !isRecording)}
-      className="
-      w-14 h-14 md:w-20 md:h-20
-      rounded-full
-      bg-white/30
-      backdrop-blur-xl
-      border border-white/40
-      shadow-control
-      flex items-center justify-center
-      transition-all duration-200
-      hover:scale-105 active:scale-95 cursor-pointer
-      disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-default
-      "
+      tone={isRecording ? "recording" : "glass"}
     >
-      {isRecording && <div>Nahráva</div>}
-      {!isLoading ? (
-        <img
-          src={RECORD_AUDIO_ICON}
-          alt={isRecording ? "Stop Recording" : "Start Recording"}
-          className="w-10 h-10 md:w-10 md:h-10 object-contain"
+      {isLoading ? (
+        <i
+          className="fa-solid fa-spinner fa-spin text-fluid-3xl text-text"
+          aria-hidden="true"
         />
-      ) : (
-        <div className="">Analyzuje sa...</div>
-      )}
-    </button>
+      ) : undefined}
+    </RoundIconButton>
   );
 };
 

@@ -1,11 +1,14 @@
 import React from "react";
 import useGameSession from "../../../hooks/useGameSession";
-import useFindAndRepeat, { PHASES } from "../../../hooks/games/useFindAndRepeat";
+import useFindAndRepeat, {
+  PHASES,
+} from "../../../hooks/games/useFindAndRepeat";
 import PageLoading from "../../loading/PageLoading.jsx";
 import EndGameScreen from "../EndGameScreen";
 import FindCard from "./FindCard";
 import RecordAudioButton from "../repeat_after/RecordAudioButton";
 import NextButton from "../repeat_after/NextButton";
+import RoundIconButton from "../RoundIconButton";
 import { FIND_PROMPT_TEXT, CONFIRM_PROMPT_TEXT } from "./prompts";
 import useMediaReady from "../../../hooks/useMediaReady";
 import useMediaPrefetch from "../../../hooks/useMediaPrefetch";
@@ -24,56 +27,38 @@ const FIND_AND_REPEAT_MEDIA = [
   SKIP_ICON,
 ];
 
-const ROUND_BTN = `
-  w-14 h-14 md:w-20 md:h-20
-  rounded-full
-  bg-white/30
-  backdrop-blur-xl
-  border border-white/40
-  shadow-control
-  flex items-center justify-center
-  transition-all duration-200
-  hover:scale-105 active:scale-95 cursor-pointer
-  disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-default
-`;
-
 const TargetCard = ({ card }) => (
   <div
     className="
-      relative
-      w-full max-w-[320px]
-      rounded-3xl
-      bg-white/20
-      backdrop-blur-xl
-      border border-white/30
-      shadow-card
+      relative w-full max-w-[20rem]
+      rounded-3xl surface-glass bg-white/20 border-white/30 shadow-card
       flex flex-col items-center
       px-6 py-5 gap-3
     "
   >
     <img
       src={previewUrl(card.image_url)}
-      alt={card.name}
-      className="h-32 md:h-44 object-contain drop-shadow-lg"
+      alt=""
+      className="max-h-[clamp(8rem,22vw,11rem)] w-auto object-contain drop-shadow-lg"
     />
-    <span className="text-2xl md:text-3xl font-bold text-text">
-      {card.name}
-    </span>
+    <span className="text-fluid-3xl font-bold text-text">{card.name}</span>
   </div>
 );
 
 const ReplayButton = ({ onClick, disabled }) => (
-  <button onClick={onClick} disabled={disabled} className={ROUND_BTN}>
-    <img
-      src={PLAY_AUDIO_ICON}
-      alt="Prehrať znova"
-      className="w-10 h-10 object-contain"
-    />
-  </button>
+  <RoundIconButton
+    icon={PLAY_AUDIO_ICON}
+    label="Prehrať znova"
+    onClick={onClick}
+    disabled={disabled}
+  />
 );
 
 const FindAndRepeat = ({ gameId, snapshotId }) => {
-  const { data, isLoading, error, ...session } = useGameSession(gameId, snapshotId);
+  const { data, isLoading, error, ...session } = useGameSession(
+    gameId,
+    snapshotId,
+  );
 
   const {
     stages,
@@ -96,7 +81,9 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
   const isMediaReady = useMediaReady(
     [
       ...FIND_AND_REPEAT_MEDIA,
-      ...(currentStage?.options ?? []).map((card) => previewUrl(card.image_url)),
+      ...(currentStage?.options ?? []).map((card) =>
+        previewUrl(card.image_url),
+      ),
     ],
     !isLoading && !error,
   );
@@ -124,7 +111,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
     if (hasCards) return <PageLoading />;
 
     return (
-      <div className="text-text text-2xl font-bold text-center px-6">
+      <div className="text-text text-fluid-2xl font-bold text-center px-6">
         Táto hra zatiaľ nemá žiadne kartičky.
       </div>
     );
@@ -141,10 +128,9 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
   return (
     <section
       className="
-        w-full h-full
+        w-full
         flex flex-col items-center justify-center
-        gap-5 md:gap-6
-        overflow-y-auto py-4
+        gap-[clamp(1.25rem,3vw,1.5rem)] py-4
       "
     >
       <div className="flex flex-col items-center gap-1.5">
@@ -154,25 +140,25 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
             rounded-full
             bg-text
             text-white
-            text-xl md:text-2xl
+            text-fluid-2xl
             font-extrabold
             shadow-control
           "
         >
           Úroveň {currentStage.levelId}
         </span>
-        <span className="text-text/80 text-sm md:text-base font-semibold">
+        <span className="text-text/80 text-fluid-sm font-semibold">
           Etapa {stageInLevel}/{stagesInLevel}
         </span>
       </div>
 
       {phase === PHASES.FINDING && (
         <>
-          <h2 className="text-2xl md:text-3xl font-bold text-text text-center">
+          <h2 className="text-fluid-3xl font-bold text-text text-center">
             {FIND_PROMPT_TEXT}
           </h2>
 
-          <div className="grid grid-cols-2 gap-4 md:gap-5 w-full max-w-[460px]">
+          <div className="grid grid-cols-2 gap-[clamp(1rem,3vw,1.25rem)] w-full max-w-[29rem]">
             {currentStage.options.map((card) => (
               <FindCard
                 key={card.card_id}
@@ -183,12 +169,13 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
             ))}
           </div>
 
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-[clamp(1rem,3vw,1.5rem)]">
             <ReplayButton onClick={replayWord} disabled={isBusy} />
             <NextButton
               onClick={skip}
               isDisabled={isBusy}
               icon={SKIP_ICON}
+              label="Preskočiť"
             />
           </div>
         </>
@@ -198,11 +185,11 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
         <>
           <TargetCard card={currentStage.target} />
 
-          <p className="text-lg md:text-xl font-semibold text-text text-center">
+          <p className="text-fluid-xl font-semibold text-text text-center">
             Stlač mikrofón a zopakuj slovo.
           </p>
 
-          <div className="flex items-center gap-4 md:gap-6">
+          <div className="flex items-center gap-[clamp(1rem,3vw,1.5rem)]">
             <ReplayButton onClick={replayWord} disabled={isBusy} />
             <RecordAudioButton
               onFinish={onRecordingFinish}
@@ -213,6 +200,7 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
               onClick={skip}
               isDisabled={isBusy}
               icon={SKIP_ICON}
+              label="Preskočiť"
             />
           </div>
         </>
@@ -222,11 +210,11 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
         <>
           <TargetCard card={currentStage.target} />
 
-          <p className="text-lg md:text-xl font-semibold text-text text-center">
+          <p className="text-fluid-xl font-semibold text-text text-center">
             {CONFIRM_PROMPT_TEXT}
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
+          <div className="flex flex-wrap items-center justify-center gap-[clamp(0.75rem,3vw,1.25rem)]">
             <ReplayButton onClick={replayReview} disabled={isBusy} />
 
             <RecordAudioButton
@@ -235,30 +223,32 @@ const FindAndRepeat = ({ gameId, snapshotId }) => {
               disabled={isBusy}
             />
 
-            <button
-              onClick={confirmCorrect}
-              disabled={isBusy}
-              className="
-                px-7 py-4
-                rounded-full
-                bg-success
-                hover:bg-success-hover
-                text-white
-                text-lg font-bold
-                shadow-control
-                transition-all duration-200
-                hover:scale-105 active:scale-95
-                disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-default
-              "
-            >
-              Správne ✓
-            </button>
-
             <NextButton
               onClick={skip}
               isDisabled={isBusy}
               icon={SKIP_ICON}
+              label="Preskočiť"
             />
+
+            <RoundIconButton
+              label="Správne"
+              onClick={confirmCorrect}
+              disabled={isBusy}
+              tone="success"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-3/5 h-3/5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 12.5 9.5 18 20 6.5" />
+              </svg>
+            </RoundIconButton>
           </div>
         </>
       )}

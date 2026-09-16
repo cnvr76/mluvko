@@ -78,19 +78,10 @@ const RepeatAfter = ({ gameId, snapshotId }) => {
   const threshold = data?.config_data.score_threshold;
 
   return (
-    <section
-      className="
-        w-full
-        min-h-[calc(100vh-10rem)]  
-        flex flex-col items-center justify-center
-      "
-    >
+    <section className="w-full flex flex-col items-center gap-6">
       <AnimalCard gameData={currentCard} currentScore={currentScore || 0} />
-      <div
-        className=" mt-8
-        flex flex-row justify-center items-center
-        gap-4 md:gap-6"
-      >
+
+      <div className="flex flex-row justify-center items-center gap-[clamp(1rem,3vw,1.5rem)]">
         <PlayAudioButton
           referenceAudioLink={`${VITE_API_BASE}/${currentCard?.reference_audio}`}
         />
@@ -99,11 +90,19 @@ const RepeatAfter = ({ gameId, snapshotId }) => {
           onClick={nextCard}
           isDisabled={isSubmitting}
           icon={SKIP_ICON}
+          label="Preskočiť"
         />
-        {currentScore && currentScore >= threshold && (
+        {currentScore >= threshold && (
           <NextButton onClick={nextCard} isDisabled={isSubmitting} />
         )}
       </div>
+
+      <p
+        aria-live="polite"
+        className="min-h-6 text-fluid-lg font-semibold text-text"
+      >
+        {isSubmitting ? "Analyzuje sa..." : ""}
+      </p>
     </section>
   );
 };

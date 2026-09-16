@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import RoundIconButton from "../RoundIconButton";
 import { PLAY_AUDIO_ICON } from "../../../constants/media";
 
 const PlayAudioButton = ({ referenceAudioLink }) => {
@@ -40,27 +41,12 @@ const PlayAudioButton = ({ referenceAudioLink }) => {
   };
 
   return (
-    <button
-      disabled={isPlaying}
+    <RoundIconButton
+      icon={PLAY_AUDIO_ICON}
+      label="Prehrať zvuk"
       onClick={replayAudio}
-      className="
-      w-14 h-14 md:w-20 md:h-20
-      rounded-full
-      bg-white/30
-      backdrop-blur-xl
-      border border-white/40
-      shadow-control
-      flex items-center justify-center
-      transition-all duration-200
-      hover:scale-105 active:scale-95 cursor-pointer
-      "
-    >
-      <img
-        src={PLAY_AUDIO_ICON}
-        alt="play audio"
-        className="w-10 h-10 md:w-10 md:h-10 object-contain"
-      />
-    </button>
+      disabled={isPlaying}
+    />
   );
 };
 
