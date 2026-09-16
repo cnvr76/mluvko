@@ -1,10 +1,11 @@
 import React from "react";
 import { toast } from "sonner";
 import { api, RoleLabels } from "../../services/api";
-import useRoleRequests from "../../hooks/profile/useRoleRequests";
+import useManagedList from "../../hooks/profile/useManagedList";
 import ActionButton from "./ActionButton";
 import PanelHeader from "./PanelHeader";
 import Notice from "./Notice";
+import FilterChips from "./FilterChips";
 
 const STATUS_LABELS = {
   pending: "Čaká",
@@ -18,11 +19,27 @@ const STATUS_BADGE = {
   rejected: "bg-danger-bg text-danger",
 };
 
-const FILTERS = ["pending", "approved", "rejected", "all"];
+const STATUS_FILTERS = [
+  ...Object.keys(STATUS_LABELS).map((value) => ({
+    value,
+    label: STATUS_LABELS[value].toUpperCase(),
+  })),
+  { value: "all", label: "VŠETKY" },
+];
+
+const REQUESTS_KEY = ["role-requests", "all"];
 
 const RoleRequests = () => {
-  const { requests, isLoading, statusFilter, setStatusFilter, handleAction } =
-    useRoleRequests();
+  const {
+    items: requests,
+    isLoading,
+    statusFilter,
+    setStatusFilter,
+    handleAction,
+  } = useManagedList({
+    queryKey: REQUESTS_KEY,
+    queryFn: api.roleRequests.all,
+  });
 
   const filteredRequests = requests.filter((r) => {
     if (statusFilter === "all") return true;
@@ -44,24 +61,12 @@ const RoleRequests = () => {
   return (
     <div className="flex flex-col gap-6">
       <PanelHeader title="Žiadosti o rolu">
-        <div className="flex gap-1 bg-white/30 p-1 rounded-full overflow-x-auto max-w-full">
-          {FILTERS.map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              aria-pressed={statusFilter === status}
-              className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-fluid-sm font-semibold cursor-pointer transition-all duration-200 ${
-                statusFilter === status
-                  ? "bg-accent-soft text-white"
-                  : "text-text/60 hover:text-accent hover:bg-white/60"
-              }`}
-            >
-              {status === "all"
-                ? "VŠETKY"
-                : STATUS_LABELS[status].toUpperCase()}
-            </button>
-          ))}
-        </div>
+        <FilterChips
+          options={STATUS_FILTERS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          label="Filter podľa stavu žiadosti"
+        />
       </PanelHeader>
 
       <div className="flex flex-col gap-4">

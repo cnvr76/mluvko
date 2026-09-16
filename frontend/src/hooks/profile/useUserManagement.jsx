@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { api } from "../../services/api";
-import useApiMutation from "../useApiMutation";
+import useManagedList from "./useManagedList";
 
 const USERS_KEY = ["users", "all"];
 
 const useUserManagement = () => {
   const [edits, setEdits] = useState({});
 
-  const { data: users = [], isLoading } = useQuery({
-    queryKey: USERS_KEY,
-    queryFn: api.users.all,
-  });
+  const {
+    items: users,
+    isLoading,
+    handleAction,
+  } = useManagedList({ queryKey: USERS_KEY, queryFn: api.users.all });
 
   useEffect(() => {
     const initialEdits = {};
@@ -20,14 +20,6 @@ const useUserManagement = () => {
     });
     setEdits(initialEdits);
   }, [users]);
-
-  const actionMutation = useApiMutation(
-    ({ actionFn, args }) => actionFn(...args),
-    { invalidateKey: USERS_KEY },
-  );
-
-  const handleAction = (actionFn, ...args) =>
-    actionMutation.mutate({ actionFn, args });
 
   const updateEdit = (userId, field, value) => {
     setEdits((prev) => ({

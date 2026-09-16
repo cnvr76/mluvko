@@ -2,15 +2,34 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { api } from "../../services/api";
-import useAdminDashboard from "../../hooks/profile/useAdminDashboard";
+import useManagedList from "../../hooks/profile/useManagedList";
 import ActionButton from "./ActionButton";
 import PanelHeader from "./PanelHeader";
 import Notice from "./Notice";
+import FilterChips from "./FilterChips";
 import { actionButtonClass } from "./actionButtonClass";
 
+const STATUS_FILTERS = [
+  "pending",
+  "published",
+  "rejected",
+  "archived",
+  "all",
+].map((value) => ({ value, label: value.toUpperCase() }));
+
+const DASHBOARD_KEY = ["admin", "dashboard"];
+
 const AdminDashboard = () => {
-  const { games, isLoading, statusFilter, setStatusFilter, handleAction } =
-    useAdminDashboard();
+  const {
+    items: games,
+    isLoading,
+    statusFilter,
+    setStatusFilter,
+    handleAction,
+  } = useManagedList({
+    queryKey: DASHBOARD_KEY,
+    queryFn: api.admin.dashboard,
+  });
 
   const allSnapshots = games.flatMap((game) =>
     game.versions.map((v) => ({
@@ -60,24 +79,12 @@ const AdminDashboard = () => {
   return (
     <div className="flex flex-col gap-6">
       <PanelHeader title="Admin Dashboard">
-        <div className="flex gap-1 bg-white/30 p-1 rounded-full overflow-x-auto max-w-full">
-          {["pending", "published", "rejected", "archived", "all"].map(
-            (status) => (
-              <button
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                aria-pressed={statusFilter === status}
-                className={`shrink-0 whitespace-nowrap px-4 py-1.5 rounded-full text-fluid-sm font-semibold cursor-pointer transition-all duration-200 ${
-                  statusFilter === status
-                    ? "bg-accent-soft text-white"
-                    : "text-text/60 hover:text-accent hover:bg-white/60"
-                }`}
-              >
-                {status.toUpperCase()}
-              </button>
-            ),
-          )}
-        </div>
+        <FilterChips
+          options={STATUS_FILTERS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          label="Filter podľa stavu verzie"
+        />
       </PanelHeader>
 
       <div className="flex flex-col gap-8">
