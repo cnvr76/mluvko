@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { api, Roles, RoleLabels } from "../../services/api";
 import useUserManagement from "../../hooks/profile/useUserManagement";
-import ActionButton from "./ActionButton";
+import ActionButton from "../shared/ActionButton";
 import PanelHeader from "./PanelHeader";
 
 const UserManagement = ({ currentUserId }) => {

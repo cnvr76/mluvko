@@ -28,16 +28,7 @@ const GameEditPage = () => {
 
   const isMediaReady = useMediaReady(EDITOR_MEDIA);
 
-  const inputClassName = `
-    border border-text/30
-    bg-white/70
-    rounded-xl
-    px-4 py-3
-    outline-none
-    text-text
-    focus:ring-2
-    focus:ring-accent-soft
-  `;
+  const inputClassName = "field rounded-xl";
 
   if (!isMediaReady) return <PageLoading />;
 
@@ -46,7 +37,7 @@ const GameEditPage = () => {
       <main
         className="
         relative isolate
-        w-full min-h-screen
+        w-full min-h-dvh
         px-4 pt-page-top pb-12
       "
       >
@@ -63,11 +54,8 @@ const GameEditPage = () => {
         <div
           className="
           w-full max-w-5xl mx-auto
-          rounded-panel
-          bg-white/30
-          backdrop-blur-xl
-          border border-white/40
-          p-10
+          surface-glass rounded-panel
+          p-8
           text-center
           text-text
           font-semibold
@@ -85,7 +73,7 @@ const GameEditPage = () => {
     <main
       className="
         relative isolate
-        w-full min-h-screen
+        w-full min-h-dvh
         px-4 pt-page-top pb-12
       "
     >
@@ -101,30 +89,24 @@ const GameEditPage = () => {
       <div
         className="
           w-full max-w-5xl mx-auto
-          rounded-panel
-          bg-white/30
-          backdrop-blur-xl
-          border border-white/40
-          shadow-panel-strong
-          p-6 md:p-8
+          surface-glass rounded-panel shadow-panel-strong
+          p-5 md:p-8
           flex flex-col gap-6
           text-text
         "
       >
-        <h1 className="text-3xl font-extrabold drop-shadow">
+        <h1 className="text-fluid-2xl font-extrabold drop-shadow">
           Editácia hry: {formData.name}
         </h1>
 
         <section
           className="
-            rounded-panel
-            bg-white/40
-            border border-white/50
-            p-6
-            flex flex-col gap-5
+            surface-glass bg-white/40 rounded-card
+            p-4 sm:p-5
+            flex flex-col gap-4
           "
         >
-          <label className="flex flex-col gap-2 font-semibold">
+          <label className="flex flex-col gap-1.5 text-fluid-sm font-semibold">
             Názov hry:
             <input
               className={inputClassName}
@@ -133,7 +115,7 @@ const GameEditPage = () => {
             />
           </label>
 
-          <label className="flex flex-col gap-2 font-semibold">
+          <label className="flex flex-col gap-1.5 text-fluid-sm font-semibold">
             Obrázok hry (obálka na stránke s hrami):
             <ImageField
               placeholder="URL obrázku (/images/...)"
@@ -143,7 +125,7 @@ const GameEditPage = () => {
             />
           </label>
 
-          <label className="flex flex-col gap-2 font-semibold">
+          <label className="flex flex-col gap-1.5 text-fluid-sm font-semibold">
             Veková skupina:
             <select
               className={inputClassName}
@@ -158,7 +140,7 @@ const GameEditPage = () => {
             </select>
           </label>
 
-          <label className="flex flex-col gap-2 font-semibold">
+          <label className="flex flex-col gap-1.5 text-fluid-sm font-semibold">
             Typ hry:
             <select
               className={inputClassName}
@@ -176,10 +158,8 @@ const GameEditPage = () => {
 
         <section
           className="
-            rounded-panel
-            bg-white/40
-            border border-white/50
-            p-6
+            surface-glass bg-white/40 rounded-card
+            p-4 sm:p-5
           "
         >
           {SpecificConfig ? (
@@ -190,32 +170,27 @@ const GameEditPage = () => {
               }
             />
           ) : (
-            <p className="text-red-500 font-semibold">
+            <p className="text-danger font-semibold">
               Editor pre tento typ hry ešte nebol vytvorený.
             </p>
           )}
         </section>
 
-        <div className="flex flex-wrap justify-center items-center gap-4 pt-2">
+        <div className="flex flex-wrap justify-center items-center gap-3 pt-2">
           <button
             onClick={handleSave}
             disabled={saving}
             className="
-              px-12 py-5
-              rounded-full
-              bg-white/50
-              backdrop-blur-xl
-              border border-white/60
-              shadow-panel
-              text-text
-              text-xl
-              font-bold
-              transition-all duration-200
-              hover:bg-white/70
-              hover:text-accent
-              disabled:opacity-50 disabled:hover:bg-white/50 disabled:hover:text-text disabled:cursor-default
+              btn-pill surface-glass bg-white/50 border-white/60 shadow-panel
+              px-8 text-fluid-lg text-text font-bold
+              hover:bg-white/70 hover:text-accent
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
             "
           >
+            <i
+              className={`fa-solid ${saving ? "fa-spinner fa-spin" : "fa-floppy-disk"} fa-fw`}
+              aria-hidden="true"
+            />
             {saving ? "Ukladám..." : "Uložiť zmeny"}
           </button>
 
@@ -224,19 +199,13 @@ const GameEditPage = () => {
               snapshotId ? `?snapshot=${snapshotId}` : ""
             }`}
             className="
-              px-12 py-5
-              rounded-full
-              bg-accent
-              hover:bg-accent-hover
-              text-white
-              text-xl
-              font-bold
-              no-underline
-              shadow-accent
-              transition-all duration-200
+              btn-pill bg-accent hover:bg-accent-hover
+              px-8 text-fluid-lg text-white font-bold shadow-accent
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
             "
           >
-            ▶ Hrať
+            <i className="fa-solid fa-play fa-fw" aria-hidden="true" />
+            Hrať
           </Link>
         </div>
       </div>

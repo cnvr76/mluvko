@@ -2,9 +2,9 @@ import React from "react";
 import { toast } from "sonner";
 import { api, RoleLabels } from "../../services/api";
 import useManagedList from "../../hooks/profile/useManagedList";
-import ActionButton from "./ActionButton";
+import ActionButton from "../shared/ActionButton";
 import PanelHeader from "./PanelHeader";
-import Notice from "./Notice";
+import Notice from "../shared/Notice";
 import FilterChips from "./FilterChips";
 
 const STATUS_LABELS = {

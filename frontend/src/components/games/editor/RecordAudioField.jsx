@@ -1,6 +1,7 @@
 import React from "react";
 import useAudioRecorder from "../../../hooks/useAudioRecorder";
 import { makePending, PENDING_AUDIO } from "../../../utils/pendingMedia";
+import { actionButtonClass } from "../../shared/actionButtonClass";
 
 const RecordAudioField = ({ onAudioChange }) => {
   const { isRecording, startRecording, stopRecording } = useAudioRecorder();
@@ -24,20 +25,16 @@ const RecordAudioField = ({ onAudioChange }) => {
     <button
       type="button"
       onClick={handleClick}
-      className={`
-        px-3 py-1.5
-        rounded-xl
-        text-white
-        text-sm font-semibold
-        transition-all duration-200
-        ${
-          isRecording
-            ? "bg-danger hover:bg-danger-hover"
-            : "bg-lavender hover:bg-lavender-hover"
-        }
-      `}
+      aria-label={isRecording ? "Zastaviť nahrávanie" : "Nahrať z mikrofónu"}
+      title={isRecording ? "Zastaviť nahrávanie" : "Nahrať z mikrofónu"}
+      className={`${actionButtonClass(isRecording ? "danger" : "lavender")} ${
+        isRecording ? "animate-pulse" : ""
+      }`}
     >
-      {isRecording ? "Zastaviť" : <i className="fa-solid fa-microphone"></i>}
+      <i
+        className={`fa-solid ${isRecording ? "fa-stop" : "fa-microphone"} fa-fw`}
+        aria-hidden="true"
+      />
     </button>
   );
 };

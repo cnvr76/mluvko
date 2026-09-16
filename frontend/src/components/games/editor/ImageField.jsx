@@ -5,23 +5,14 @@ import {
   PENDING_IMAGE,
   previewUrl,
 } from "../../../utils/pendingMedia";
+import { actionButtonClass } from "../../shared/actionButtonClass";
 
 // Reusable image input with a live preview, shared by all game editors.
 // Supports two sources:
 //   1) external/public URL (typed by hand into the text input),
 //   2) file upload from the user's computer — odložené ako PendingFile,
 //      skutočný upload prebehne až pri „Uložiť zmeny" v GameEditPage.
-const DEFAULT_INPUT_CLASS = `
-  border border-text/30
-  bg-white/70
-  rounded-lg
-  px-3 py-2
-  text-sm
-  text-text
-  outline-none
-  focus:border-accent
-  placeholder:text-text/40
-`;
+const DEFAULT_INPUT_CLASS = "field rounded-xl text-fluid-sm";
 
 const ImageField = ({
   label = "Obrázok",
@@ -68,19 +59,10 @@ const ImageField = ({
           type="button"
           onClick={() => inputRef.current?.click()}
           title="Nahrať obrázok z počítača"
-          className="
-            shrink-0
-            px-3 py-2
-            rounded-lg
-            bg-blue
-            hover:bg-blue-hover
-            text-white
-            text-sm font-semibold
-            transition-all duration-200
-            aspect-square
-          "
+          aria-label="Nahrať obrázok z počítača"
+          className={actionButtonClass("blue")}
         >
-          <i className="fa-solid fa-folder-open"></i>
+          <i className="fa-solid fa-folder-open fa-fw" aria-hidden="true" />
         </button>
 
         {value && (
@@ -88,19 +70,10 @@ const ImageField = ({
             type="button"
             onClick={handleClear}
             title="Vymazať obrázok"
-            className="
-              shrink-0
-              rounded-lg
-              bg-danger-bg
-              hover:bg-danger-bg-hover
-              text-danger
-              text-[0.9rem]
-              font-semibold
-              transition-all duration-200
-              aspect-square
-            "
+            aria-label="Vymazať obrázok"
+            className={actionButtonClass("danger")}
           >
-            <i className="fa-solid fa-trash"></i>
+            <i className="fa-solid fa-trash fa-fw" aria-hidden="true" />
           </button>
         )}
       </div>
@@ -110,7 +83,7 @@ const ImageField = ({
           <img
             src={previewUrl(value)}
             alt={label}
-            className="h-24 w-auto object-contain rounded-lg drop-shadow"
+            className="h-24 w-auto object-contain rounded-xl drop-shadow"
           />
         </div>
       )}

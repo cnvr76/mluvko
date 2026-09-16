@@ -69,7 +69,7 @@ const GameCard = ({ data, onFavoriteToggle }) => {
           className="
             relative aspect-[3/4]
             rounded-3xl p-4
-            surface-glass bg-white/20 border-white/30 shadow-card
+            bg-white/20 border-white/30 shadow-card
             flex flex-col items-center justify-between gap-4
           "
         >

@@ -1,6 +1,7 @@
 import React from "react";
 import AudioSources from "./AudioSources";
 import ImageField from "./ImageField";
+import ActionButton from "../../shared/ActionButton";
 
 const PexesoConfig = ({ configData, onChange }) => {
   const cards = configData.cards || [];
@@ -30,47 +31,24 @@ const PexesoConfig = ({ configData, onChange }) => {
     onChange({ ...configData, cards: newCards });
   };
 
-  const inputClassName = `
-    border
-    border-text
-    bg-white/70
-    p-3
-    rounded-xl
-    text-text
-    outline-none
-    placeholder:text-text/40
-    focus:border-accent
-  `;
+  const inputClassName = "field rounded-xl";
 
   return (
     <div className="flex flex-col gap-6">
       <div
         className="
-          flex justify-between items-center
-          bg-white/40
-          backdrop-blur-md
-          p-4
-          rounded-2xl
-          border border-white/40
+          flex flex-wrap gap-3 justify-between items-center
+          surface-glass bg-white/40 rounded-card p-4
         "
       >
-        <h3 className="text-xl font-bold text-text">
-          Kartičky Pexesa
-        </h3>
+        <h3 className="text-fluid-lg font-bold text-text">Kartičky Pexesa</h3>
 
         <button
           onClick={addCard}
-          className="
-            px-5 py-2.5
-            rounded-xl
-            bg-accent
-            hover:bg-accent-hover
-            text-white
-            font-bold
-            transition-all duration-200
-          "
+          className="btn-pill bg-accent hover:bg-accent-hover text-white text-fluid-sm font-bold shadow-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
-          + Pridať dvojicu
+          <i className="fa-solid fa-plus fa-fw" aria-hidden="true" />
+          Pridať dvojicu
         </button>
       </div>
 
@@ -80,21 +58,18 @@ const PexesoConfig = ({ configData, onChange }) => {
             key={index}
             className="
               relative
-              p-4
-              rounded-2xl
-              bg-white/75
-              backdrop-blur-md
-              border border-white/40
-              shadow-field
+              surface-glass bg-white/60 rounded-card p-4
               flex flex-col gap-3
             "
           >
-           <button
-              onClick={() => removeCard(index)}
-              className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs"
-            >
-              ✕
-            </button>
+            <div className="absolute -top-3 -right-3 z-10">
+              <ActionButton
+                icon="fa-xmark"
+                label="Odstrániť dvojicu"
+                tone="danger"
+                onClick={() => removeCard(index)}
+              />
+            </div>
 
             <div className="flex gap-3">
               <input
@@ -107,16 +82,7 @@ const PexesoConfig = ({ configData, onChange }) => {
               />
 
               <input
-                className="
-                  w-16
-                  border border-text/30
-                  bg-white/70
-                  p-3
-                  rounded-xl
-                  text-center
-                  text-gray-400
-                  font-semibold
-                "
+                className="field rounded-xl w-16 text-center text-text/50 font-semibold"
                 value={card.id}
                 disabled
               />
@@ -125,9 +91,7 @@ const PexesoConfig = ({ configData, onChange }) => {
             <ImageField
               placeholder="URL obrázku (/images/pexeso/...)"
               value={card.animal_image_url}
-              onChange={(value) =>
-                updateCard(index, "animal_image_url", value)
-              }
+              onChange={(value) => updateCard(index, "animal_image_url", value)}
               inputClassName={inputClassName}
             />
 

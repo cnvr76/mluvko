@@ -3,6 +3,7 @@ import { api } from "../../../services/api";
 import { deleteServerFile } from "../../../utils/mediaPaths";
 import { previewUrl } from "../../../utils/pendingMedia";
 import useApiMutation from "../../../hooks/useApiMutation";
+import { actionButtonClass } from "../../shared/actionButtonClass";
 
 const generateAndSwapAudio = async (
   trimmedText,
@@ -39,7 +40,10 @@ const TTSField = ({
   const handleGenerate = () => {
     const trimmed = text.trim();
     if (!trimmed) return;
-    generateMutation.mutate({ trimmedText: trimmed, previousPath: currentPath });
+    generateMutation.mutate({
+      trimmedText: trimmed,
+      previousPath: currentPath,
+    });
   };
 
   const handleClear = () => {
@@ -51,11 +55,11 @@ const TTSField = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 p-2 bg-gray-50 rounded border">
-      <label className="text-xs font-semibold text-gray-600">{label}</label>
-      <div className="flex gap-2">
+    <div className="flex flex-col gap-2 p-3 rounded-xl bg-white/50 border border-white/60">
+      <span className="text-fluid-sm font-semibold text-text/70">{label}</span>
+      <div className="flex flex-wrap gap-2">
         <input
-          className="flex-1 border p-1 text-sm rounded"
+          className="field rounded-xl text-fluid-sm flex-1 min-w-40 py-2"
           placeholder="Text pre generovanie..."
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -64,18 +68,14 @@ const TTSField = ({
           type="button"
           onClick={handleGenerate}
           disabled={isLoading}
-          className="
-            px-3 py-1.5
-            rounded-xl
-            bg-accent
-            hover:bg-accent-hover
-            text-white
-            transition-all duration-200
-            disabled:opacity-50
-            font-bold
-          "
+          aria-label="Generovať zvuk"
+          title="Generovať zvuk"
+          className={actionButtonClass("accent")}
         >
-          {isLoading ? "..." : "Generovať"}
+          <i
+            className={`fa-solid ${isLoading ? "fa-spinner fa-spin" : "fa-wand-magic-sparkles"} fa-fw`}
+            aria-hidden="true"
+          />
         </button>
       </div>
 
@@ -84,26 +84,16 @@ const TTSField = ({
           <audio
             src={previewUrl(currentPath)}
             controls
-            className="h-8 w-full"
+            className="h-9 w-full min-w-0"
           />
           <button
             type="button"
             onClick={handleClear}
             title="Vymazať nahrávku"
-            className="
-              shrink-0
-              px-3 py-2
-              rounded-lg
-              bg-danger-bg
-              hover:bg-danger-bg-hover
-              text-danger
-              text-xs
-              font-semibold
-              transition-all duration-200
-              aspect-square
-            "
+            aria-label="Vymazať nahrávku"
+            className={actionButtonClass("danger")}
           >
-            <i className="fa-solid fa-trash"></i>
+            <i className="fa-solid fa-trash fa-fw" aria-hidden="true" />
           </button>
         </div>
       )}

@@ -88,7 +88,7 @@ body {
 }
 
 #root {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .react-card-flip {

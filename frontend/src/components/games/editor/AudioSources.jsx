@@ -24,7 +24,7 @@ const AudioSources = ({ label, currentPath, onChange, defaultText = "" }) => {
       />
 
       <div className="flex flex-wrap items-center gap-2 pl-1">
-        <span className="text-[10px] uppercase font-semibold text-gray-400">
+        <span className="text-fluid-sm uppercase font-semibold text-text/50">
           alebo:
         </span>
         <UploadAudioField onAudioChange={onChange} />

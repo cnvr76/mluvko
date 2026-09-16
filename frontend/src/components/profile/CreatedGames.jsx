@@ -1,10 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import useCreatedGames from "../../hooks/profile/useCreatedGames";
-import ActionButton from "./ActionButton";
+import ActionButton from "../shared/ActionButton";
 import PanelHeader from "./PanelHeader";
-import Notice from "./Notice";
-import { actionButtonClass } from "./actionButtonClass";
+import Notice from "../shared/Notice";
+import { actionButtonClass } from "../shared/actionButtonClass";
 
 const CreatedGames = () => {
   const {
