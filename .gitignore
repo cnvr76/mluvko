@@ -1,6 +1,7 @@
 # sqltools
 *.vscode
 # *.sql
+.claude
 
 # Logs
 logs

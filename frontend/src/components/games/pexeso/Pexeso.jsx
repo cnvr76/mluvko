@@ -52,40 +52,31 @@ const Pexeso = ({ gameId, snapshotId }) => {
   if (isFinished)
     return <EndGameScreen bestScore={bestScore} currentScore={finalScore} />;
 
+  const boardPlacement = isPreviewing
+    ? "col-span-full justify-self-center"
+    : "col-span-2 justify-self-center xl:col-span-1 xl:col-start-2 xl:row-start-1";
+
   return (
-    <section className="w-full flex justify-center px-3 sm:px-6">
-      <div className="relative w-fit mx-auto">
+    <section className="w-full flex justify-center">
+      <div className="w-[min(90vw,40rem)] xl:w-full grid grid-cols-2 xl:grid-cols-[1fr_auto_1fr] items-center gap-x-4 xl:gap-x-10 gap-y-2">
         {isPreviewing ? (
-          <h2
-            className="absolute left-1/2 -translate-x-1/2 -top-10 sm:-top-12
-          text-xl sm:text-3xl font-bold text-[#642f37] text-center
-          leading-tight whitespace-nowrap"
-          >
+          <h2 className="col-span-full text-center text-fluid-3xl font-bold text-text">
             Zapamätaj si kartičky!
           </h2>
         ) : (
           <>
-            <h2 className="hidden md:block absolute -left-10 top-1/2 -translate-x-full -translate-y-1/2 pr-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+            <h2 className="text-fluid-3xl xl:text-fluid-5xl font-bold text-text xl:col-start-1 xl:row-start-1 xl:justify-self-end">
               Nájdi páry!
             </h2>
-
-            <h2 className="hidden md:block absolute -right-10 top-1/2 translate-x-full -translate-y-1/2 pl-6 text-5xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
+            <h2 className="text-fluid-3xl xl:text-fluid-5xl font-bold text-text whitespace-nowrap justify-self-end xl:col-start-3 xl:row-start-1 xl:justify-self-start">
               Pohybov: {moves}
             </h2>
-
-            {/* телефон  */}
-            <div className="md:hidden mb-1 flex items-end justify-between gap-3">
-              <h2 className="text-xl font-bold text-[#642f37] leading-tight">
-                Nájdi páry!
-              </h2>
-              <h2 className="text-xl font-bold text-[#642f37] leading-tight whitespace-nowrap">
-                Pohybov: {moves}
-              </h2>
-            </div>
           </>
         )}
 
-        <div className="grid w-fit mx-auto grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4 place-items-center">
+        <div
+          className={`${boardPlacement} w-[min(90vw,40rem)] grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-4`}
+        >
           {cards.map((card) => (
             <FlipCard
               key={`${card.id}${card.matchId}`}

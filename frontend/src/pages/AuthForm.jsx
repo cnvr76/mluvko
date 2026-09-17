@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../contexts/AuthContext";
-import { useLocation } from "react-router-dom";
 import { useQueryState, parseAsStringLiteral } from "nuqs";
 import PageLoading from "../components/loading/PageLoading";
 import useMediaReady from "../hooks/useMediaReady";
@@ -12,7 +12,6 @@ const AUTH_TYPES = ["login", "signup"];
 
 const AuthForm = () => {
   const { login, signup } = useAuth();
-  const location = useLocation();
 
   const [type, setType] = useQueryState(
     "type",
@@ -23,84 +22,40 @@ const AuthForm = () => {
     email: "",
     password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isPwdVisible, setIsPwdVisible] = useState(false);
 
   const isMediaReady = useMediaReady(AUTH_MEDIA);
   const isLoginMode = type !== "signup";
-  const from = location.state?.from?.pathname || "/";
-
-  const inputClassName = `
-    w-full
-    rounded-full
-    bg-white/50
-    border border-white/60
-    px-5 py-3
-    text-[#642f37]
-    placeholder:text-[#642f37]/60
-    outline-none
-    shadow-[0_4px_15px_rgba(0,0,0,0.08)]
-    focus:bg-white/70
-  `;
-
-  const buttonClassName = `
-    mt-3
-    px-8 py-4
-    rounded-full
-    bg-white/40
-    backdrop-blur-xl
-    border border-white/50
-    shadow-[0_4px_20px_rgba(0,0,0,0.15)]
-    font-semibold text-xl
-    text-[#642f37]
-    transition-all duration-200
-    hover:scale-105
-    active:scale-95
-    hover:bg-white/50
-    hover:text-[#ff7110]
-    disabled:opacity-60
-  `;
-
-  const linkButtonClassName = `
-    bg-transparent
-    border-none
-    font-semibold
-    text-[#ff7110]
-    cursor-pointer
-    hover:text-[#642f37]
-  `;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    let result;
-
-    if (isLoginMode) {
-      result = await login(formData.email, formData.password);
-    } else {
-      result = await signup(
+  const submitMutation = useMutation({
+    mutationFn: async () => {
+      if (isLoginMode) {
+        return login(formData.email, formData.password);
+      }
+      const signupResult = await signup(
         formData.username,
         formData.email,
         formData.password,
       );
+      return signupResult.success
+        ? login(formData.email, formData.password)
+        : signupResult;
+    },
+  });
+  const isLoading = submitMutation.isPending;
 
-      if (result.success) {
-        result = await login(formData.email, formData.password);
-      }
-    }
-
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    const result = await submitMutation.mutateAsync();
     if (!result.success) {
       setError(result.error);
     }
-
-    setIsLoading(false);
   };
 
   const toggleMode = () => {
@@ -112,31 +67,21 @@ const AuthForm = () => {
   if (!isMediaReady) return <PageLoading />;
 
   return (
-    <main
-      className="
-        w-screen h-screen
-        bg-cover bg-no-repeat bg-center
-        flex items-center justify-center
-        px-4
-      "
-      style={{
-        backgroundImage: `url('${APP_BACKGROUND}')`,
-      }}
-    >
+    <main className="relative isolate w-full min-h-dvh flex items-center justify-center px-4 py-page-top">
+      <div
+        className="fixed inset-0 -z-10 bg-cover bg-no-repeat bg-center"
+        style={{ backgroundImage: `url('${APP_BACKGROUND}')` }}
+      />
+
       <section
         className="
           w-full max-w-md
-          rounded-[2rem]
-          bg-white/30
-          backdrop-blur-xl
-          border border-white/40
-          shadow-[0_4px_30px_rgba(0,0,0,0.18)]
-          px-8 py-10
-          text-center
-          text-[#642f37]
+          surface-glass rounded-panel shadow-panel-strong
+          px-6 sm:px-8 py-10
+          text-center text-text
         "
       >
-        <h2 className="text-3xl font-extrabold mb-8 drop-shadow">
+        <h2 className="text-fluid-3xl font-extrabold mb-8 drop-shadow">
           {isLoginMode ? "Prihlásiť sa" : "Registrácia"}
         </h2>
 
@@ -149,7 +94,7 @@ const AuthForm = () => {
               value={formData.username}
               onChange={handleChange}
               required={!isLoginMode}
-              className={inputClassName}
+              className="field rounded-full"
             />
           )}
 
@@ -160,10 +105,10 @@ const AuthForm = () => {
             value={formData.email}
             onChange={handleChange}
             required
-            className={inputClassName}
+            className="field rounded-full"
           />
 
-          <div className="flex relative h-full">
+          <div className="relative">
             <input
               type={isPwdVisible ? "text" : "password"}
               name="password"
@@ -171,27 +116,35 @@ const AuthForm = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              className={inputClassName + "pr-12"}
+              className="field rounded-full pr-12"
             />
             <button
               type="button"
-              className="absolute right-4 top-3.5 w-5"
               onClick={() => setIsPwdVisible((prev) => !prev)}
+              aria-label={isPwdVisible ? "Skryť heslo" : "Zobraziť heslo"}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-text hover:text-accent transition-colors duration-200 cursor-pointer"
             >
               <i
-                className={`fa-solid fa-eye${isPwdVisible ? "-slash" : ""}`}
-              ></i>
+                className={`fa-solid fa-eye${isPwdVisible ? "-slash" : ""} fa-fw`}
+                aria-hidden="true"
+              />
             </button>
           </div>
 
           {error && (
-            <p className="text-sm font-semibold text-red-600 -mt-1">{error}</p>
+            <p className="text-fluid-sm font-semibold text-danger -mt-1">{error}</p>
           )}
 
           <button
             type="submit"
             disabled={isLoading}
-            className={buttonClassName}
+            className="
+              btn-pill surface-glass bg-white/40 border-white/50 shadow-control
+              mt-3 px-8 py-4
+              text-fluid-xl text-text
+              hover:bg-white/50 hover:text-accent
+              focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent
+            "
           >
             {isLoading
               ? "Načítava sa..."
@@ -201,13 +154,13 @@ const AuthForm = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center text-[#642f37]">
+        <div className="mt-6 text-center text-fluid-lg text-text">
           {isLoginMode ? "Nemáte účet? " : "Už máte účet? "}
 
           <button
             type="button"
             onClick={toggleMode}
-            className={linkButtonClassName}
+            className="font-semibold text-accent hover:text-text cursor-pointer"
           >
             {isLoginMode ? "Vytvoriť účet" : "Prihlásiť sa"}
           </button>

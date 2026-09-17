@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import useFavoriteGames from "../../hooks/profile/useFavoriteGames";
 import GameCard from "../shared/GameCard";
 import PageLoading from "../loading/PageLoading";
+import PanelHeader from "./PanelHeader";
 
 const FavoriteGames = () => {
   const { games, isLoading, handleFavoriteToggle } = useFavoriteGames();
@@ -10,18 +11,14 @@ const FavoriteGames = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
-        <h2 className="text-3xl font-bold">Obľúbené hry</h2>
+        <PanelHeader title="Obľúbené hry" />
 
         <div
           className="
-          rounded-[2rem]
-          bg-white/30
-          backdrop-blur-xl
-          border border-white/40
-          shadow-[0_4px_20px_rgba(0,0,0,0.12)]
+          surface-glass rounded-card
           p-8
           text-center
-          text-[#642f37]
+          text-text
           font-semibold
         "
         >
@@ -34,20 +31,17 @@ const FavoriteGames = () => {
   if (games.length === 0)
     return (
       <div className="flex flex-col gap-4">
-        <h2 className="text-3xl font-extrabold drop-shadow">Obľúbené hry</h2>
+        <PanelHeader title="Obľúbené hry" />
 
         <div
           className="
-            rounded-[2rem]
-            bg-white/30
-            backdrop-blur-xl
-            border border-white/40
-            p-10
+            surface-glass rounded-card
+            p-8
             text-center
-            text-[#642f37]
+            text-text
           "
         >
-          <p className="text-xl font-bold mb-2">
+          <p className="text-fluid-xl font-bold mb-2">
             Momentálne nemáš žiadne obľúbené hry
           </p>
 
@@ -58,17 +52,7 @@ const FavoriteGames = () => {
 
           <Link
             to="/"
-            className="
-              inline-block
-              px-6 py-3
-              rounded-xl
-              bg-[#ff7110]
-              hover:bg-[#e9650c]
-              text-white
-              font-bold
-              no-underline
-              transition-all duration-200
-            "
+            className="btn-pill bg-accent hover:bg-accent-hover text-white font-bold shadow-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             Objaviť hry
           </Link>
@@ -78,7 +62,7 @@ const FavoriteGames = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <h2 className="text-3xl font-extrabold drop-shadow">Obľúbené hry</h2>
+      <PanelHeader title="Obľúbené hry" />
 
       <div
         className="

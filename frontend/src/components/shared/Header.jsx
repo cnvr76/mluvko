@@ -1,93 +1,152 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-const Header = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleMenu = () => setIsOpen((prev) => !prev);
-  const { isAuthenticated, logout } = useAuth();
+const MENU_ITEMS = [
+  { key: "contact", label: "Kontakt", to: null },
+  { key: "about", label: "O nás", to: null },
+];
+
+const BAR_ITEM_CLASS =
+  "flex items-center gap-2 font-semibold text-fluid-2xl leading-none text-text no-underline whitespace-nowrap transition-colors duration-200 hover:text-accent cursor-pointer";
+
+const BAR_ICON_CLASS = "fa-fw shrink-0 text-fluid-xl -translate-y-[0.14em]";
+
+const PANEL_ITEM_CLASS =
+  "block w-full text-left rounded-full px-6 py-3 font-semibold text-fluid-2xl leading-none text-text no-underline bg-white/30 transition-colors duration-200 hover:text-accent cursor-pointer";
+
+const renderMenuItems = (itemClass) =>
+  MENU_ITEMS.map(({ key, label, to }) =>
+    to ? (
+      <Link key={key} to={to} className={itemClass}>
+        {label}
+      </Link>
+    ) : (
+      <span key={key} className={itemClass}>
+        {label}
+      </span>
+    ),
+  );
+
+const AccountControls = () => {
+  const { isAuthenticated, username, logout } = useAuth();
+
+  if (!isAuthenticated)
+    return (
+      <Link to="/auth?type=signup" className={BAR_ITEM_CLASS}>
+        Prihláste sa
+      </Link>
+    );
 
   return (
-    <header
-      className="
-        fixed top-0 left-0
-        w-full h-16 md:h-20
-        flex items-center justify-between
-        px-4 py-3 md:px-6 md:py-6
-        z-50
-        bg-transparent
-      "
-    >
-      <Link to="/">
-        <img src="/images/logo.png" alt="Logo" className="h-8 w-auto" />
+    <>
+      <Link to="/profile" className={`${BAR_ITEM_CLASS} min-w-0`}>
+        <i
+          className={`fa-solid fa-user ${BAR_ICON_CLASS}`}
+          aria-hidden="true"
+        />
+        <span className="truncate max-w-[clamp(3rem,18vw,12rem)]">
+          {username}
+        </span>
       </Link>
-
-      {/* desktop */}
-      <nav className="hidden md:flex gap-8 mr-4 font-[600] text-[#642f37]">
-        <h3 className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]">
-          Kontakt
-        </h3>
-        <Link
-          to="/auth?type=signup"
-          className="text-lg md:text-2xl m-0 transition-colors duration-300 cursor-pointer hover:text-[#ff7110]"
-        >
-          {isAuthenticated
-            ? `Konto (${localStorage.getItem("username")})`
-            : "Prihláste sa"}
-        </Link>
-        {isAuthenticated && (
-          <button
-            onClick={logout}
-            className="cursor-pointer hover:text-[#ff7110] transition-colors duration-300"
-          >
-            <i className="fa-solid fa-right-from-bracket text-2xl"></i>
-          </button>
-        )}
-      </nav>
-
-      {/* burger */}
       <button
         type="button"
-        onClick={toggleMenu}
-        className="md:hidden flex flex-col gap-1.5 mr-1"
-        aria-label="Otvoriť menu"
+        onClick={logout}
+        aria-label="Odhlásiť sa"
+        className={BAR_ITEM_CLASS}
       >
-        <span className="w-6 h-0.5 bg-[#642f37] rounded-full" />
-        <span className="w-6 h-0.5 bg-[#642f37] rounded-full" />
-        <span className="w-6 h-0.5 bg-[#642f37] rounded-full" />
+        <i
+          className={`fa-solid fa-right-from-bracket ${BAR_ICON_CLASS}`}
+          aria-hidden="true"
+        />
       </button>
+    </>
+  );
+};
 
-      {/* mobile dropdown */}
-      {isOpen && (
-        <nav
-          className="
-            md:hidden
-            absolute top-full right-0 mt-2 mr-4
-            bg-white/90 backdrop-blur-xl
-            rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.15)]
-            flex flex-col items-start gap-3
-            px-5 py-4 font-[600]
-          "
-        >
-          <button
-            onClick={() => setIsOpen(false)}
-            className="self-end text-sm text-[#642f37]"
-          >
-            ✕
-          </button>
+const Header = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const panelRef = useRef(null);
 
-          <h3 className="text-lg text-[#642f37] m-0 hover:text-[#ff7110]">
-            Aktuality
-          </h3>
-          <h3 className="text-lg text-[#642f37] m-0 hover:text-[#ff7110]">
-            Všetky hry
-          </h3>
-          <h3 className="text-lg text-[#642f37] m-0 hover:text-[#ff7110]">
-            Kontakt
-          </h3>
+  useEffect(() => setIsMenuOpen(false), [location.key]);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+
+    const closeOnEscape = (event) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    panelRef.current?.focus();
+
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isMenuOpen]);
+
+  return (
+    <>
+      <header className="fixed inset-x-0 top-0 z-50 h-header grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-6 px-4 sm:px-6">
+        <Link to="/" className="col-start-1 justify-self-start shrink-0">
+          <img
+            src="/images/logo.png"
+            alt="Mluvko"
+            className="h-7 sm:h-8 w-auto"
+          />
+        </Link>
+
+        <nav className="col-start-2 hidden md:flex items-center gap-6">
+          {renderMenuItems(BAR_ITEM_CLASS)}
         </nav>
-      )}
-    </header>
+
+        <div className="col-start-3 justify-self-end flex items-center gap-4 min-w-0">
+          <AccountControls />
+
+          <button
+            type="button"
+            onClick={() => setIsMenuOpen(true)}
+            className={`${BAR_ITEM_CLASS} md:hidden`}
+            aria-label="Otvoriť menu"
+            aria-expanded={isMenuOpen}
+            aria-controls="site-menu"
+          >
+            <i
+              className={`fa-solid fa-bars ${BAR_ICON_CLASS}`}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+      </header>
+
+      <div
+        onClick={() => setIsMenuOpen(false)}
+        className={`md:hidden fixed inset-0 z-50 bg-text/25 backdrop-blur-[2px] transition-opacity duration-300 ${
+          isMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+        aria-hidden="true"
+      />
+
+      <nav
+        id="site-menu"
+        ref={panelRef}
+        tabIndex={-1}
+        inert={!isMenuOpen}
+        aria-label="Hlavné menu"
+        className={`md:hidden fixed top-3 right-3 bottom-3 z-50 w-[min(78vw,17rem)] surface-glass bg-white/45 rounded-panel shadow-panel-strong flex flex-col gap-3 p-3 transition-transform duration-300 ease-out outline-none ${
+          isMenuOpen ? "translate-x-0" : "translate-x-[calc(100%+0.75rem)]"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen(false)}
+          aria-label="Zavrieť menu"
+          className="self-end shrink-0 size-10 rounded-full surface-glass bg-white/40 hover:bg-white/70 text-fluid-xl text-text hover:text-accent transition-colors duration-200 cursor-pointer"
+        >
+          <i className="fa-solid fa-xmark fa-fw" aria-hidden="true" />
+        </button>
+
+        {renderMenuItems(PANEL_ITEM_CLASS)}
+      </nav>
+    </>
   );
 };
 

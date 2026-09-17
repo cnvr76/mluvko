@@ -26,6 +26,9 @@ const attemptSilentLogin = async (refreshSession) => {
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState(
+    () => localStorage.getItem("username") ?? "",
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isTherapist, setIsTherapist] = useState(false);
@@ -48,6 +51,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     clearAccessToken();
     localStorage.removeItem("username");
+    setUsername("");
     setIsAuthenticated(false);
     await api.auth.logout();
   };
@@ -59,6 +63,7 @@ export const AuthProvider = ({ children }) => {
       setAccessToken(tokens.access_token);
       localStorage.setItem("username", user.username);
       localStorage.setItem("role", user.role);
+      setUsername(user.username);
       applyRole(user.role);
 
       return { success: true, username: user.username };
@@ -102,7 +107,11 @@ export const AuthProvider = ({ children }) => {
     const initAuth = async () => {
       // no valid refresh cookie -> attemptSilentLogin returns null -> just not authenticated
       const user = await attemptSilentLogin(refreshSession);
-      if (user) applyRole(user.role);
+      if (user) {
+        localStorage.setItem("username", user.username);
+        setUsername(user.username);
+        applyRole(user.role);
+      }
       setIsLoading(false);
     };
 
@@ -111,6 +120,7 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     isAuthenticated,
+    username,
     isAdmin,
     isTherapist,
     isLoading,

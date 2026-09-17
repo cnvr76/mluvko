@@ -1,28 +1,28 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "../services/api";
 import { useAuth } from "../contexts/AuthContext";
-import { useLocation, useNavigate } from "react-router-dom";
+import useRequireAuth from "./useRequireAuth";
+import useApiMutation from "./useApiMutation";
+import { savePendingScore } from "../utils/pendingScore";
 
-const fetchBestScore = async (gameId, score) => {
+const submitScore = async (mutateAsync, score) => {
   try {
-    const response = await api.games.updateStats(gameId, score);
-    return Math.round(response?.best_score * 100) / 100;
-  } catch (error) {
-    console.error("Failed to update game score:", error);
-    return score;
+    const response = await mutateAsync(score);
+    return { best: Math.round(response?.best_score * 100) / 100, saved: true };
+  } catch {
+    return { best: score, saved: false };
   }
 };
 
 const useGameSession = (gameId, snapshotId) => {
   const { isAuthenticated } = useAuth();
-  const [isSaving, setIsSaving] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [finalScore, setFinalScore] = useState(null);
   const [bestScore, setBestScore] = useState(null);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const requireAuthOrRedirect = useRequireAuth();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["game", gameId, snapshotId],
@@ -33,34 +33,46 @@ const useGameSession = (gameId, snapshotId) => {
     enabled: Boolean(gameId),
   });
 
-  const requireAuthOrRedirect = () => {
-    if (!isAuthenticated) {
-      navigate("/auth?type=login", {
-        state: { from: location },
-        replace: true,
-      });
-      return true;
-    }
-    return false;
-  };
+  const updateStatsMutation = useApiMutation(
+    (score) => api.games.updateStats(gameId, score),
+    { errorMessage: "Nepodarilo sa uložiť skóre." },
+  );
+  const updateStats = updateStatsMutation.mutateAsync;
 
-  const finishGame = async (score) => {
-    if (requireAuthOrRedirect()) return;
+  const hasFinishedRef = useRef(false);
 
-    setIsSaving(true);
+  const showResult = useCallback((score, best) => {
+    hasFinishedRef.current = true;
     setFinalScore(score);
-    setBestScore(score);
+    setBestScore(best);
     setIsFinished(true);
-    const finalBestScore = await fetchBestScore(gameId, score);
-    setBestScore(finalBestScore);
-    setIsSaving(false);
-  };
+  }, []);
+
+  const finishGame = useCallback(
+    async (score) => {
+      if (hasFinishedRef.current) return;
+
+      showResult(score, score);
+
+      if (!isAuthenticated) {
+        savePendingScore(gameId, score);
+        return;
+      }
+
+      const { best, saved } = await submitScore(updateStats, score);
+      setBestScore(best);
+      if (saved) {
+        toast.success(`Výsledok ${score} sme uložili k vášmu profilu.`);
+      }
+    },
+    [gameId, isAuthenticated, showResult, updateStats],
+  );
 
   return {
     data,
     isLoading,
     error,
-    isSaving,
+    isSaving: updateStatsMutation.isPending,
     isFinished,
     isAuthenticated,
     finalScore,

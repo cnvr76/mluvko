@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { makePending, PENDING_AUDIO } from "../../../utils/pendingMedia";
+import { actionButtonClass } from "../../shared/actionButtonClass";
 
 const UploadAudioField = ({ onAudioChange }) => {
   const inputRef = useRef(null);
@@ -24,17 +25,11 @@ const UploadAudioField = ({ onAudioChange }) => {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="
-          px-3 py-1.5
-          rounded-xl
-          bg-[#9DBBD8]
-          hover:bg-[#88a9c9]
-          text-white
-          text-sm font-semibold
-          transition-all duration-200
-        "
+        aria-label="Nahrať zvuk zo súboru"
+        title="Nahrať zvuk zo súboru"
+        className={actionButtonClass("blue")}
       >
-        <i className="fa-solid fa-folder-open"></i>
+        <i className="fa-solid fa-folder-open fa-fw" aria-hidden="true" />
       </button>
     </>
   );

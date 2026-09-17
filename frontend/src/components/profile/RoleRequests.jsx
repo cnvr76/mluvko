@@ -1,7 +1,11 @@
 import React from "react";
 import { toast } from "sonner";
 import { api, RoleLabels } from "../../services/api";
-import useRoleRequests from "../../hooks/profile/useRoleRequests";
+import useManagedList from "../../hooks/profile/useManagedList";
+import ActionButton from "../shared/ActionButton";
+import PanelHeader from "./PanelHeader";
+import Notice from "../shared/Notice";
+import FilterChips from "./FilterChips";
 
 const STATUS_LABELS = {
   pending: "Čaká",
@@ -10,14 +14,32 @@ const STATUS_LABELS = {
 };
 
 const STATUS_BADGE = {
-  pending: "bg-[#F7C767] text-white",
-  approved: "bg-[#a5ad24] text-white",
-  rejected: "bg-[#ffe5e5] text-[#d62828]",
+  pending: "bg-yellow text-white",
+  approved: "bg-success text-white",
+  rejected: "bg-danger-bg text-danger",
 };
 
+const STATUS_FILTERS = [
+  ...Object.keys(STATUS_LABELS).map((value) => ({
+    value,
+    label: STATUS_LABELS[value].toUpperCase(),
+  })),
+  { value: "all", label: "VŠETKY" },
+];
+
+const REQUESTS_KEY = ["role-requests", "all"];
+
 const RoleRequests = () => {
-  const { requests, isLoading, statusFilter, setStatusFilter, handleAction } =
-    useRoleRequests();
+  const {
+    items: requests,
+    isLoading,
+    statusFilter,
+    setStatusFilter,
+    handleAction,
+  } = useManagedList({
+    queryKey: REQUESTS_KEY,
+    queryFn: api.roleRequests.all,
+  });
 
   const filteredRequests = requests.filter((r) => {
     if (statusFilter === "all") return true;
@@ -27,20 +49,9 @@ const RoleRequests = () => {
   if (isLoading) {
     return (
       <div className="flex flex-col gap-4">
-        <h2 className="text-3xl font-extrabold drop-shadow">Žiadosti o rolu</h2>
+        <PanelHeader title="Žiadosti o rolu" />
 
-        <div
-          className="
-            rounded-[2rem]
-            bg-white/30
-            backdrop-blur-xl
-            border border-white/40
-            p-10
-            text-center
-            text-[#642f37]
-            font-semibold
-          "
-        >
+        <div className="surface-glass rounded-card p-8 text-center text-text font-semibold">
           Načítavam žiadosti...
         </div>
       </div>
@@ -48,138 +59,99 @@ const RoleRequests = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-4">
-      <div className="flex flex-col gap-4 bg-white p-4 rounded-xl shadow-sm md:flex-row md:justify-between md:items-center">
-        <h2 className="text-2xl font-extrabold drop-shadow">
-          Žiadosti o rolu logopéda
-        </h2>
-
-        <div className="flex gap-2 bg-gray-100 p-1 rounded-xl">
-          {["pending", "approved", "rejected", "all"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                statusFilter === status
-                  ? "bg-[#F3904B] text-white"
-                  : "text-gray-500 hover:text-[#ff7110] hover:bg-white"
-              }`}
-            >
-              {status === "all" ? "VŠETKY" : STATUS_LABELS[status].toUpperCase()}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="flex flex-col gap-6">
+      <PanelHeader title="Žiadosti o rolu">
+        <FilterChips
+          options={STATUS_FILTERS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          label="Filter podľa stavu žiadosti"
+        />
+      </PanelHeader>
 
       <div className="flex flex-col gap-4">
         {filteredRequests.length > 0 ? (
           filteredRequests.map((request) => (
             <div
               key={request.id}
-              className="
-                bg-white
-                border border-[#642f37]/40
-                rounded-xl
-                p-4
-                shadow-sm
-                flex flex-col gap-3
-                lg:flex-row lg:justify-between lg:items-center
-              "
+              className="surface-glass bg-white/40 rounded-card p-4 flex flex-col gap-3"
             >
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-3">
-                  <h4 className="font-bold text-lg">{request.username}</h4>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex flex-col gap-1 min-w-0">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <h4 className="font-bold text-fluid-lg">
+                      {request.username}
+                    </h4>
 
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                      STATUS_BADGE[request.status]
-                    }`}
-                  >
-                    {STATUS_LABELS[request.status]}
-                  </span>
+                    <span
+                      className={`text-fluid-sm px-2.5 py-0.5 rounded-full font-bold ${
+                        STATUS_BADGE[request.status]
+                      }`}
+                    >
+                      {STATUS_LABELS[request.status]}
+                    </span>
+                  </div>
+
+                  <p className="text-fluid-sm text-text/60 break-words">
+                    {request.email} • {RoleLabels[request.current_role]} →{" "}
+                    <span className="font-semibold text-text">
+                      {RoleLabels[request.requested_role]}
+                    </span>{" "}
+                    • {new Date(request.created_at).toLocaleDateString()}
+                  </p>
                 </div>
 
-                <p className="text-sm text-gray-500">
-                  {request.email} • {RoleLabels[request.current_role]} →{" "}
-                  <span className="font-semibold text-[#642f37]">
-                    {RoleLabels[request.requested_role]}
-                  </span>{" "}
-                  • {new Date(request.created_at).toLocaleDateString()}
-                </p>
+                {request.status === "pending" && (
+                  <div className="flex gap-2 shrink-0">
+                    <ActionButton
+                      icon="fa-check"
+                      label="Schváliť žiadosť"
+                      tone="success"
+                      onClick={() => {
+                        const isConfirmed = window.confirm(
+                          `Schváliť žiadosť používateľa „${request.username}“ a zmeniť mu rolu na ${RoleLabels[request.requested_role]}?`,
+                        );
+                        if (isConfirmed) {
+                          handleAction(api.roleRequests.approve, request.id);
+                        }
+                      }}
+                    />
 
-                {request.status === "rejected" && request.admin_feedback && (
-                  <p className="text-xs text-red-500 mt-1 italic">
-                    Feedback: {request.admin_feedback}
-                  </p>
+                    <ActionButton
+                      icon="fa-xmark"
+                      label="Zamietnuť žiadosť"
+                      tone="danger"
+                      onClick={() => {
+                        const reason = prompt("Dôvod zamietnutia:");
+                        if (reason === null) return;
+                        if (reason.trim().length < 3) {
+                          toast.error("Dôvod musí mať aspoň 3 znaky!");
+                          return;
+                        }
+                        handleAction(
+                          api.roleRequests.reject,
+                          request.id,
+                          reason,
+                        );
+                      }}
+                    />
+                  </div>
                 )}
               </div>
 
-              {request.status === "pending" && (
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      const isConfirmed = window.confirm(
-                        `Schváliť žiadosť používateľa „${request.username}“ a zmeniť mu rolu na ${RoleLabels[request.requested_role]}?`,
-                      );
-                      if (isConfirmed) {
-                        handleAction(api.roleRequests.approve, request.id);
-                      }
-                    }}
-                    className="
-                      px-4 py-2
-                      rounded-xl
-                      bg-[#a5ad24]
-                      hover:bg-[#92991f]
-                      text-white
-                      text-sm
-                      font-semibold
-                      transition-all duration-200
-                    "
-                  >
-                    Schváliť
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      const reason = prompt("Dôvod zamietnutia:");
-                      if (reason === null) return;
-                      if (reason.trim().length < 3) {
-                        toast.error("Dôvod musí mať aspoň 3 znaky!");
-                        return;
-                      }
-                      handleAction(api.roleRequests.reject, request.id, reason);
-                    }}
-                    className="
-                      px-4 py-2
-                      rounded-xl
-                      bg-[#ffe5e5]
-                      hover:bg-[#ffd6d6]
-                      text-[#d62828]
-                      text-sm
-                      font-semibold
-                      transition-all duration-200
-                    "
-                  >
-                    Zamietnuť
-                  </button>
-                </div>
+              {request.status === "rejected" && request.admin_feedback && (
+                <Notice tone="danger" title="Dôvod">
+                  {request.admin_feedback}
+                </Notice>
               )}
             </div>
           ))
         ) : (
-          <div
-            className="
-              text-center
-              py-20
-              text-[#642f37]/60
-              bg-white/40
-              rounded-[2rem]
-              border border-white/40
-              backdrop-blur-xl
-            "
-          >
-            <p className="text-xl font-bold mb-2">Žiadne žiadosti na zobrazenie</p>
-            <p className="text-sm">pre filter: {statusFilter}</p>
+          <div className="surface-glass bg-white/40 rounded-card text-center py-12 text-text/60">
+            <p className="text-fluid-xl font-bold mb-2">
+              Žiadne žiadosti na zobrazenie
+            </p>
+            <p className="text-fluid-sm">pre filter: {statusFilter}</p>
           </div>
         )}
       </div>
